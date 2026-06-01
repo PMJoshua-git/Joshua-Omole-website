@@ -3,8 +3,11 @@ import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-d
 import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';
+import Training from './pages/Training';
 import Audit from './pages/Audit';
 import Contact from './pages/Contact';
+import Connect from './pages/Connect';
+import Newsletter from './pages/Newsletter';
 import FloatingAssistant from './components/FloatingAssistant';
 
 // Scroll to top component
@@ -27,8 +30,11 @@ const App: React.FC = () => {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/services" element={<Services />} />
+        <Route path="/training" element={<Training />} />
         <Route path="/audit" element={<Audit />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/connect" element={<Connect />} />
+        <Route path="/newsletter" element={<Newsletter />} />
       </Routes>
     </Router>
   );

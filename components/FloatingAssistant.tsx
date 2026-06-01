@@ -99,7 +99,7 @@ const FloatingAssistant: React.FC = () => {
                 <iframe 
                     id="JotFormIFrame-019b3f0fa49d753791c4f0020584579e405a" 
                     title="Chatbot: Service Advisor"
-                    allowTransparency={true}
+                    allowtransparency="true"
                     allow="geolocation; microphone; camera; fullscreen"
                     src="https://agent.jotform.com/019b3f0fa49d753791c4f0020584579e405a?embedMode=iframe&background=1&shadow=1"
                     frameBorder="0"

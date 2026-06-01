@@ -4,7 +4,10 @@ export const ROUTES: RouteItem[] = [
   { name: 'Home', path: '/' },
   { name: 'About', path: '/about' },
   { name: 'Services', path: '/services' },
+  { name: 'Training', path: '/training' },
   { name: 'Audit', path: '/audit' },
+  { name: 'Connect', path: '/connect' },
+  { name: 'Newsletter', path: '/newsletter' },
   { name: 'Contact', path: '/contact' },
 ];
 

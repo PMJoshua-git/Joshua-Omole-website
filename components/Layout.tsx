@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Navigation from './Navigation';
 import { ChildrenProps } from '../types';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../constants';
 import { Linkedin, Facebook } from 'lucide-react';
+import NewsletterModal from './NewsletterModal';
 
 const XIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -18,6 +19,50 @@ const MediumIcon = ({ className }: { className?: string }) => (
 );
 
 const Layout: React.FC<ChildrenProps> = ({ children }) => {
+  const [isNewsletterModalOpen, setIsNewsletterModalOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const hasSubscribed = localStorage.getItem('newsletter_subscribed') === 'true';
+    if (hasSubscribed) return;
+
+    const hasClosed = sessionStorage.getItem('newsletter_closed') === 'true';
+    
+    // Only show timer popup on homepage
+    if (location.pathname === '/' && !hasClosed) {
+      const timer = setTimeout(() => {
+        setIsNewsletterModalOpen(true);
+      }, 12000);
+      return () => clearTimeout(timer);
+    }
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handleMouseLeave = (e: MouseEvent) => {
+      const hasSubscribed = localStorage.getItem('newsletter_subscribed') === 'true';
+      if (hasSubscribed) return;
+
+      // Check if mouse left the top of the viewport (exit intent)
+      if (e.clientY <= 0) {
+        const exitShown = sessionStorage.getItem('exit_intent_shown') === 'true';
+        const excludedPaths = ['/newsletter', '/connect', '/contact'];
+        
+        if (!exitShown && !excludedPaths.includes(location.pathname)) {
+          setIsNewsletterModalOpen(true);
+          sessionStorage.setItem('exit_intent_shown', 'true');
+        }
+      }
+    };
+
+    document.addEventListener('mouseleave', handleMouseLeave);
+    return () => document.removeEventListener('mouseleave', handleMouseLeave);
+  }, [location.pathname]);
+
+  const handleCloseModal = () => {
+    setIsNewsletterModalOpen(false);
+    sessionStorage.setItem('newsletter_closed', 'true');
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-obsidian text-white font-sans antialiased selection:bg-purple/30 selection:text-white">
       <Navigation />
@@ -107,6 +152,8 @@ const Layout: React.FC<ChildrenProps> = ({ children }) => {
           </div>
         </div>
       </footer>
+
+      <NewsletterModal isOpen={isNewsletterModalOpen} onClose={handleCloseModal} />
     </div>
   );
 };

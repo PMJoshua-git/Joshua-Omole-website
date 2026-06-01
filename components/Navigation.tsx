@@ -22,7 +22,7 @@ const Navigation: React.FC = () => {
   }, [location]);
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'py-4' : 'py-6'}`}>
+    <nav className={`fixed w-full z-[70] transition-all duration-300 ${scrolled ? 'py-4' : 'py-6'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`
             flex justify-between items-center px-6 py-4 rounded-full transition-all duration-300
@@ -77,21 +77,22 @@ const Navigation: React.FC = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden absolute top-24 left-4 right-4 glass-panel shadow-2xl rounded-3xl animate-in slide-in-from-top-4 p-4 z-50">
+        <div className="md:hidden absolute top-24 left-4 right-4 bg-midnight/95 backdrop-blur-xl border border-navy/50 shadow-2xl rounded-3xl animate-in slide-in-from-top-4 p-4 z-[70] max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain">
           <div className="flex flex-col space-y-2">
-            {ROUTES.map((route) => (
+            {ROUTES.filter(r => r.name !== 'Contact').map((route) => (
               <Link
                 key={route.path}
                 to={route.path}
                 className={`block px-5 py-4 rounded-2xl text-base font-medium text-center ${
-                  location.pathname === route.path ? 'bg-navy/50 text-white border border-navy' : 'text-silver hover:text-white hover:bg-white/5'
+                  location.pathname === route.path ? 'bg-navy/80 text-white border border-blue/30 shadow-glow' : 'text-silver hover:text-white hover:bg-white/5'
                 }`}
+                onClick={() => setIsOpen(false)}
               >
                 {route.name}
               </Link>
             ))}
-            <div className="pt-2">
-               <Button to="/contact" variant="primary" className="w-full justify-center">
+            <div className="pt-4 pb-2">
+               <Button to="/contact" variant="primary" className="w-full justify-center" onClick={() => setIsOpen(false)}>
                 Book Strategy Call
                </Button>
             </div>
