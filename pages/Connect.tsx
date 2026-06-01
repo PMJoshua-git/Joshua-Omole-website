@@ -85,11 +85,10 @@ const Connect: React.FC = () => {
                         <div className="absolute inset-0 bg-blue/20 rounded-[2.5rem] blur-[20px] transition-all duration-700 group-hover:bg-blue/30"></div>
                         
                         <div className="relative w-full h-full bg-midnight rounded-[2rem] border border-navy shadow-lg overflow-hidden z-10 p-1">
-                             <img 
+                            <img 
                                 src="/joshua-portrait.jpg" 
                                 alt="Joshua Omole" 
                                 className="w-full h-full object-cover rounded-[1.75rem]"
-                                onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?auto=format&fit=crop&w=400&h=400' }}
                             />
                         </div>
                     </div>
