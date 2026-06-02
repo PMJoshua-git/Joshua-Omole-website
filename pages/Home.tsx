@@ -56,12 +56,12 @@ const Home: React.FC = () => {
                  </div>
                  
                  {/* Floating Glass Card 1 - Code Snippet */}
-                 <div className="absolute top-10 -left-4 md:-left-12 glass-panel p-4 rounded-2xl w-64 animate-[float_6s_ease-in-out_infinite] shadow-lg border border-purple/30">
+                 <div className="absolute md:top-10 -bottom-6 md:bottom-auto -left-4 md:-left-12 glass-panel p-4 rounded-2xl w-56 md:w-64 scale-90 md:scale-100 origin-bottom-left animate-[float_6s_ease-in-out_infinite] shadow-lg border border-purple/30 z-20">
                     <div className="flex items-center gap-2 mb-3 border-b border-white/10 pb-2">
                         <Code2 className="w-4 h-4 text-purple" />
                         <span className="text-xs text-silver font-mono">system_optimization.py</span>
                     </div>
-                    <div className="space-y-1.5 font-mono text-[10px] text-silver/80">
+                    <div className="space-y-1.5 font-mono text-[10px] md:text-xs text-silver/80">
                         <div className="flex"><span className="text-blue mr-2">def</span> optimize_workflow():</div>
                         <div className="pl-4"><span className="text-purple">return</span> efficiency * 1.4</div>
                         <div className="pl-4 text-gray-500"># AI Integrated</div>
@@ -69,7 +69,7 @@ const Home: React.FC = () => {
                  </div>
 
                  {/* Floating Glass Card 2 - Stats */}
-                 <div className="absolute bottom-20 -right-4 md:-right-8 glass-panel p-5 rounded-3xl w-60 animate-[float_5s_ease-in-out_infinite_reverse] shadow-lg border border-blue/30">
+                 <div className="absolute bottom-24 md:bottom-20 -right-4 md:-right-8 glass-panel p-4 md:p-5 rounded-3xl w-48 md:w-60 scale-90 md:scale-100 origin-bottom-right animate-[float_5s_ease-in-out_infinite_reverse] shadow-lg border border-blue/30 z-20">
                     <div className="flex justify-between items-start mb-4">
                         <div>
                             <p className="text-xs text-silver uppercase tracking-wider">Processing</p>
