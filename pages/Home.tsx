@@ -22,22 +22,21 @@ const Home: React.FC = () => {
           <div className="lg:col-span-6 relative z-10">
             <FadeIn direction="up">
               <div className="font-mono text-blue mb-6 tracking-wider text-sm border border-blue/30 inline-block px-3 py-1 rounded-full bg-blue/5">
-                 {`{ Every process starts with a trigger }`}
+                 {`{ Every operational problem has a fixable system behind it }`}
               </div>
               <h1 className="text-5xl md:text-7xl font-serif text-white leading-[1.05] mb-8 tracking-tight drop-shadow-xl">
-                AI Integration for Businesses That Want <br/> <span className="text-transparent bg-clip-text bg-neon-gradient">Results — Not Confusion</span>
+                Your Business Is Growing. <br/> <span className="text-transparent bg-clip-text bg-neon-gradient">Your Operations Need to Keep Up.</span>
               </h1>
               <p className="text-xl text-silver leading-relaxed mb-10 max-w-lg">
-                I help founders and leadership teams integrate AI and technology into their operations using a proven change management framework that does not disrupt operations.
+                I help businesses design smarter operations using technical tools, AI, systems thinking and practical execution.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                 <Button to="/contact" variant="primary" size="large" className="group">
-                  Explore the Future <ArrowUpRight className="ml-2 w-5 h-5 group-hover:rotate-45 transition-transform" />
+                  Book a Free Audit <ArrowUpRight className="ml-2 w-5 h-5 group-hover:rotate-45 transition-transform" />
                 </Button>
-                <div className="flex items-center gap-3 text-silver hover:text-white transition-colors cursor-pointer px-4">
-                   <PlayCircle className="w-12 h-12 text-blue opacity-80" />
-                   <span className="text-sm font-medium">Watch Demo</span>
-                </div>
+                <Button to="/services" variant="text" size="large" className="group text-silver hover:text-white">
+                  See How I Work
+                </Button>
               </div>
             </FadeIn>
           </div>
@@ -64,7 +63,7 @@ const Home: React.FC = () => {
                     <div className="space-y-1.5 font-mono text-[10px] md:text-xs text-silver/80">
                         <div className="flex"><span className="text-blue mr-2">def</span> optimize_workflow():</div>
                         <div className="pl-4"><span className="text-purple">return</span> efficiency * 1.4</div>
-                        <div className="pl-4 text-gray-500"># AI Integrated</div>
+                        <div className="pl-4 text-gray-500"># System Integrated</div>
                     </div>
                  </div>
 
@@ -94,14 +93,14 @@ const Home: React.FC = () => {
       {/* Section 2: Signature Quote */}
       <section className="px-4">
         <QuoteBlock 
-          quote="I understand business. I understand AI. And I focus on integrating the two in ways that actually work."
+          quote="I understand business. I understand the technology. My job is to make sure both work together in ways your team can actually use."
         />
       </section>
 
       {/* Section 3: Bento Grid Credibility */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <FadeIn>
-            <h2 className="text-3xl font-serif mb-12 text-center text-white">Core Competencies</h2>
+            <h2 className="text-3xl font-serif mb-12 text-center text-white">What I Bring</h2>
         </FadeIn>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Main large card */}
@@ -112,8 +111,8 @@ const Home: React.FC = () => {
                         <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-6 text-white border border-white/10">
                             <BrainCircuit className="w-6 h-6" />
                         </div>
-                        <h3 className="text-2xl font-serif mb-4 text-white">AI Integration Specialist</h3>
-                        <p className="text-silver leading-relaxed">Bridging the gap between theoretical AI capabilities and practical business applications. I don't sell tools; I sell systems.</p>
+                        <h3 className="text-2xl font-serif mb-4 text-white">Systems First</h3>
+                        <p className="text-silver leading-relaxed">I don't recommend a single tool until I understand the business. Every engagement starts with a clear map of how your operation actually runs and where it's breaking down.</p>
                     </div>
                 </div>
             </FadeIn>
@@ -123,8 +122,8 @@ const Home: React.FC = () => {
                     <div className="w-12 h-12 bg-blue/10 rounded-2xl flex items-center justify-center mb-6 text-blue group-hover:text-white group-hover:bg-blue transition-colors">
                         <ShieldCheck className="w-6 h-6" />
                     </div>
-                    <h3 className="text-xl font-serif mb-3 text-white">Business First</h3>
-                    <p className="text-silver text-sm leading-relaxed">Solutions driven by ROI, not tool hype. If it doesn't make money or save time, we don't do it.</p>
+                    <h3 className="text-xl font-serif mb-3 text-white">ROI Driven</h3>
+                    <p className="text-silver text-sm leading-relaxed">If it doesn't save time, reduce cost, or grow revenue, it doesn't make the cut. Every recommendation is filtered through what actually moves the business forward.</p>
                  </div>
             </FadeIn>
 
@@ -134,7 +133,7 @@ const Home: React.FC = () => {
                         <LayoutTemplate className="w-6 h-6" />
                     </div>
                     <h3 className="text-xl font-serif mb-3 text-white">Technical Fluency</h3>
-                    <p className="text-silver text-sm leading-relaxed">DevOps, automation, & scalable platforms. I speak the language of your developers.</p>
+                    <p className="text-silver text-sm leading-relaxed">I speak the language of your developers, your vendors, and your tools. You get one person who bridges both sides without losing anything in translation.</p>
                  </div>
             </FadeIn>
             
@@ -145,8 +144,8 @@ const Home: React.FC = () => {
                         <Users className="w-8 h-8" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-serif mb-2 text-white">Strategy & Execution</h3>
-                        <p className="text-silver max-w-2xl">Leadership that controls the outcome. I bring IT Project Management discipline to the chaotic world of AI implementation.</p>
+                        <h3 className="text-xl font-serif mb-2 text-white">Strategy to Execution</h3>
+                        <p className="text-silver max-w-2xl">Strategy without execution is just a document. I use IT Project Management discipline — from designing the system to managing the implementation to measuring what actually changed.</p>
                     </div>
                     <div className="ml-auto">
                         <Button to="/about" variant="text">About Me <ArrowUpRight className="w-4 h-4 ml-1" /></Button>
@@ -164,24 +163,16 @@ const Home: React.FC = () => {
         
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
           <FadeIn>
-            <h2 className="text-3xl md:text-5xl font-serif mb-16 text-white">Why AI Integration Fails</h2>
+            <h2 className="text-3xl md:text-5xl font-serif mb-12 text-white">Why Operations Break Down</h2>
           </FadeIn>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left mb-16">
-            {[
-                { title: "Too many tools", desc: "Implementing disjointed software without a unified strategy creates debt, not value." },
-                { title: "No system thinking", desc: "AI is treated as a plug-in rather than a fundamental operational shift." },
-                { title: "No ownership", desc: "Without a dedicated owner, projects stall in the \"idea\" phase forever." },
-                { title: "No execution discipline", desc: "Great strategies die without rigorous project management." }
-            ].map((item, i) => (
-                 <FadeIn key={i} delay={100 * (i+1)} className="p-8 rounded-[2rem] bg-obsidian/50 hover:bg-navy/30 transition-colors border border-navy hover:border-blue/30 group">
-                    <h4 className="text-xl font-serif mb-3 text-blue group-hover:text-purple transition-colors">{item.title}</h4>
-                    <p className="text-silver leading-relaxed text-sm">{item.desc}</p>
-                </FadeIn>
-            ))}
-          </div>
-          <FadeIn delay={500}>
-            <p className="text-xl md:text-2xl font-serif italic text-white/80">
-                "AI fails when it’s treated as a tool instead of a system."
+          <FadeIn delay={100} className="mb-16">
+            <p className="text-silver leading-relaxed text-lg md:text-xl max-w-3xl mx-auto">
+              Tools without strategy create complexity, not capability. Most businesses treat AI as a plug-in. It's actually a fundamental change to how work moves. Without a dedicated operational architect, good ideas stall permanently in the planning phase. The strategy is rarely the problem. It's the execution where everything falls apart.
+            </p>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <p className="text-2xl md:text-3xl font-serif italic text-white/90">
+                "Most businesses don't have an AI problem. They have an operations problem."
             </p>
           </FadeIn>
         </div>
@@ -191,15 +182,15 @@ const Home: React.FC = () => {
       <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center mb-20">
             <FadeIn>
-                <h2 className="text-4xl md:text-5xl font-serif text-white mb-6">How I Help You Win</h2>
-                <p className="text-silver max-w-2xl mx-auto text-lg">Structured engagements designed to move you from confusion to clarity.</p>
+                <h2 className="text-4xl md:text-5xl font-serif text-white mb-6">How I Work With You</h2>
+                <p className="text-silver max-w-2xl mx-auto text-lg">Three clear engagements. One consistent outcome — an operation that runs better than it did before.</p>
             </FadeIn>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <FadeIn delay={0} className="h-full">
                 <ServiceCard 
-                    title="Integration & Strategy"
-                    description="The foundational blueprint. We identify high-impact use cases and select the right stack."
+                    title="Systems & Operations Audit"
+                    description="The starting point. We map your current operation, identify where friction and cost are hiding, and build a clear path forward. This is where every engagement begins."
                     outcomes={[
                         "Identify high-impact AI use cases",
                         "Design integrated workflows",
@@ -213,8 +204,8 @@ const Home: React.FC = () => {
             </FadeIn>
             <FadeIn delay={150} className="h-full">
                 <ServiceCard 
-                    title="Automation Design"
-                    description="Rebuilding manual workflows with intelligent agents for speed and consistency."
+                    title="AI & Automation Design"
+                    description="We rebuild the manual workflows eating your team's time using AI, automation, and intelligent system design built around how your business actually runs."
                     outcomes={[
                         "Process mapping",
                         "AI + automation integration",
@@ -227,8 +218,8 @@ const Home: React.FC = () => {
             </FadeIn>
             <FadeIn delay={300} className="h-full">
                  <ServiceCard 
-                    title="Project Oversight"
-                    description="Fractional technical management to ensure your vendors deliver on time."
+                    title="Technical Project Oversight"
+                    description="I sit between you and your vendors or development team to ensure what gets built is exactly what was designed — on time, within scope."
                     outcomes={[
                         "Manage implementations",
                         "Coordinate vendors",
@@ -251,32 +242,32 @@ const Home: React.FC = () => {
             <div className="space-y-6">
                 <ProcessStep 
                     number="01" 
-                    title="Understand the Business" 
-                    description="I start by auditing your current operations, goals, and bottlenecks. No tools are suggested until the problem is clear." 
+                    title="Understand the Business First" 
+                    description="I audit your current operations, goals, and bottlenecks before touching a single tool. The problem has to be clear before the solution can be designed." 
                     delay={0}
                 />
                 <ProcessStep 
                     number="02" 
-                    title="Identify Real AI Opportunities" 
-                    description="I filter out the hype to find the specific areas where AI can drive revenue or save significant time." 
+                    title="Find the Real Opportunities" 
+                    description="I filter the hype to identify specifically where AI and automation create measurable value for your business — not AI in general. Yours." 
                     delay={100}
                 />
                 <ProcessStep 
                     number="03" 
-                    title="Design Integrated Systems" 
-                    description="I map out the future state—how data flows, how teams interact with AI, and what the stack looks like." 
+                    title="Design the System" 
+                    description="I map the future state — how data flows, how teams interact with the tools, what the operation looks like when it works the way it should." 
                     delay={200}
                 />
                  <ProcessStep 
                     number="04" 
-                    title="Coordinate Execution" 
-                    description="I manage the implementation, ensuring technical teams deliver exactly what the strategy requires." 
+                    title="Manage the Execution" 
+                    description="I coordinate the implementation, ensuring every technical decision serves the operational goal — not the other way around." 
                     delay={300}
                 />
                  <ProcessStep 
                     number="05" 
-                    title="Measure Outcomes" 
-                    description="I validate success against the original KPIs. Speed, savings, or scale."
+                    title="Measure What Changed" 
+                    description="Success is validated against the original problem. Speed. Cost. Scale. Not vanity metrics."
                     isLast={true} 
                     delay={400}
                 />
@@ -332,10 +323,10 @@ const Home: React.FC = () => {
       {/* Section 8: Final CTA */}
       <section className="py-32 text-center px-4">
         <FadeIn direction="up">
-            <h2 className="text-4xl md:text-6xl font-serif text-white mb-8">Ready to Integrate AI?</h2>
-            <p className="text-silver mb-12 text-xl max-w-xl mx-auto">Stop guessing. Start building systems that work.</p>
+            <h2 className="text-4xl md:text-6xl font-serif text-white mb-8">Ready to Build an Operation That Actually Scales?</h2>
+            <p className="text-silver mb-12 text-xl max-w-xl mx-auto">Start with a 30-minute audit. Walk away with three things you can fix immediately — whether you work with me after or not.</p>
             <Button to="/contact" variant="primary" size="large" className="shadow-glow">
-                Book a Strategy Call
+                Book the Audit — It's Free
             </Button>
         </FadeIn>
       </section>

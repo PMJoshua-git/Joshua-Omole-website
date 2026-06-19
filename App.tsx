@@ -8,7 +8,9 @@ import Audit from './pages/Audit';
 import Contact from './pages/Contact';
 import Connect from './pages/Connect';
 import Newsletter from './pages/Newsletter';
+import KnowledgeHub from './pages/KnowledgeHub';
 import FloatingAssistant from './components/FloatingAssistant';
+import { captureAttributionData } from './utils/attribution';
 
 // Scroll to top component
 const ScrollToTop = () => {
@@ -21,10 +23,19 @@ const ScrollToTop = () => {
   return null;
 };
 
+const AttributionTracker = () => {
+  const { pathname, search } = useLocation();
+  useEffect(() => {
+    captureAttributionData(search);
+  }, [pathname, search]);
+  return null;
+};
+
 const App: React.FC = () => {
   return (
     <Router>
       <ScrollToTop />
+      <AttributionTracker />
       <FloatingAssistant />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -35,6 +46,7 @@ const App: React.FC = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/connect" element={<Connect />} />
         <Route path="/newsletter" element={<Newsletter />} />
+        <Route path="/knowledge-hub" element={<KnowledgeHub />} />
       </Routes>
     </Router>
   );

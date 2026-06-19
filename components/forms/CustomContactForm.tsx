@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { contactFormSchema, ContactFormValues } from './schema';
+import { getAttributionData } from '../../utils/attribution';
 import { 
   CheckCircle2, 
   ChevronRight, 
@@ -80,10 +81,32 @@ const CustomContactForm: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Mock API Call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const attribution = getAttributionData();
+      const payload = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        company: data.company,
+        position: data.position,
+        service: data.services.join(', '),
+        businessGoal: data.businessGoal,
+        newsletterConsent: data.newsletterConsent,
+        ...attribution
+      };
       
-      console.log('Submitted data to /api/book-consultation:', data);
+      const response = await fetch('/api/book-consultation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      const result = await response.json();
+      if (!result.success) {
+         console.error('Server error:', result);
+      }
       
       setSubmittedData(data);
       setShowCalendar(true); // Show calendar first

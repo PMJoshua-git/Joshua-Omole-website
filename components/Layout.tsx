@@ -67,7 +67,7 @@ const Layout: React.FC<ChildrenProps> = ({ children }) => {
     <div className="flex flex-col min-h-screen bg-obsidian text-white font-sans antialiased selection:bg-purple/30 selection:text-white">
       <Navigation />
       
-      <main className="flex-grow pt-24 relative z-10">
+      <main className="flex-grow pt-24 relative">
         {children}
       </main>
 
@@ -81,7 +81,7 @@ const Layout: React.FC<ChildrenProps> = ({ children }) => {
             <div className="col-span-1 md:col-span-2">
               <h3 className="text-xl font-serif font-bold text-white mb-4">Joshua Omole</h3>
               <p className="text-silver text-sm leading-relaxed max-w-sm mb-6">
-                Helping founders and leadership teams integrate AI and technology into their operations using a proven Change management framework that does not disrupt operations.
+                I help businesses design smarter operations using technical tools, AI, systems thinking and practical execution.
               </p>
               
               {/* Social Links */}
@@ -148,7 +148,7 @@ const Layout: React.FC<ChildrenProps> = ({ children }) => {
           </div>
           <div className="mt-12 pt-8 border-t border-navy text-center md:text-left flex flex-col md:flex-row justify-between items-center text-xs text-silver/60">
             <p>&copy; {new Date().getFullYear()} Joshua Omole. All rights reserved.</p>
-            <p className="mt-2 md:mt-0">AI Integration Specialist || IT Project Manager</p>
+            <p className="mt-2 md:mt-0">Business Operations & AI Systems Strategist</p>
           </div>
         </div>
       </footer>

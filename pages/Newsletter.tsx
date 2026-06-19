@@ -4,6 +4,7 @@ import FadeIn from '../components/FadeIn';
 import Layout from '../components/Layout';
 import QuoteBlock from '../components/QuoteBlock';
 import NewsletterModal from '../components/NewsletterModal';
+import { getAttributionData } from '../utils/attribution';
 
 const Newsletter: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -19,13 +20,34 @@ const Newsletter: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        // Simulate API call
-        setTimeout(() => {
+        
+        const attribution = getAttributionData();
+        const payload = {
+            firstName,
+            email,
+            ...attribution
+        };
+
+        try {
+            const response = await fetch('/api/newsletter-subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            if (!result.success) {
+                console.error('Newsletter subscribe error:', result);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
             setIsSubmitting(false);
             setIsSubmitted(true);
             setEmail('');
             setFirstName('');
-        }, 1500);
+        }
     };
 
     return (
@@ -50,7 +72,7 @@ const Newsletter: React.FC = () => {
 
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue/10 border border-blue/30 text-blue font-mono text-sm mb-8 backdrop-blur-md">
                             <Mail className="w-4 h-4" />
-                            <span>Executive Briefing</span>
+                            <span>Weekly Dispatch</span>
                         </div>
                         
                         <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white leading-tight tracking-tight mb-6">

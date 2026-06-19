@@ -29,10 +29,10 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   const variants = {
-    primary: "border-transparent text-white bg-neon-gradient hover:bg-neon-gradient-hover shadow-glow hover:shadow-glow-hover hover:-translate-y-0.5",
-    secondary: "border-transparent text-white bg-white/10 hover:bg-white/20 backdrop-blur-md shadow-sm hover:shadow-md border border-white/5",
-    outline: "border border-navy text-silver bg-transparent hover:border-blue hover:text-white hover:bg-blue/10 hover:shadow-glow",
-    text: "border-transparent text-blue hover:text-purple px-0 rounded-none underline-offset-4 hover:underline"
+    primary: "border-transparent text-white bg-neon-gradient md:hover:bg-neon-gradient-hover shadow-glow md:hover:shadow-glow-hover md:hover:-translate-y-0.5",
+    secondary: "border-transparent text-white bg-white/10 md:hover:bg-white/20 backdrop-blur-md shadow-sm md:hover:shadow-md border border-white/5",
+    outline: "border border-navy text-silver bg-transparent md:hover:border-blue md:hover:text-white md:hover:bg-blue/10 md:hover:shadow-glow",
+    text: "border-transparent text-blue md:hover:text-purple px-0 rounded-none underline-offset-4 md:hover:underline"
   };
 
   const combinedClasses = `${baseStyles} ${sizeStyles[size]} ${variants[variant]} ${className}`;

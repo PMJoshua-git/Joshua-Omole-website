@@ -12,7 +12,7 @@ const Audit: React.FC = () => {
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue/10 rounded-full blur-[100px] -ml-32 -mb-32"></div>
         
         <FadeIn className="max-w-4xl mx-auto text-center relative z-10">
-          <h1 className="text-4xl md:text-6xl font-serif mb-6 leading-tight">AI & Tech Clarity Audit</h1>
+          <h1 className="text-4xl md:text-6xl font-serif mb-6 leading-tight">Systems & Operations Audit</h1>
           <p className="text-xl text-silver max-w-2xl mx-auto font-light">
             Cut through the noise. Get a 30-minute diagnosis of your current tech stack and AI potential.
           </p>

@@ -10,9 +10,9 @@ const Contact: React.FC = () => {
       <section className="py-24 px-4 max-w-4xl mx-auto">
         <FadeIn direction="up">
           <div className="text-center mb-16">
-            <h1 className="text-5xl md:text-6xl font-serif text-white mb-6 leading-tight">Let's Talk Strategy</h1>
+            <h1 className="text-5xl md:text-6xl font-serif text-white mb-6 leading-tight">Let's Look at Your Operation</h1>
             <p className="text-xl text-silver leading-relaxed max-w-2xl mx-auto">
-              Get in touch to discuss your specific technological bottlenecks, potential AI integration, or project oversight needs.
+              Whether you're dealing with operational friction, thinking about AI adoption, or need a clear-eyed look at how your business is actually running — this is where to start.
             </p>
           </div>
         </FadeIn>

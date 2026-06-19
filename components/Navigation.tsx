@@ -22,8 +22,8 @@ const Navigation: React.FC = () => {
   }, [location]);
 
   return (
-    <nav className={`fixed w-full z-[70] transition-all duration-300 ${scrolled ? 'py-4' : 'py-6'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className={`fixed w-full z-[70] pointer-events-none transition-all duration-300 ${scrolled ? 'py-4' : 'py-6'}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pointer-events-auto">
         <div className={`
             flex justify-between items-center px-6 py-4 rounded-full transition-all duration-300
             ${scrolled ? 'glass-panel shadow-glow' : 'bg-transparent border border-transparent'}
@@ -37,7 +37,7 @@ const Navigation: React.FC = () => {
                 </div>
                 <span className="text-xl md:text-2xl font-serif font-bold text-white tracking-tight group-hover:text-blue transition-colors">Joshua Omole</span>
             </div>
-            <span className="hidden md:block text-[10px] text-silver tracking-widest uppercase mt-0.5 font-medium pl-10">AI Integration Specialist || IT Project Manager</span>
+            <span className="hidden md:block text-[10px] text-silver tracking-widest uppercase mt-0.5 font-medium pl-10">Business Operations & AI Systems Strategist</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -77,7 +77,7 @@ const Navigation: React.FC = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden absolute top-24 left-4 right-4 bg-midnight/95 backdrop-blur-xl border border-navy/50 shadow-2xl rounded-3xl animate-in slide-in-from-top-4 p-4 z-[70] max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain">
+        <div className="md:hidden absolute top-24 left-4 right-4 bg-midnight/95 backdrop-blur-xl border border-navy/50 shadow-2xl rounded-3xl animate-in slide-in-from-top-4 p-4 z-[70] max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain pointer-events-auto">
           <div className="flex flex-col space-y-2">
             {ROUTES.filter(r => r.name !== 'Contact').map((route) => (
               <Link

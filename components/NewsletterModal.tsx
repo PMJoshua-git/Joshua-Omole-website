@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ShieldCheck, ArrowRight } from 'lucide-react';
+import { getAttributionData } from '../utils/attribution';
 
 interface NewsletterModalProps {
     isOpen: boolean;
@@ -17,14 +18,35 @@ const NewsletterModal: React.FC<NewsletterModalProps> = ({ isOpen, onClose }) =>
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        // Simulate API call
-        setTimeout(() => {
+        
+        const attribution = getAttributionData();
+        const payload = {
+            firstName,
+            email,
+            ...attribution
+        };
+
+        try {
+            const response = await fetch('/api/newsletter-subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            if (!result.success) {
+                console.error('Newsletter subscribe error', result);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
             setIsSubmitting(false);
             setIsSubmitted(true);
             setEmail('');
             setFirstName('');
             localStorage.setItem('newsletter_subscribed', 'true');
-        }, 1500);
+        }
     };
 
     return (

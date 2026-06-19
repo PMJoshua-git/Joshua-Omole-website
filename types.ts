@@ -19,6 +19,23 @@ export interface ProcessStepItem {
   description: string;
 }
 
+export interface Resource {
+  id: string;
+  title: string;
+  category: string;
+  shortDescription: string;
+  longDescription: string;
+  coverImageUrl: string;
+  downloadUrl?: string; // from Airtable mapping
+  estimatedReadingTime: string;
+  format: string;
+  displayOrder: number;
+  featured: boolean;
+  status: 'Draft' | 'Coming Soon' | 'Published' | 'Archived';
+  socialProofCount: number;
+  createdDate: string;
+}
+
 export interface ChildrenProps {
   children: ReactNode;
 }

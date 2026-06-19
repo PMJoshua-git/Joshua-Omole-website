@@ -101,17 +101,7 @@ const Connect: React.FC = () => {
                     </h1>
                 </FadeIn>
 
-                {/* Primary CTA */}
-                <FadeIn delay={100} className="mb-10">
-                    <ConnectCard 
-                        title="Free AI & Technology Audit"
-                        description="Get practical insights into your operations, identify opportunities for improvement, and discover where AI and automation can create real business value."
-                        buttonText="Get Started"
-                        icon={Search}
-                        to="/audit"
-                        isPrimary={true}
-                    />
-                </FadeIn>
+                {/* Primary CTA removed to be inside the list */}
 
                 {/* Further Steps */}
                 <FadeIn delay={200} className="mb-8 text-center sm:text-left pl-2">
@@ -124,11 +114,12 @@ const Connect: React.FC = () => {
                 <div className="space-y-4 mb-20">
                     <FadeIn delay={300}>
                         <ConnectCard 
-                            title="Join My WhatsApp Channel"
-                            description="Practical AI & technical insights, implementation ideas, business systems thinking, and lessons from the field."
-                            buttonText="Join Channel"
-                            icon={MessageCircle}
-                            href="https://whatsapp.com/channel/0029VbDLFtOL7UVdGXm7aw1E"
+                            title="Free AI & Technology Audit"
+                            description="Get practical insights into your operations, identify opportunities for improvement, and discover where AI and automation can create real business value."
+                            buttonText="Get Started"
+                            icon={Search}
+                            to="/audit"
+                            isPrimary={true}
                         />
                     </FadeIn>
 
@@ -144,11 +135,11 @@ const Connect: React.FC = () => {
 
                     <FadeIn delay={500}>
                         <ConnectCard 
-                            title="AI & Technical Training"
-                            description="Training programs for executives, teams, and individuals looking to build practical AI capability."
-                            buttonText="Explore Training"
-                            icon={GraduationCap}
-                            to="/training"
+                            title="Join My WhatsApp Channel"
+                            description="Practical AI & technical insights, implementation ideas, business systems thinking, and lessons from the field."
+                            buttonText="Join Channel"
+                            icon={MessageCircle}
+                            href="https://whatsapp.com/channel/0029VbDLFtOL7UVdGXm7aw1E"
                         />
                     </FadeIn>
 
@@ -182,7 +173,7 @@ const Connect: React.FC = () => {
                     </div>
                     <FadeIn className="relative z-10 w-full">
                         <QuoteBlock 
-                            quote="Technology only creates value when people understand how to use it."
+                            quote="A business that runs on systems scales. A business that runs on people burns out."
                         />
                     </FadeIn>
                 </div>
