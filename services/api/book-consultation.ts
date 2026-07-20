@@ -1,9 +1,7 @@
 import express from 'express';
 import { z } from 'zod';
 import { leadsTable } from '../airtable';
-import { resend } from '../resend';
 import { addContactToSysteme } from '../systeme';
-import { getConsultationConfirmationTemplate } from '../emails/templates';
 
 const router = express.Router();
 
@@ -14,9 +12,12 @@ const consultationSchema = z.object({
   phone: z.string().optional(),
   company: z.string().optional(),
   position: z.string().optional(),
+  country: z.string().optional(),
+  companySize: z.string().optional(),
   service: z.string().min(1, 'Service selection is required'),
   businessGoal: z.string().optional(),
   newsletterConsent: z.boolean().optional().default(false),
+  bookingTime: z.string().optional(),
   // Attribution data
   lead_source: z.string().optional(),
   landing_page: z.string().optional(),
@@ -31,10 +32,9 @@ router.post('/', async (req, res) => {
     const data = consultationSchema.parse(req.body);
 
     // 1. Save lead to Airtable
-    let airtableRecordId: string | undefined;
     if (leadsTable) {
       try {
-        const record = await leadsTable.create([
+        await leadsTable.create([
           {
             fields: {
               "Created Date": new Date().toISOString(),
@@ -45,9 +45,12 @@ router.post('/', async (req, res) => {
               "Phone Number": data.phone || "",
               "Company Name": data.company || "",
               "Position": data.position || "",
+              "Country": data.country || "",
+              "Company Size": data.companySize || "",
               "Service Selected": data.service,
               "Business Goal": data.businessGoal || "",
               "Newsletter Opt-In": data.newsletterConsent,
+              "Booking Time": data.bookingTime || "",
               "Lead Source": data.lead_source || "direct",
               "Landing Page": data.landing_page || "",
               "UTM Source": data.utm_source || "",
@@ -58,55 +61,22 @@ router.post('/', async (req, res) => {
             }
           }
         ]);
-        airtableRecordId = record[0].getId();
       } catch (err) {
         console.error('Airtable Error:', err);
         return res.status(500).json({ success: false, message: 'Database failure' });
       }
     }
 
-    // 2. Send emails
-    if (resend) {
-      // Confirmation Email
-      try {
-        const { html, text } = getConsultationConfirmationTemplate(data.firstName, data.service);
-        await resend.emails.send({
-          from: 'Joshua Omole <hello@joshuaomole.com>', // MUST BE verified domain
-          to: data.email,
-          subject: 'Consultation Request Received',
-          html,
-          text
-        });
-      } catch (err) {
-        console.error('Resend Client Confirmation Error:', err);
-      }
-
-      // Admin Notification Email
-      const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
-      if (adminEmail) {
-        try {
-          await resend.emails.send({
-            from: 'System <notifications@joshuaomole.com>',
-            to: adminEmail,
-            subject: 'New Service Inquiry - Joshua Omole',
-            html: `
-              <h3>New Lead Details</h3>
-              <p>Name: ${data.firstName} ${data.lastName}</p>
-              <p>Email: ${data.email}</p>
-              <p>Service: ${data.service}</p>
-              <p>Source: ${data.lead_source}</p>
-            `,
-          });
-        } catch (err) {
-           console.error('Resend Admin Notification Error:', err);
-        }
-      }
-    }
-
-    // 3. Add to Systeme.io if opted in
+    // 2. Add to Systeme.io if opted in
     if (data.newsletterConsent && process.env.SYSTEME_API_KEY) {
       const tagId = process.env.SYSTEME_NEWSLETTER_TAG_ID;
-      await addContactToSysteme(data.email, data.firstName, tagId);
+      await addContactToSysteme(data.email, data.firstName, tagId, {
+        lastName: data.lastName,
+        company: data.company,
+        position: data.position,
+        country: data.country,
+        companySize: data.companySize
+      });
     }
 
     return res.status(200).json({ success: true, message: 'Consultation request received successfully' });

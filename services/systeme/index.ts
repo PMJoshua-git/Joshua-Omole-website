@@ -1,5 +1,16 @@
 // Systeme.io API wrapper
-export const addContactToSysteme = async (email: string, firstName?: string, tagId?: string) => {
+export const addContactToSysteme = async (
+  email: string, 
+  firstName?: string, 
+  tagId?: string,
+  additionalData?: {
+    lastName?: string;
+    position?: string;
+    company?: string;
+    country?: string;
+    companySize?: string;
+  }
+) => {
   const apiKey = process.env.SYSTEME_API_KEY;
   if (!apiKey) return null;
 
@@ -12,10 +23,22 @@ export const addContactToSysteme = async (email: string, firstName?: string, tag
     };
 
     if (firstName) {
-      // Assuming a custom field for first name if needed, or there might be standard mapping.
-      // Often in Systeme, standard fields are added through the 'fields' array or direct if supported.
-      // E.g. {"fields": [ { "slug": "first_name", "value": firstName } ] }
       payload.fields.push({ slug: "first_name", value: firstName });
+    }
+    if (additionalData?.lastName) {
+      payload.fields.push({ slug: "surname", value: additionalData.lastName });
+    }
+    if (additionalData?.company) {
+      payload.fields.push({ slug: "company_name", value: additionalData.company });
+    }
+    if (additionalData?.country) {
+      payload.fields.push({ slug: "country", value: additionalData.country });
+    }
+    if (additionalData?.position) {
+      payload.fields.push({ slug: "position", value: additionalData.position });
+    }
+    if (additionalData?.companySize) {
+      payload.fields.push({ slug: "company_size", value: additionalData.companySize });
     }
 
     const res = await fetch(url, {

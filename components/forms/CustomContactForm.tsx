@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,15 +14,18 @@ import {
   Mail, 
   Building2, 
   Phone,
-  ArrowRight
+  ArrowRight,
+  Globe,
+  Users
 } from 'lucide-react';
 import Cal, { getCalApi } from '@calcom/embed-react';
+import { countriesList } from '../../utils/countries';
 
 const SERVICES = [
-  'Free AI & Technology Clarity Audit',
-  'AI / Technical Integration & Transition Strategy',
-  'Technology Project Oversight',
-  'AI-Powered Automation',
+  'Free System clarity audit',
+  'Implementation Partnership',
+  'Operational Diagnostic Brief',
+  'Automation & Workflow Design',
   'Training'
 ];
 
@@ -36,6 +39,11 @@ const CustomContactForm: React.FC = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submittedData, setSubmittedData] = useState<ContactFormValues | null>(null);
+  const submittedDataRef = useRef<ContactFormValues | null>(null);
+
+  useEffect(() => {
+    submittedDataRef.current = submittedData;
+  }, [submittedData]);
 
   const {
     register,
@@ -53,12 +61,49 @@ const CustomContactForm: React.FC = () => {
 
   const selectedServices = watch('services') || [];
 
+  const saveLead = async (data: any, bookingTime?: string) => {
+    try {
+      const attribution = getAttributionData();
+      const payload = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        company: data.companyName, // from form schema
+        position: data.position,
+        country: data.country,
+        companySize: data.companySize,
+        service: data.services.join(', '),
+        businessGoal: data.businessGoal,
+        newsletterConsent: data.newsletterOptIn, // from form schema
+        bookingTime: bookingTime,
+        ...attribution
+      };
+      
+      await fetch('/api/book-consultation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+    } catch (err) {
+      console.error('Submission error:', err);
+    }
+  };
+
   useEffect(() => {
     (async function () {
       const cal = await getCalApi({"namespace": "30min"});
       cal("on", {
         action: "bookingSuccessful",
         callback: (e) => {
+          const bookingTime = e.detail?.data?.date || new Date().toISOString();
+          
+          if (submittedDataRef.current) {
+            saveLead(submittedDataRef.current, bookingTime);
+          }
+          
           setShowCalendar(false);
           setIsSuccess(true);
         }
@@ -79,42 +124,9 @@ const CustomContactForm: React.FC = () => {
 
   const onSubmit = async (data: ContactFormValues) => {
     setIsSubmitting(true);
-    
-    try {
-      const attribution = getAttributionData();
-      const payload = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        company: data.company,
-        position: data.position,
-        service: data.services.join(', '),
-        businessGoal: data.businessGoal,
-        newsletterConsent: data.newsletterConsent,
-        ...attribution
-      };
-      
-      const response = await fetch('/api/book-consultation', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-      
-      const result = await response.json();
-      if (!result.success) {
-         console.error('Server error:', result);
-      }
-      
-      setSubmittedData(data);
-      setShowCalendar(true); // Show calendar first
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    setSubmittedData(data);
+    setShowCalendar(true);
+    setIsSubmitting(false);
   };
 
   // The calendar screen
@@ -136,12 +148,19 @@ const CustomContactForm: React.FC = () => {
             namespace="30min"
             calLink="joshua-omole-d9c2vi/30min"
             style={{ width: "100%", height: "100%", overflow: "scroll" }}
-            config={{ layout: "month_view" }}
+            config={{ 
+              layout: "month_view",
+              name: `${submittedData.firstName} ${submittedData.lastName}`.trim(),
+              email: submittedData.email
+            }}
           />
         </div>
 
         <button 
           onClick={() => {
+            if (submittedData) {
+              saveLead(submittedData);
+            }
             setShowCalendar(false);
             setIsSuccess(true);
           }}
@@ -299,6 +318,46 @@ const CustomContactForm: React.FC = () => {
                  />
               </div>
               {errors.companyName && <p className="text-red-400 text-xs ml-1">{errors.companyName.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm text-silver font-medium ml-1">Country *</label>
+              <div className="relative">
+                 <Globe className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-navy pointer-events-none" />
+                 <input 
+                   {...register('country')} 
+                   list="countries-list"
+                   className="w-full bg-obsidian/60 border border-navy text-white pl-12 pr-5 py-4 rounded-xl focus:outline-none focus:border-blue transition-all"
+                   placeholder="Country Your company is located"
+                   autoComplete="off"
+                 />
+                 <datalist id="countries-list">
+                   {countriesList.map(country => (
+                     <option key={country} value={country} />
+                   ))}
+                 </datalist>
+              </div>
+              {errors.country && <p className="text-red-400 text-xs ml-1">{errors.country.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm text-silver font-medium ml-1">Company Size *</label>
+              <div className="relative">
+                 <Users className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-navy pointer-events-none" />
+                 <select 
+                   {...register('companySize')} 
+                   className="w-full bg-obsidian/60 border border-navy text-white pl-12 pr-5 py-4 rounded-xl focus:outline-none focus:border-blue transition-all appearance-none"
+                 >
+                   <option value="" disabled>Select company size</option>
+                   <option value="1-15 employees">1-15 employees</option>
+                   <option value="16-50 employees">16-50 employees</option>
+                   <option value="50+ employees">50+ employees</option>
+                 </select>
+                 <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none">
+                   <ChevronRight className="w-5 h-5 text-navy rotate-90" />
+                 </div>
+              </div>
+              {errors.companySize && <p className="text-red-400 text-xs ml-1">{errors.companySize.message}</p>}
             </div>
           </div>
         </section>

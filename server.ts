@@ -15,11 +15,15 @@ import bookConsultationRouter from "./services/api/book-consultation";
 import newsletterSubscribeRouter from "./services/api/newsletter-subscribe";
 import resourceAccessRouter from "./services/api/resource-access";
 import resourcesRouter from "./services/api/resources";
+import trainingSessionsRouter from "./services/api/training-sessions";
+import bookTrainingRouter from "./services/api/book-training";
 
 app.use("/api/book-consultation", bookConsultationRouter);
 app.use("/api/newsletter-subscribe", newsletterSubscribeRouter);
 app.use("/api/resource-access", resourceAccessRouter);
 app.use("/api/resources", resourcesRouter);
+app.use("/api/training-sessions", trainingSessionsRouter);
+app.use("/api/book-training", bookTrainingRouter);
 
 async function startServer() {
   // Vite middleware for development

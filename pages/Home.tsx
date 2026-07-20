@@ -155,29 +155,6 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Section 4: Problem Framing */}
-      <section className="py-24 bg-midnight relative overflow-hidden rounded-[3rem] mx-4 lg:mx-8 my-12 border border-navy">
-        {/* Subtle texture */}
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.3) 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue to-transparent opacity-50"></div>
-        
-        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <FadeIn>
-            <h2 className="text-3xl md:text-5xl font-serif mb-12 text-white">Why Operations Break Down</h2>
-          </FadeIn>
-          <FadeIn delay={100} className="mb-16">
-            <p className="text-silver leading-relaxed text-lg md:text-xl max-w-3xl mx-auto">
-              Tools without strategy create complexity, not capability. Most businesses treat AI as a plug-in. It's actually a fundamental change to how work moves. Without a dedicated operational architect, good ideas stall permanently in the planning phase. The strategy is rarely the problem. It's the execution where everything falls apart.
-            </p>
-          </FadeIn>
-          <FadeIn delay={200}>
-            <p className="text-2xl md:text-3xl font-serif italic text-white/90">
-                "Most businesses don't have an AI problem. They have an operations problem."
-            </p>
-          </FadeIn>
-        </div>
-      </section>
-
       {/* Section 5: Services Overview */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center mb-20">
@@ -189,44 +166,44 @@ const Home: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <FadeIn delay={0} className="h-full">
                 <ServiceCard 
-                    title="Systems & Operations Audit"
-                    description="The starting point. We map your current operation, identify where friction and cost are hiding, and build a clear path forward. This is where every engagement begins."
+                    title="Systems Clarity Audit"
+                    description="A focused 30-minute diagnostic session where we look at how your business currently runs, identify the highest-leverage pressure points, and give you immediate, actionable steps."
                     outcomes={[
-                        "Identify high-impact AI use cases",
-                        "Design integrated workflows",
-                        "Tech Stack Selection",
-                        "Execution roadmap"
+                        "Identify high-pressure points",
+                        "Map current workflows",
+                        "Surface immediate quick wins",
+                        "Assess operational health"
                     ]}
                     ctaText="Start Here"
-                    ctaLink="/contact"
+                    ctaLink="/audit"
                     isPrimary={true}
                 />
             </FadeIn>
             <FadeIn delay={150} className="h-full">
                 <ServiceCard 
-                    title="AI & Automation Design"
-                    description="We rebuild the manual workflows eating your team's time using AI, automation, and intelligent system design built around how your business actually runs."
+                    title="Operational Diagnostic Brief"
+                    description="A structured deep-dive into your operations. We map how work actually moves and deliver a detailed Brief showing what's broken, what it costs, and the exact roadmap to fix it."
                     outcomes={[
-                        "Process mapping",
-                        "AI + automation integration",
-                        "Scale optimization",
-                        "Documentation & handoff"
+                        "Current bottleneck analysis",
+                        "Cost & ROI breakdown",
+                        "Tool & resource requirements",
+                        "Implementation roadmap"
                     ]}
-                    ctaText="Discuss Automation"
-                    ctaLink="/contact"
+                    ctaText="See the Brief"
+                    ctaLink="/services"
                 />
             </FadeIn>
             <FadeIn delay={300} className="h-full">
                  <ServiceCard 
-                    title="Technical Project Oversight"
-                    description="I sit between you and your vendors or development team to ensure what gets built is exactly what was designed — on time, within scope."
+                    title="Implementation Partnership"
+                    description="We lead the execution of the Brief's recommendations — coordinating specialists, managing the project, and overseeing the transition from your current state to the future state."
                     outcomes={[
-                        "Manage implementations",
-                        "Coordinate vendors",
-                        "Protect scope & cost",
-                        "Ensure quality delivery"
+                        "Full execution management",
+                        "Vendor coordination",
+                        "Internal workflow transition",
+                        "Outcome validation"
                     ]}
-                    ctaText="See How I Work"
+                    ctaText="Discuss Implementation"
                     ctaLink="/contact"
                 />
             </FadeIn>

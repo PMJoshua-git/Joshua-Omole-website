@@ -36,6 +36,23 @@ export interface Resource {
   createdDate: string;
 }
 
+export interface TrainingSession {
+  id: string;
+  title: string;
+  slug: string;
+  shortDescription: string;
+  fullDescription: string;
+  thumbnail: string;
+  priceTierA: number;
+  priceTierB: number;
+  durationHours: number;
+  whatYouGet: string;
+  monthlyEnrollments: number;
+  calBookingLink: string;
+  isPublished: boolean;
+  displayOrder: number;
+}
+
 export interface ChildrenProps {
   children: ReactNode;
 }

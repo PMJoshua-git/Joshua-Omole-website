@@ -10,6 +10,8 @@ export const contactFormSchema = z.object({
     .array(z.string())
     .max(2, 'You can select a maximum of two services'),
   position: z.string().min(1, 'Please select your position'),
+  country: z.string().min(1, 'Please select your country'),
+  companySize: z.string().min(1, 'Please select company size'),
   businessChallenge: z.string().optional(),
   newsletterOptIn: z.boolean().default(false),
 });

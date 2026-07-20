@@ -2,7 +2,6 @@ import React from 'react';
 import Layout from '../components/Layout';
 import Button from '../components/Button';
 import FadeIn from '../components/FadeIn';
-import { ArrowRight, Search, FileText, Lightbulb } from 'lucide-react';
 
 const Audit: React.FC = () => {
   return (
@@ -12,85 +11,106 @@ const Audit: React.FC = () => {
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue/10 rounded-full blur-[100px] -ml-32 -mb-32"></div>
         
         <FadeIn className="max-w-4xl mx-auto text-center relative z-10">
-          <h1 className="text-4xl md:text-6xl font-serif mb-6 leading-tight">Systems & Operations Audit</h1>
-          <p className="text-xl text-silver max-w-2xl mx-auto font-light">
-            Cut through the noise. Get a 30-minute diagnosis of your current tech stack and AI potential.
+          <div className="inline-block text-blue font-mono text-sm tracking-widest uppercase mb-6 px-3 py-1 rounded-full bg-blue/10 border border-blue/30">
+            Free · 30 Minutes · No Commitment
+          </div>
+          <h1 className="text-4xl md:text-6xl font-serif mb-6 leading-tight">Find Out What Your Operation Is Actually Costing You</h1>
+          <p className="text-xl text-silver max-w-2xl mx-auto font-light leading-relaxed">
+            Not what AI could do for you one day. What your current operation is costing you right now — in time, in revenue, and in decisions you're making without the data to back them up.
           </p>
         </FadeIn>
       </section>
 
-      <section className="py-24 px-4 max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <FadeIn direction="left">
-                <h2 className="text-4xl font-serif text-white mb-8">Stop wondering "What if?"</h2>
-                <div className="space-y-6 text-lg text-silver leading-relaxed">
-                    <p>
-                        You suspect your business could be more efficient. You see competitors using AI. But you don't know where to start, and you certainly don't have time to demo 50 different tools.
-                    </p>
-                    <p>
-                        The Clarity Audit is a low-friction, high-value way to get an expert opinion on your operations without committing to a massive contract.
-                    </p>
-                </div>
-                
-                <div className="mt-10 bg-midnight p-8 rounded-[2rem] border border-navy hover:border-blue/50 transition-colors">
-                    <p className="text-sm font-bold text-blue uppercase tracking-wide mb-2">The Outcome</p>
-                    <p className="text-white font-medium text-lg">
-                        You walk away with 3 actionable improvements you can make immediately, whether you hire me or not.
-                    </p>
-                </div>
-            </FadeIn>
+      <section className="py-24 px-4 max-w-4xl mx-auto">
+        <FadeIn>
+          <div className="mb-20">
+            <h2 className="text-3xl md:text-4xl font-serif text-white mb-8">You already sense something is off.</h2>
+            <div className="space-y-6 text-lg text-silver leading-relaxed">
+              <p>
+                Maybe orders are getting missed. Maybe your team is spending hours on tasks that shouldn't require human hands. Maybe you've tried to fix it before and nothing stuck. Maybe you just know the business could run cleaner, faster, and with less of you holding every part together.
+              </p>
+              <p>
+                The Systems Clarity Audit is a focused 30-minute session where we look at your operation together — not your tools, not your tech stack, not your AI readiness. Your operation. How work actually moves through your business, where it slows down, and where the real cost is hiding.
+              </p>
+              <p className="text-white bg-navy/20 p-6 rounded-2xl border border-navy/50 font-medium">
+                You walk away with three specific, actionable findings you can move on immediately — whether you work with me after or not.
+              </p>
+            </div>
+          </div>
+        </FadeIn>
 
-            <FadeIn direction="right" delay={200} className="h-full">
-                <div className="bg-midnight border border-navy shadow-glow rounded-[3rem] p-10 h-full flex flex-col justify-between hover:shadow-glow-hover transition-shadow duration-500 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-neon-gradient opacity-10 blur-3xl rounded-full"></div>
-                    
-                    <div className="relative z-10">
-                        <h3 className="text-2xl font-serif text-white mb-10 pb-4 border-b border-navy">What I Cover</h3>
-                        <div className="space-y-8">
-                            <div className="flex group">
-                                <div className="flex-shrink-0 mr-6">
-                                    <div className="w-14 h-14 bg-navy/50 rounded-2xl flex items-center justify-center text-blue group-hover:bg-blue group-hover:text-white transition-colors border border-navy">
-                                        <Search className="w-7 h-7" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-white text-xl">Current Friction</h4>
-                                    <p className="text-base text-silver mt-2 leading-relaxed">Where is time bleeding out of your business?</p>
-                                </div>
-                            </div>
-                            <div className="flex group">
-                                <div className="flex-shrink-0 mr-6">
-                                    <div className="w-14 h-14 bg-navy/50 rounded-2xl flex items-center justify-center text-purple group-hover:bg-purple group-hover:text-white transition-colors border border-navy">
-                                        <Lightbulb className="w-7 h-7" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-white text-xl">AI Readiness</h4>
-                                    <p className="text-base text-silver mt-2 leading-relaxed">Do you have the data and structure to actually use AI?</p>
-                                </div>
-                            </div>
-                             <div className="flex group">
-                                <div className="flex-shrink-0 mr-6">
-                                    <div className="w-14 h-14 bg-navy/50 rounded-2xl flex items-center justify-center text-white group-hover:bg-white group-hover:text-obsidian transition-colors border border-navy">
-                                        <FileText className="w-7 h-7" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-white text-xl">Quick Wins</h4>
-                                    <p className="text-base text-silver mt-2 leading-relaxed">Immediate tools or changes to implement now.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="mt-12 relative z-10">
-                        <Button to="/contact" className="w-full justify-center group" size="large">
-                            Book Your Audit <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"/>
-                        </Button>
-                        <p className="text-xs text-center text-silver/50 mt-4">No pressure. No sales pitch.</p>
-                    </div>
-                </div>
-            </FadeIn>
-        </div>
+        <FadeIn delay={100}>
+          <div className="mb-20">
+            <span className="text-silver/50 font-bold tracking-widest uppercase text-xs mb-4 block">What We Cover</span>
+            <h3 className="text-2xl font-serif text-white mb-8">What I Look At</h3>
+            <ul className="space-y-6 text-silver">
+              <li className="flex items-start">
+                <span className="text-blue mr-4 mt-1 text-xl leading-none">•</span>
+                <span><strong className="text-white">How work moves</strong> — where your operation flows and where it breaks down</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue mr-4 mt-1 text-xl leading-none">•</span>
+                <span><strong className="text-white">Where decisions stall</strong> — approval chains, unclear ownership, single points of failure</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue mr-4 mt-1 text-xl leading-none">•</span>
+                <span><strong className="text-white">What lives in people's heads</strong> — undocumented processes, relationships, and knowledge that shouldn't</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue mr-4 mt-1 text-xl leading-none">•</span>
+                <span><strong className="text-white">Your data visibility</strong> — can you actually see what's happening in your business, or are you running on instinct?</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue mr-4 mt-1 text-xl leading-none">•</span>
+                <span><strong className="text-white">Your tool stack</strong> — are your tools talking to each other, or creating more friction than they solve?</span>
+              </li>
+            </ul>
+          </div>
+        </FadeIn>
+
+        <FadeIn delay={200}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24">
+            <div className="bg-midnight border border-navy p-8 rounded-[2rem] shadow-sm">
+              <h3 className="text-xl font-serif text-white mb-6 border-b border-navy pb-4">What You Leave With</h3>
+              <ul className="space-y-4 text-silver">
+                <li className="flex items-start">
+                  <span className="text-purple mr-3 mt-1 leading-none">•</span>
+                  <span>A clear picture of your operation's highest-pressure point</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-purple mr-3 mt-1 leading-none">•</span>
+                  <span>Three immediate, actionable improvements</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-purple mr-3 mt-1 leading-none">•</span>
+                  <span>An honest assessment of whether and how technology or AI fits into the fix</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div className="bg-obsidian border border-navy/50 p-8 rounded-[2rem]">
+              <h3 className="text-xl font-serif text-white mb-6 border-b border-navy/50 pb-4">What Happens After</h3>
+              <p className="text-silver leading-relaxed">
+                This is not a sales call. But if what the Audit surfaces is deeper than three quick fixes can solve, I'll tell you — and explain what a full Operational Diagnostic Brief would look like as the next step. You decide if that's right for you.
+              </p>
+            </div>
+          </div>
+        </FadeIn>
+
+        {/* CTA Block */}
+        <FadeIn direction="up">
+          <div className="bg-midnight border border-blue/30 p-10 md:p-16 rounded-[3rem] text-center shadow-glow relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue/5 to-purple/5 pointer-events-none"></div>
+            <div className="relative z-10">
+              <h2 className="text-3xl md:text-4xl font-serif text-white mb-6">Thirty minutes. Three findings. Complete clarity on where to start.</h2>
+              <p className="text-xl text-silver mb-10">No pitch. No pressure. Just an honest look at your operation.</p>
+              <Button to="/contact" size="large" variant="primary" className="mb-6">Book Your Free Audit &rarr;</Button>
+              <p className="text-sm text-silver/60 italic font-serif">
+                *Spots are limited — the Audit is a live session, not an automated tool.
+              </p>
+            </div>
+          </div>
+        </FadeIn>
       </section>
     </Layout>
   );

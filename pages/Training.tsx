@@ -2,6 +2,7 @@ import React from 'react';
 import Layout from '../components/Layout';
 import Button from '../components/Button';
 import FadeIn from '../components/FadeIn';
+import LiveTrainingSessions from '../components/LiveTrainingSessions';
 import { 
     Users, 
     Network, 
@@ -33,25 +34,27 @@ const Training: React.FC = () => {
           <FadeIn direction="up">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue/10 border border-blue/30 text-blue font-mono text-sm mb-8">
               <BrainCircuit className="w-4 h-4" />
-              <span>Capability Building</span>
+              <span>Operational Training</span>
             </div>
             <h1 className="text-5xl md:text-7xl font-serif text-white leading-[1.05] mb-8 tracking-tight drop-shadow-xl">
-              Build the AI Capability<br/> <span className="text-transparent bg-clip-text bg-neon-gradient">Your Business Actually Needs</span>
+              Operational Training Built For<br/> <span className="text-transparent bg-clip-text bg-neon-gradient">How Business Actually Works</span>
             </h1>
             <p className="text-xl md:text-2xl text-silver leading-relaxed mb-12 max-w-3xl mx-auto">
-              Most AI training teaches tools. This teaches how to think — about systems, operations, and how AI fits into the way your business actually runs.
+              Every tutorial online teaches the tool. This teaches you how to use it inside your operation — combining the technical, the operational, and the systems layer in one session.
             </p>
             <div className="flex flex-col sm:flex-row gap-5 items-center justify-center">
-              <Button to="/contact" variant="primary" size="large" className="group w-full sm:w-auto hover:shadow-glow-hover hover:-translate-y-1 transition-all duration-300">
-                Schedule a Training Consultation
+              <Button to="#live-sessions" variant="primary" size="large" className="group w-full sm:w-auto hover:shadow-glow-hover hover:-translate-y-1 transition-all duration-300">
+                Explore Live Sessions
               </Button>
               <Button to="#tracks" variant="outline" size="large" className="w-full sm:w-auto text-silver border-navy hover:text-white hover:border-blue transition-colors">
-                Explore Training Tracks
+                View Training Tracks
               </Button>
             </div>
           </FadeIn>
         </div>
       </section>
+
+      <LiveTrainingSessions />
 
       {/* Audience Training Tracks */}
       <section id="tracks" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
