@@ -2,5 +2,5 @@
   "name": "Joshua Omole - AI Integration",
   "description": "Personal brand website for Joshua Omole, AI Integration Specialist & IT Project Manager.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

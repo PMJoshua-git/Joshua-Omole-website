@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
+import fs from "fs";
 
 dotenv.config();
 
@@ -25,6 +26,60 @@ app.use("/api/resources", resourcesRouter);
 app.use("/api/training-sessions", trainingSessionsRouter);
 app.use("/api/book-training", bookTrainingRouter);
 
+interface PageMeta {
+  title: string;
+  description: string;
+  url: string;
+}
+
+const META_MAP: Record<string, PageMeta> = {
+  "/": {
+    title: "Joshua Omole | Business Operations & AI Systems Strategist",
+    description: "I help businesses design smarter operations using technical tools, AI, systems thinking and practical execution",
+    url: "https://joshuaomole.com/"
+  },
+  "/about": {
+    title: "About | Joshua Omole | Business Operations & AI Systems Strategist",
+    description: "I build the operational architecture that makes a business run without the founder holding everything together manually.",
+    url: "https://joshuaomole.com/about"
+  },
+  "/services": {
+    title: "Services | Joshua Omole | Business Operations & AI Systems Strategist",
+    description: "Clear engagements. Defined outcomes. Smarter operations designed to scale your business using systems thinking, automation, and AI.",
+    url: "https://joshuaomole.com/services"
+  },
+  "/training": {
+    title: "Training | Joshua Omole | Business Operations & AI Systems Strategist",
+    description: "Operational training built for how business actually works. Explore our targeted curriculums for leaders, executives, and team members.",
+    url: "https://joshuaomole.com/training"
+  },
+  "/audit": {
+    title: "Free Systems Clarity Audit | Joshua Omole",
+    description: "Find out what your operation is actually costing you right now. A focused 30-minute session to pinpoint bottlenecks and walk away with 3 actionable findings.",
+    url: "https://joshuaomole.com/audit"
+  },
+  "/contact": {
+    title: "Book a Call | Joshua Omole | Business Operations & AI Systems Strategist",
+    description: "Let's discuss how to optimize, automate, and integrate intelligent systems into your business operations. Book a direct strategy call.",
+    url: "https://joshuaomole.com/contact"
+  },
+  "/connect": {
+    title: "Connect & Resources | Joshua Omole",
+    description: "Book consultation calls, access operational training, register for live workshops, and sign up for the weekly newsletter with Joshua Omole.",
+    url: "https://joshuaomole.com/connect"
+  },
+  "/newsletter": {
+    title: "Newsletter | Joshua Omole | Business Operations & AI Systems Strategist",
+    description: "Join founders and operators receiving weekly systems thinking strategies, actionable AI implementation guides, and operational case studies.",
+    url: "https://joshuaomole.com/newsletter"
+  },
+  "/knowledge-hub": {
+    title: "Knowledge Hub | Joshua Omole | Business Operations & AI Systems Strategist",
+    description: "Practical resource library. Explore guides, checklists, frameworks, and tools designed to help you build smarter business operations.",
+    url: "https://joshuaomole.com/knowledge-hub"
+  }
+};
+
 async function startServer() {
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
@@ -35,9 +90,68 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    app.use(express.static(distPath, { index: false }));
+    
+    app.get('*', (req, res, next) => {
+      // If it looks like a file asset (has extension) or API route, let express.static or api routes handle it
+      if (req.path.includes('.') || req.path.startsWith('/api')) {
+        return next();
+      }
+
+      const filePath = path.join(distPath, 'index.html');
+      fs.readFile(filePath, 'utf8', (err, html) => {
+        if (err) {
+          console.error("Error reading index.html:", err);
+          return res.sendFile(filePath);
+        }
+
+        let cleanPath = req.path;
+        if (cleanPath.length > 1 && cleanPath.endsWith('/')) {
+          cleanPath = cleanPath.slice(0, -1);
+        }
+
+        const meta = META_MAP[cleanPath] || META_MAP["/"];
+
+        let customizedHtml = html;
+        customizedHtml = customizedHtml.replace(
+          /<title>[^<]*<\/title>/g,
+          `<title>${meta.title}</title>`
+        );
+        customizedHtml = customizedHtml.replace(
+          /<meta name="title" content="[^"]*"/g,
+          `<meta name="title" content="${meta.title}"`
+        );
+        customizedHtml = customizedHtml.replace(
+          /<meta name="description" content="[^"]*"/g,
+          `<meta name="description" content="${meta.description}"`
+        );
+        customizedHtml = customizedHtml.replace(
+          /<meta property="og:title" content="[^"]*"/g,
+          `<meta property="og:title" content="${meta.title}"`
+        );
+        customizedHtml = customizedHtml.replace(
+          /<meta property="og:description" content="[^"]*"/g,
+          `<meta property="og:description" content="${meta.description}"`
+        );
+        customizedHtml = customizedHtml.replace(
+          /<meta property="og:url" content="[^"]*"/g,
+          `<meta property="og:url" content="${meta.url}"`
+        );
+        customizedHtml = customizedHtml.replace(
+          /<meta property="twitter:title" content="[^"]*"/g,
+          `<meta property="twitter:title" content="${meta.title}"`
+        );
+        customizedHtml = customizedHtml.replace(
+          /<meta property="twitter:description" content="[^"]*"/g,
+          `<meta property="twitter:description" content="${meta.description}"`
+        );
+        customizedHtml = customizedHtml.replace(
+          /<meta property="twitter:url" content="[^"]*"/g,
+          `<meta property="twitter:url" content="${meta.url}"`
+        );
+
+        res.send(customizedHtml);
+      });
     });
   }
 
