@@ -47,7 +47,7 @@ const Home: React.FC = () => {
                  {/* Main Image */}
                  <div className="absolute inset-0 z-0 rounded-[3rem] overflow-hidden border border-navy/50 shadow-glow">
                     <img 
-                        src="/joshua-portrait.jpg" 
+                        src="/joshua-portrait.jpg?v=2" 
                         alt="Joshua Omole" 
                         referrerPolicy="no-referrer"
                         className="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-700"

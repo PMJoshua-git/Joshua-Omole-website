@@ -86,7 +86,7 @@ const Connect: React.FC = () => {
                         
                         <div className="relative w-full h-full bg-midnight rounded-[2rem] border border-navy shadow-lg overflow-hidden z-10 p-1">
                             <img 
-                                src="/joshua-portrait.jpg" 
+                                src="/joshua-portrait.jpg?v=2" 
                                 alt="Joshua Omole" 
                                 referrerPolicy="no-referrer"
                                 className="w-full h-full object-cover rounded-[1.75rem]"
