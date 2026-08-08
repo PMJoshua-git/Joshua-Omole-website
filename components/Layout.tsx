@@ -22,6 +22,8 @@ const Layout: React.FC<ChildrenProps> = ({ children }) => {
   const [isNewsletterModalOpen, setIsNewsletterModalOpen] = useState(false);
   const location = useLocation();
 
+  // Automatic newsletter popups suspended as per user request
+  /*
   useEffect(() => {
     const hasSubscribed = localStorage.getItem('newsletter_subscribed') === 'true';
     if (hasSubscribed) return;
@@ -57,6 +59,7 @@ const Layout: React.FC<ChildrenProps> = ({ children }) => {
     document.addEventListener('mouseleave', handleMouseLeave);
     return () => document.removeEventListener('mouseleave', handleMouseLeave);
   }, [location.pathname]);
+  */
 
   const handleCloseModal = () => {
     setIsNewsletterModalOpen(false);
