@@ -1,7 +1,6 @@
 import express from 'express';
 import { z } from 'zod';
 import { leadsTable } from '../airtable';
-import { addContactToSysteme } from '../systeme';
 
 const router = express.Router();
 
@@ -67,16 +66,43 @@ router.post('/', async (req, res) => {
       }
     }
 
-    // 2. Add to Systeme.io if opted in
-    if (data.newsletterConsent && process.env.SYSTEME_API_KEY) {
-      const tagId = process.env.SYSTEME_NEWSLETTER_TAG_ID;
-      await addContactToSysteme(data.email, data.firstName, tagId, {
-        lastName: data.lastName,
-        company: data.company,
-        position: data.position,
-        country: data.country,
-        companySize: data.companySize
-      });
+    // 2. Add to Loops.so
+    if (process.env.LOOPS_API_KEY) {
+      try {
+        // Extract the single primary service chosen
+        const serviceChosen = data.service.split(',')[0].trim();
+
+        const loopsPayload = {
+          email: data.email,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          country: data.country || "",
+          companySize: data.companySize || "",
+          company: data.company || "",
+          source: "Contact page",
+          userGroup: serviceChosen
+        };
+
+        const response = await fetch('https://app.loops.so/api/v1/contacts/create', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.LOOPS_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(loopsPayload)
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          console.error(`Loops API responded with status ${response.status}: ${errText}`);
+        } else {
+          console.log(`Successfully added contact ${data.email} to Loops`);
+        }
+      } catch (err) {
+        console.error('Error adding contact to Loops:', err);
+      }
+    } else {
+      console.warn('LOOPS_API_KEY is not set in environment variables');
     }
 
     return res.status(200).json({ success: true, message: 'Consultation request received successfully' });

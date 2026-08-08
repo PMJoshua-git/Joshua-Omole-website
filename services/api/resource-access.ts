@@ -1,8 +1,6 @@
 import express from 'express';
 import { z } from 'zod';
 import { resourcesTable } from '../airtable';
-import { resend } from '../resend';
-import { getResourceEmailTemplate } from '../emails/templates';
 
 const router = express.Router();
 
@@ -55,46 +53,37 @@ router.post('/', async (req, res) => {
       }
     }
 
-    // 2. Send Resource Email
-    if (resend) {
+    // 2. Add contact to Loops.so
+    if (process.env.LOOPS_API_KEY) {
       try {
-        // Construct a generic resource link. Realistically this should map to Google Drive or local file
-        // For demonstration, we simply link back to the site.
-        const siteUrl = process.env.SITE_URL || 'https://joshuaomole.com';
-        const resourceLink = `${siteUrl}/downloads/${data.resource_id}`;
-        
-        const { html, text } = getResourceEmailTemplate(data.firstName, data.resource_title || "Resource", resourceLink);
-        await resend.emails.send({
-          from: 'Joshua Omole <hello@joshuaomole.com>', // MUST BE verified domain
-          to: data.email,
-          subject: 'Your Requested Resource Is Ready',
-          html,
-          text
-        });
-      } catch (err) {
-        console.error('Resend Resource Email Error:', err);
-      }
+        const loopsPayload = {
+          email: data.email,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          source: "Knowledge Hub page",
+          userGroup: data.resource_title || "Unknown Resource"
+        };
 
-      // Admin Notification Email
-      const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
-      if (adminEmail) {
-        try {
-          await resend.emails.send({
-            from: 'System <notifications@joshuaomole.com>',
-            to: adminEmail,
-            subject: 'New Resource Request - Joshua Omole',
-            html: `
-              <h3>Resource Requested</h3>
-              <p>Name: ${data.firstName} ${data.lastName}</p>
-              <p>Email: ${data.email}</p>
-              <p>Resource: ${data.resource_title} (${data.resource_id})</p>
-              <p>Source: ${data.lead_source}</p>
-            `,
-          });
-        } catch (err) {
-           console.error('Resend Admin Notification Error:', err);
+        const response = await fetch('https://app.loops.so/api/v1/contacts/create', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.LOOPS_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(loopsPayload)
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          console.error(`Loops API responded with status ${response.status}: ${errText}`);
+        } else {
+          console.log(`Successfully added contact ${data.email} to Loops (Resource: ${data.resource_title})`);
         }
+      } catch (err) {
+        console.error('Error adding contact to Loops:', err);
       }
+    } else {
+      console.warn('LOOPS_API_KEY is not set in environment variables');
     }
 
     return res.status(200).json({ success: true, message: 'Resource access request received.' });

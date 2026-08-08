@@ -7,8 +7,9 @@ import ResourceModal from '../components/knowledge-hub/ResourceModal';
 import LeadCaptureModal from '../components/knowledge-hub/LeadCaptureModal';
 import SuccessModal from '../components/knowledge-hub/SuccessModal';
 import { Resource } from '../types';
-import { Search, Loader2, AlertCircle } from 'lucide-react';
+import { Search, AlertCircle } from 'lucide-react';
 import { useResources } from '../hooks/useResources';
+import { ResourceCardSkeleton } from '../components/Skeleton';
 
 const KnowledgeHub: React.FC = () => {
   const { resources, loading, error } = useResources();
@@ -77,9 +78,18 @@ const KnowledgeHub: React.FC = () => {
       {/* Main Content Area */}
       <section id="resources" className="px-4 sm:px-6 lg:px-8 pb-32 max-w-7xl mx-auto relative z-10">
         {loading && (
-          <div className="flex flex-col items-center justify-center py-20 text-silver">
-            <Loader2 className="w-8 h-8 animate-spin text-blue mb-4" />
-            <p className="animate-pulse">Loading resources...</p>
+          <div className="space-y-16 animate-pulse">
+            <div>
+              <div className="mb-8">
+                <div className="shimmer h-10 w-64 bg-navy/20 rounded-xl mb-3"></div>
+                <div className="w-20 h-1 bg-neon-gradient rounded-full mt-4"></div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <ResourceCardSkeleton />
+                <ResourceCardSkeleton />
+                <ResourceCardSkeleton />
+              </div>
+            </div>
           </div>
         )}
 

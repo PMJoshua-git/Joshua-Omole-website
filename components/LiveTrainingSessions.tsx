@@ -4,6 +4,7 @@ import { TrainingSession } from '../types';
 import { UsersRound, X } from 'lucide-react';
 import Markdown from 'react-markdown';
 import Cal, { getCalApi } from "@calcom/embed-react";
+import { LiveTrainingSessionSkeleton } from './Skeleton';
 
 const LiveTrainingSessions: React.FC = () => {
   const [sessions, setSessions] = useState<TrainingSession[]>([]);
@@ -93,8 +94,17 @@ const LiveTrainingSessions: React.FC = () => {
 
   if (loading) {
     return (
-      <section id="live-sessions" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex justify-center">
-        <div className="w-8 h-8 border-4 border-blue border-t-transparent rounded-full animate-spin"></div>
+      <section id="live-sessions" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="text-center mb-16 max-w-3xl mx-auto animate-pulse">
+          <div className="shimmer h-8 w-40 bg-navy/20 rounded-full mx-auto mb-6"></div>
+          <div className="shimmer h-12 w-5/6 bg-navy/20 rounded-xl mx-auto mb-6"></div>
+          <div className="shimmer h-6 w-2/3 bg-navy/10 rounded-lg mx-auto"></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <LiveTrainingSessionSkeleton />
+          <LiveTrainingSessionSkeleton />
+          <LiveTrainingSessionSkeleton />
+        </div>
       </section>
     );
   }

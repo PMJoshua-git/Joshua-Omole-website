@@ -6,9 +6,7 @@ export const contactFormSchema = z.object({
   email: z.string().email('Please enter a valid business email'),
   phone: z.string().optional(),
   companyName: z.string().min(1, 'Company Name is required'),
-  services: z
-    .array(z.string())
-    .max(2, 'You can select a maximum of two services'),
+  service: z.string().min(1, 'Please select a service'),
   position: z.string().min(1, 'Please select your position'),
   country: z.string().min(1, 'Please select your country'),
   companySize: z.string().min(1, 'Please select company size'),

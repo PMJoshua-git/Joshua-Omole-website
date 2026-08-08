@@ -54,12 +54,12 @@ const CustomContactForm: React.FC = () => {
   } = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
-      services: [],
+      service: '',
       newsletterOptIn: false
     }
   });
 
-  const selectedServices = watch('services') || [];
+  const selectedService = watch('service') || '';
 
   const saveLead = async (data: any, bookingTime?: string) => {
     try {
@@ -73,8 +73,8 @@ const CustomContactForm: React.FC = () => {
         position: data.position,
         country: data.country,
         companySize: data.companySize,
-        service: data.services.join(', '),
-        businessGoal: data.businessGoal,
+        service: data.service,
+        businessGoal: data.businessChallenge || "",
         newsletterConsent: data.newsletterOptIn, // from form schema
         bookingTime: bookingTime,
         ...attribution
@@ -112,14 +112,8 @@ const CustomContactForm: React.FC = () => {
     })();
   }, []);
 
-  const toggleService = (service: string) => {
-    if (selectedServices.includes(service)) {
-      setValue('services', selectedServices.filter(s => s !== service), { shouldValidate: true });
-    } else {
-      if (selectedServices.length < 2) {
-        setValue('services', [...selectedServices, service], { shouldValidate: true });
-      }
-    }
+  const selectService = (service: string) => {
+    setValue('service', service, { shouldValidate: true });
   };
 
   const onSubmit = async (data: ContactFormValues) => {
@@ -195,7 +189,7 @@ const CustomContactForm: React.FC = () => {
           <div className="mb-4">
             <span className="text-sm text-silver/70 font-mono uppercase tracking-wider block mb-1">Service Selected</span>
             <div className="text-white font-medium">
-              {submittedData.services.length > 0 ? submittedData.services.join(' & ') : 'General Consultation'}
+              {submittedData.service || 'General Consultation'}
             </div>
           </div>
           <div className="mb-4">
@@ -365,31 +359,26 @@ const CustomContactForm: React.FC = () => {
         {/* Step 2: Service Selection */}
         <section className="bg-midnight/30 border border-navy/40 rounded-[2rem] p-6 md:p-10 shadow-lg">
           <h2 className="text-2xl font-serif text-white mb-2">What would you like help with?</h2>
-          <p className="text-silver/80 text-sm mb-6">Select up to two services.</p>
+          <p className="text-silver/80 text-sm mb-6">Select the primary service you require.</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
              {SERVICES.map((service) => {
-               const isSelected = selectedServices.includes(service);
-               const isDisabled = selectedServices.length >= 2 && !isSelected;
+               const isSelected = selectedService === service;
                
                return (
                  <motion.button
                    type="button"
                    key={service}
-                   whileHover={!isDisabled ? { y: -2 } : {}}
-                   whileTap={!isDisabled ? { scale: 0.98 } : {}}
-                   onClick={() => toggleService(service)}
-                   disabled={isDisabled}
+                   whileHover={{ y: -2 }}
+                   whileTap={{ scale: 0.98 }}
+                   onClick={() => selectService(service)}
                    className={`
                      relative p-6 rounded-2xl border text-left transition-all duration-300 overflow-hidden
                      ${isSelected 
                        ? 'bg-blue/10 border-blue shadow-[0_0_15px_rgba(60,117,165,0.2)]' 
                        : 'bg-obsidian/60 border-navy hover:bg-midnight hover:border-blue/30'}
-                     ${isDisabled ? 'opacity-50 cursor-not-allowed hidden' : ''}
                    `}
-                   style={{ display: isDisabled ? 'none' : 'block' }} 
                  >
-                   {/* Remove hidden if you just want to blur it instead of display: none */}
                    <div className="absolute top-0 right-0 w-16 h-16 bg-blue/10 rounded-bl-full blur-xl -mr-4 -mt-4 opacity-0 transition-opacity" style={{ opacity: isSelected ? 1 : 0 }}></div>
                    
                    <div className="flex items-start justify-between gap-4">
@@ -402,7 +391,7 @@ const CustomContactForm: React.FC = () => {
                );
              })}
           </div>
-          {errors.services && <p className="text-red-400 text-xs mt-4">{errors.services.message}</p>}
+          {errors.service && <p className="text-red-400 text-xs mt-4">{errors.service.message}</p>}
         </section>
 
         {/* Step 3: Role Selection */}
