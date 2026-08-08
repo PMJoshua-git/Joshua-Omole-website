@@ -88,6 +88,7 @@ const Connect: React.FC = () => {
                             <img 
                                 src="/joshua-portrait.jpg" 
                                 alt="Joshua Omole" 
+                                referrerPolicy="no-referrer"
                                 className="w-full h-full object-cover rounded-[1.75rem]"
                             />
                         </div>

@@ -49,6 +49,7 @@ const Home: React.FC = () => {
                     <img 
                         src="/joshua-portrait.jpg" 
                         alt="Joshua Omole" 
+                        referrerPolicy="no-referrer"
                         className="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-700"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-transparent to-transparent"></div>
@@ -274,21 +275,25 @@ const Home: React.FC = () => {
                         <img 
                             src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=300&q=80" 
                             alt="Professional Consultant" 
+                            referrerPolicy="no-referrer"
                             className="w-32 h-32 md:w-40 md:h-40 rounded-[2rem] object-cover hover:scale-105 transition-all duration-500 shadow-xl rotate-[-3deg] border border-white/10 opacity-90 hover:opacity-100"
                         />
                         <img 
                             src="https://images.unsplash.com/photo-1573496359-7973112e1714?auto=format&fit=crop&w=300&q=80" 
                             alt="Automation Specialist" 
+                            referrerPolicy="no-referrer"
                             className="w-32 h-32 md:w-40 md:h-40 rounded-[2rem] object-cover hover:scale-105 transition-all duration-500 shadow-xl mt-12 rotate-[3deg] border border-white/10 opacity-90 hover:opacity-100"
                         />
                         <img 
                             src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=300&q=80" 
                             alt="Systems Architect" 
+                            referrerPolicy="no-referrer"
                             className="w-32 h-32 md:w-40 md:h-40 rounded-[2rem] object-cover hover:scale-105 transition-all duration-500 shadow-xl -mt-6 rotate-[2deg] border border-white/10 opacity-90 hover:opacity-100"
                         />
                         <img 
                             src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" 
                             alt="Developer" 
+                            referrerPolicy="no-referrer"
                             className="w-32 h-32 md:w-40 md:h-40 rounded-[2rem] object-cover hover:scale-105 transition-all duration-500 shadow-xl mt-6 rotate-[-2deg] border border-white/10 opacity-90 hover:opacity-100"
                         />
                     </div>
