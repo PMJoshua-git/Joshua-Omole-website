@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import Button from '../components/Button';
 import QuoteBlock from '../components/QuoteBlock';
@@ -8,6 +8,8 @@ import FadeIn from '../components/FadeIn';
 import { LayoutTemplate, ShieldCheck, Users, BrainCircuit, ArrowUpRight, PlayCircle, Code2, Cpu } from 'lucide-react';
 
 const Home: React.FC = () => {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <Layout>
       {/* Section 1: Hero */}
@@ -45,14 +47,27 @@ const Home: React.FC = () => {
           <div className="lg:col-span-6 relative h-[500px] lg:h-[600px] flex items-center justify-center">
              <FadeIn direction="right" delay={200} className="w-full h-full relative">
                  {/* Main Image */}
-                 <div className="absolute inset-0 z-0 rounded-[3rem] overflow-hidden border border-navy/50 shadow-glow">
-                    <img 
-                        src="/joshua-portrait.jpg?v=2" 
-                        alt="Joshua Omole" 
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-transparent to-transparent"></div>
+                 <div className="absolute inset-0 z-0 rounded-[3rem] overflow-hidden border border-navy/50 shadow-glow bg-midnight flex items-center justify-center">
+                    {!imageError ? (
+                       <img 
+                           src="/joshua-portrait.jpg?v=3" 
+                           alt="Joshua Omole" 
+                           referrerPolicy="no-referrer"
+                           className="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-700"
+                           onError={() => setImageError(true)}
+                       />
+                    ) : (
+                       <div className="w-full h-full bg-gradient-to-br from-midnight via-navy/40 to-purple/20 flex flex-col items-center justify-center p-8 text-center">
+                          <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-blue to-purple flex items-center justify-center shadow-glow mb-6">
+                             <span className="text-white font-serif italic font-bold text-3xl">J.O</span>
+                          </div>
+                          <h3 className="text-xl font-serif font-bold text-white mb-2">Joshua Omole</h3>
+                          <p className="text-xs text-silver uppercase tracking-widest max-w-xs leading-relaxed">
+                             Business Operations & AI Systems Strategist
+                          </p>
+                       </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-transparent to-transparent pointer-events-none"></div>
                  </div>
                  
                  {/* Floating Glass Card 1 - Code Snippet */}

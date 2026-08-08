@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Network, 
@@ -70,6 +70,8 @@ const ConnectCard: React.FC<ConnectCardProps> = ({ title, description, buttonTex
 };
 
 const Connect: React.FC = () => {
+    const [imageError, setImageError] = useState(false);
+
     useEffect(() => {
         document.title = "Connect | Joshua Omole";
     }, []);
@@ -84,13 +86,20 @@ const Connect: React.FC = () => {
                         {/* Soft glow behind portrait */}
                         <div className="absolute inset-0 bg-blue/20 rounded-[2.5rem] blur-[20px] transition-all duration-700 group-hover:bg-blue/30"></div>
                         
-                        <div className="relative w-full h-full bg-midnight rounded-[2rem] border border-navy shadow-lg overflow-hidden z-10 p-1">
-                            <img 
-                                src="/joshua-portrait.jpg?v=2" 
-                                alt="Joshua Omole" 
-                                referrerPolicy="no-referrer"
-                                className="w-full h-full object-cover rounded-[1.75rem]"
-                            />
+                        <div className="relative w-full h-full bg-midnight rounded-[2rem] border border-navy shadow-lg overflow-hidden z-10 p-1 flex items-center justify-center">
+                            {!imageError ? (
+                                <img 
+                                    src="/joshua-portrait.jpg?v=3" 
+                                    alt="Joshua Omole" 
+                                    referrerPolicy="no-referrer"
+                                    className="w-full h-full object-cover rounded-[1.75rem]"
+                                    onError={() => setImageError(true)}
+                                />
+                            ) : (
+                                <div className="w-full h-full bg-gradient-to-tr from-blue to-purple rounded-[1.75rem] flex items-center justify-center shadow-glow">
+                                    <span className="text-white font-serif italic font-bold text-4xl">J.O</span>
+                                </div>
+                            )}
                         </div>
                     </div>
 

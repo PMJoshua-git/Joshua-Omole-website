@@ -109,44 +109,45 @@ async function startServer() {
         if (cleanPath.length > 1 && cleanPath.endsWith('/')) {
           cleanPath = cleanPath.slice(0, -1);
         }
+        cleanPath = cleanPath.toLowerCase();
 
         const meta = META_MAP[cleanPath] || META_MAP["/"];
 
         let customizedHtml = html;
         customizedHtml = customizedHtml.replace(
-          /<title>[^<]*<\/title>/g,
+          /<title>[^<]*<\/title>/gi,
           `<title>${meta.title}</title>`
         );
         customizedHtml = customizedHtml.replace(
-          /<meta name="title" content="[^"]*"/g,
+          /<meta name="title" content="[^"]*"/gi,
           `<meta name="title" content="${meta.title}"`
         );
         customizedHtml = customizedHtml.replace(
-          /<meta name="description" content="[^"]*"/g,
+          /<meta name="description" content="[^"]*"/gi,
           `<meta name="description" content="${meta.description}"`
         );
         customizedHtml = customizedHtml.replace(
-          /<meta property="og:title" content="[^"]*"/g,
+          /<meta property="og:title" content="[^"]*"/gi,
           `<meta property="og:title" content="${meta.title}"`
         );
         customizedHtml = customizedHtml.replace(
-          /<meta property="og:description" content="[^"]*"/g,
+          /<meta property="og:description" content="[^"]*"/gi,
           `<meta property="og:description" content="${meta.description}"`
         );
         customizedHtml = customizedHtml.replace(
-          /<meta property="og:url" content="[^"]*"/g,
+          /<meta property="og:url" content="[^"]*"/gi,
           `<meta property="og:url" content="${meta.url}"`
         );
         customizedHtml = customizedHtml.replace(
-          /<meta property="twitter:title" content="[^"]*"/g,
+          /<meta property="twitter:title" content="[^"]*"/gi,
           `<meta property="twitter:title" content="${meta.title}"`
         );
         customizedHtml = customizedHtml.replace(
-          /<meta property="twitter:description" content="[^"]*"/g,
+          /<meta property="twitter:description" content="[^"]*"/gi,
           `<meta property="twitter:description" content="${meta.description}"`
         );
         customizedHtml = customizedHtml.replace(
-          /<meta property="twitter:url" content="[^"]*"/g,
+          /<meta property="twitter:url" content="[^"]*"/gi,
           `<meta property="twitter:url" content="${meta.url}"`
         );
 
