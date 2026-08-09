@@ -73,9 +73,9 @@ app.post("/api/save-contact", async (req, res) => {
   }
 
   const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
-  const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN || process.env.AIRTABLE_API_KEY;
+  const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
 
-  if (!AIRTABLE_BASE_ID || !AIRTABLE_TOKEN) {
+  if (!AIRTABLE_BASE_ID || !AIRTABLE_API_KEY) {
     console.error("Missing Airtable environment variables");
     return res.status(500).json({ error: "Server configuration error" });
   }
@@ -87,7 +87,7 @@ app.post("/api/save-contact", async (req, res) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${AIRTABLE_TOKEN}`,
+          "Authorization": `Bearer ${AIRTABLE_API_KEY}`,
         },
         body: JSON.stringify({ fields }),
       }
