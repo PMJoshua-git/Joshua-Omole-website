@@ -26,6 +26,87 @@ app.use("/api/resources", resourcesRouter);
 app.use("/api/training-sessions", trainingSessionsRouter);
 app.use("/api/book-training", bookTrainingRouter);
 
+// Secure proxy routes matching the Vercel Serverless Functions
+app.post("/api/subscribe", async (req, res) => {
+  const { email, firstName, lastName, mailingLists, userGroup } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
+
+  try {
+    const response = await fetch("https://app.loops.so/api/v1/contacts/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.LOOPS_API_KEY}`,
+      },
+      body: JSON.stringify({
+        email,
+        firstName: firstName || "",
+        lastName: lastName || "",
+        mailingLists: mailingLists || {},
+        userGroup: userGroup || "",
+        source: "joshuaomole.com",
+      }),
+    });
+
+    const data = await response.json() as any;
+
+    if (!response.ok) {
+      console.error("Loops API error:", data);
+      return res.status(response.status).json({ error: "Failed to add contact to Loops", details: data });
+    }
+
+    return res.status(200).json({ success: true, data });
+  } catch (error) {
+    console.error("Loops function error:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/api/save-contact", async (req, res) => {
+  const { tableName, fields } = req.body;
+
+  if (!tableName || !fields) {
+    return res.status(400).json({ error: "tableName and fields are required" });
+  }
+
+  const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
+  const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+
+  if (!AIRTABLE_BASE_ID || !AIRTABLE_TOKEN) {
+    console.error("Missing Airtable environment variables");
+    return res.status(500).json({ error: "Server configuration error" });
+  }
+
+  try {
+    const response = await fetch(
+      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(tableName)}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${AIRTABLE_TOKEN}`,
+        },
+        body: JSON.stringify({ fields }),
+      }
+    );
+
+    const data = await response.json() as any;
+
+    if (!response.ok) {
+      console.error("Airtable API error:", data);
+      return res.status(response.status).json({ error: "Failed to save to Airtable", details: data });
+    }
+
+    return res.status(200).json({ success: true, data });
+  } catch (error) {
+    console.error("Airtable function error:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 interface PageMeta {
   title: string;
   description: string;

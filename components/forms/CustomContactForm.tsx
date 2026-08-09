@@ -64,29 +64,65 @@ const CustomContactForm: React.FC = () => {
   const saveLead = async (data: any, bookingTime?: string) => {
     try {
       const attribution = getAttributionData();
-      const payload = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        company: data.companyName, // from form schema
-        position: data.position,
-        country: data.country,
-        companySize: data.companySize,
-        service: data.service,
-        businessGoal: data.businessChallenge || "",
-        newsletterConsent: data.newsletterOptIn, // from form schema
-        bookingTime: bookingTime,
-        ...attribution
-      };
       
-      await fetch('/api/book-consultation', {
+      // 1. Save to Airtable Leads using save-contact
+      const airtableResponse = await fetch('/api/save-contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          tableName: 'Leads',
+          fields: {
+            "Created Date": new Date().toISOString(),
+            "Lead Type": "Service Inquiry",
+            "First Name": data.firstName,
+            "Last Name": data.lastName,
+            "Email": data.email,
+            "Phone Number": data.phone || "",
+            "Company Name": data.companyName || "",
+            "Position": data.position || "",
+            "Country": data.country || "",
+            "Company Size": data.companySize || "",
+            "Service Selected": data.service,
+            "Business Goal": data.businessChallenge || "",
+            "Newsletter Opt-In": data.newsletterOptIn || false,
+            "Booking Time": bookingTime || "",
+            "Lead Source": attribution.lead_source || "direct",
+            "Landing Page": attribution.landing_page || "",
+            "UTM Source": attribution.utm_source || "",
+            "UTM Medium": attribution.utm_medium || "",
+            "UTM Campaign": attribution.utm_campaign || "",
+            "Referrer": attribution.referrer || "",
+            "Status": "New"
+          }
+        })
       });
+
+      if (!airtableResponse.ok) {
+        const errData = await airtableResponse.json();
+        console.error('Airtable save error:', errData);
+      }
+
+      // 2. Add to Loops using subscribe
+      const serviceChosen = (data.service || '').split(',')[0].trim();
+      try {
+        await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: data.email,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            userGroup: serviceChosen,
+            mailingLists: {},
+          })
+        });
+      } catch (loopsErr) {
+        console.error('Loops subscribe error:', loopsErr);
+      }
     } catch (err) {
       console.error('Submission error:', err);
     }

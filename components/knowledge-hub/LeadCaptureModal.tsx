@@ -57,19 +57,58 @@ const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ resource, isOpen, o
         ...attribution
       };
       
-      const response = await fetch('/api/resource-access', {
+      // 1. Save to Airtable using the save-contact serverless function
+      const airtableResponse = await fetch('/api/save-contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          tableName: 'Resource Downloads',
+          fields: {
+            "Created Date": new Date().toISOString(),
+            "First Name": data.firstName,
+            "Last Name": data.lastName,
+            "Email": data.email,
+            "Resource ID": resource.id,
+            "Resource Title": resource.title,
+            "Resource Category": resource.category || "",
+            "Lead Source": attribution.lead_source || "direct",
+            "Landing Page": attribution.landing_page || "",
+            "UTM Source": attribution.utm_source || "",
+            "UTM Medium": attribution.utm_medium || "",
+            "UTM Campaign": attribution.utm_campaign || "",
+            "Referrer": attribution.referrer || "",
+            "Status": "Requested"
+          }
+        })
       });
       
-      const result = await response.json();
-      if (!result.success) {
-        setErrorMsg(result.message || 'An error occurred. Please try again.');
+      if (!airtableResponse.ok) {
+        const errorResult = await airtableResponse.json();
+        console.error('Airtable Resource Error:', errorResult);
+        setErrorMsg('Database failure. Please try again.');
         setIsSubmitting(false);
         return;
+      }
+
+      // 2. Add contact to Loops
+      try {
+        await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: data.email,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            userGroup: resource.title || "Unknown Resource",
+            mailingLists: {},
+          })
+        });
+      } catch (loopsErr) {
+        console.error('Error adding contact to Loops:', loopsErr);
       }
       
       reset();

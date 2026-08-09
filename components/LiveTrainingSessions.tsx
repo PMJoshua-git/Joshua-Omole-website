@@ -72,14 +72,25 @@ const LiveTrainingSessions: React.FC = () => {
         sessionTitle: selectedSession.title
       };
       
-      const response = await fetch('/api/book-training', {
+      const response = await fetch('/api/save-contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          tableName: 'Training Pipeline',
+          fields: {
+            "Name": formData.name,
+            "Email": formData.email,
+            "Location": formData.location,
+            "Expectations": formData.expectations || "",
+            "Session": selectedSession.title || "",
+            "Booking date": new Date().toISOString(),
+            "Status": "Pending"
+          }
+        })
       });
       
       const result = await response.json();
-      if (result.success && selectedSession.calBookingLink) {
+      if (response.ok && selectedSession.calBookingLink) {
         setShowCalEmbed(true);
       } else {
         alert('Failed to submit booking. Please try again.');
