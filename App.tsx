@@ -22,6 +22,7 @@ const TITLE_MAP: Record<string, string> = {
   "/connect": "Connect & Resources | Joshua Omole",
   "/newsletter": "Newsletter | Joshua Omole",
   "/knowledge-hub": "Knowledge Hub | Joshua Omole",
+  "/knowledge": "Knowledge Hub | Joshua Omole",
 };
 
 const PageTitleUpdater = () => {
@@ -72,6 +73,7 @@ const App: React.FC = () => {
         <Route path="/connect" element={<Connect />} />
         <Route path="/newsletter" element={<Newsletter />} />
         <Route path="/knowledge-hub" element={<KnowledgeHub />} />
+        <Route path="/knowledge" element={<KnowledgeHub />} />
       </Routes>
     </Router>
   );

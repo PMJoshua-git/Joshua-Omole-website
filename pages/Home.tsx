@@ -5,13 +5,28 @@ import QuoteBlock from '../components/QuoteBlock';
 import ServiceCard from '../components/ServiceCard';
 import ProcessStep from '../components/ProcessStep';
 import FadeIn from '../components/FadeIn';
+import { Helmet } from 'react-helmet-async';
 import { LayoutTemplate, ShieldCheck, Users, BrainCircuit, ArrowUpRight, PlayCircle, Code2, Cpu } from 'lucide-react';
 
 const Home: React.FC = () => {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <Layout>
+    <>
+      <Helmet>
+        <title>Joshua Omole | Business Operations and AI Systems Strategist</title>
+        <meta name="description" content="Joshua Omole helps small and mid-sized businesses design smarter operations using AI, automation, and systems thinking. The bridge between business strategy and technical execution." />
+        <meta property="og:title" content="Joshua Omole | Business Operations and AI Systems Strategist" />
+        <meta property="og:description" content="Helping growing businesses design smarter operations using AI, automation, and systems thinking. Start with a free Systems Clarity Audit." />
+        <meta property="og:url" content="https://joshuaomole.com" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://joshuaomole.com/images/joshua-portrait.jpg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Joshua Omole | Business Operations and AI Systems Strategist" />
+        <meta name="twitter:description" content="Helping growing businesses design smarter operations using AI, automation, and systems thinking." />
+        <link rel="canonical" href="https://joshuaomole.com" />
+      </Helmet>
+      <Layout>
       {/* Section 1: Hero */}
       <section className="relative px-4 sm:px-6 lg:px-8 pt-32 pb-20 md:pt-48 md:pb-32 max-w-7xl mx-auto overflow-hidden">
         {/* Glow Backgrounds */}
@@ -50,8 +65,8 @@ const Home: React.FC = () => {
                  <div className="absolute inset-0 z-0 rounded-[3rem] overflow-hidden border border-navy/50 shadow-glow bg-midnight flex items-center justify-center">
                     {!imageError ? (
                        <img 
-                           src="/joshua-portrait.jpg?v=3" 
-                           alt="Joshua Omole" 
+                           src="/images/joshua-portrait.jpg" 
+                           alt="Joshua Omole — Business Operations and AI Systems Strategist" 
                            referrerPolicy="no-referrer"
                            className="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-700"
                            onError={() => setImageError(true)}
@@ -328,6 +343,7 @@ const Home: React.FC = () => {
         </FadeIn>
       </section>
     </Layout>
+    </>
   );
 };
 

@@ -89,8 +89,8 @@ const Connect: React.FC = () => {
                         <div className="relative w-full h-full bg-midnight rounded-[2rem] border border-navy shadow-lg overflow-hidden z-10 p-1 flex items-center justify-center">
                             {!imageError ? (
                                 <img 
-                                    src="/joshua-portrait.jpg?v=3" 
-                                    alt="Joshua Omole" 
+                                    src="/images/joshua-portrait.jpg" 
+                                    alt="Joshua Omole — Business Operations and AI Systems Strategist" 
                                     referrerPolicy="no-referrer"
                                     className="w-full h-full object-cover rounded-[1.75rem]"
                                     onError={() => setImageError(true)}

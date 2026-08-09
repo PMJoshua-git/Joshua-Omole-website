@@ -6,6 +6,7 @@ import ResourceGrid from '../components/knowledge-hub/ResourceGrid';
 import ResourceModal from '../components/knowledge-hub/ResourceModal';
 import LeadCaptureModal from '../components/knowledge-hub/LeadCaptureModal';
 import SuccessModal from '../components/knowledge-hub/SuccessModal';
+import { Helmet } from 'react-helmet-async';
 import { Resource } from '../types';
 import { Search, AlertCircle } from 'lucide-react';
 import { useResources } from '../hooks/useResources';
@@ -44,7 +45,21 @@ const KnowledgeHub: React.FC = () => {
   const categories = Array.from(new Set(resources.map(r => r.category))).filter(c => c && c !== 'Featured');
 
   return (
-    <Layout>
+    <>
+      <Helmet>
+        <title>Knowledge Hub | Joshua Omole</title>
+        <meta name="description" content="Free guides, frameworks, and operational resources built specifically for business owners who want to understand AI and systems without the noise. Practical resources you can apply to your operation today." />
+        <meta property="og:title" content="Knowledge Hub — Free Operational Resources | Joshua Omole" />
+        <meta property="og:description" content="Free guides, frameworks, and resources for SME founders and operators. Stop searching. Start implementing." />
+        <meta property="og:url" content="https://joshuaomole.com/knowledge" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://joshuaomole.com/images/joshua-portrait.jpg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Knowledge Hub — Free Operational Resources | Joshua Omole" />
+        <meta name="twitter:description" content="Free guides, frameworks, and resources for SME founders. Practical. Applicable. Built for real business operations." />
+        <link rel="canonical" href="https://joshuaomole.com/knowledge" />
+      </Helmet>
+      <Layout>
       {/* Hero Section */}
       <section className="relative px-4 sm:px-6 lg:px-8 pt-32 pb-20 max-w-7xl mx-auto overflow-hidden text-center min-h-[50vh] flex flex-col items-center justify-center">
         {/* Glow Backgrounds */}
@@ -154,6 +169,7 @@ const KnowledgeHub: React.FC = () => {
       />
 
     </Layout>
+    </>
   );
 };
 

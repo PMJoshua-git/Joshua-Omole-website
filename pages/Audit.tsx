@@ -2,10 +2,25 @@ import React from 'react';
 import Layout from '../components/Layout';
 import Button from '../components/Button';
 import FadeIn from '../components/FadeIn';
+import { Helmet } from 'react-helmet-async';
 
 const Audit: React.FC = () => {
   return (
-    <Layout>
+    <>
+      <Helmet>
+        <title>Free Systems Clarity Audit | Joshua Omole</title>
+        <meta name="description" content="Book a free 30-minute Systems Clarity Audit with Joshua Omole. Find out exactly where your operation is leaking time, money, and momentum — and walk away with three things you can act on immediately." />
+        <meta property="og:title" content="Free Systems Clarity Audit | Joshua Omole" />
+        <meta property="og:description" content="Book a free 30-minute Systems Clarity Audit. Find out where your operation is breaking down and walk away with three immediate actions — no pitch, no commitment." />
+        <meta property="og:url" content="https://joshuaomole.com/audit" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://joshuaomole.com/images/joshua-portrait.jpg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Free Systems Clarity Audit | Joshua Omole" />
+        <meta name="twitter:description" content="Book a free 30-minute Systems Clarity Audit. Walk away with three immediate actions for your business — no pitch, no commitment." />
+        <link rel="canonical" href="https://joshuaomole.com/audit" />
+      </Helmet>
+      <Layout>
       <section className="bg-midnight text-white py-32 px-4 relative overflow-hidden rounded-b-[3rem] border-b border-navy">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue/10 rounded-full blur-[100px] -ml-32 -mb-32"></div>
@@ -113,6 +128,7 @@ const Audit: React.FC = () => {
         </FadeIn>
       </section>
     </Layout>
+    </>
   );
 };
 

@@ -3,6 +3,7 @@ import Layout from '../components/Layout';
 import Button from '../components/Button';
 import FadeIn from '../components/FadeIn';
 import LiveTrainingSessions from '../components/LiveTrainingSessions';
+import { Helmet } from 'react-helmet-async';
 import { 
     Users, 
     Network, 
@@ -20,7 +21,21 @@ import {
 
 const Training: React.FC = () => {
   return (
-    <Layout>
+    <>
+      <Helmet>
+        <title>Live Training Sessions | Joshua Omole</title>
+        <meta name="description" content="Live, curriculum-led training sessions that teach you how to use AI and operational tools inside your specific business. Not tutorials — real application, live Q&A, built for SME founders and operators." />
+        <meta property="og:title" content="Live Training Sessions | Joshua Omole" />
+        <meta property="og:description" content="Live sessions combining technical knowledge, operational thinking, and systems design. Built for SME founders and operators. Reserve your spot." />
+        <meta property="og:url" content="https://joshuaomole.com/training" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://joshuaomole.com/images/joshua-portrait.jpg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Live Training Sessions | Joshua Omole" />
+        <meta name="twitter:description" content="Live sessions combining technical knowledge, operational thinking, and systems design. Built for SME founders and operators." />
+        <link rel="canonical" href="https://joshuaomole.com/training" />
+      </Helmet>
+      <Layout>
       {/* Hero Section */}
       <section className="relative px-4 sm:px-6 lg:px-8 pt-32 pb-20 md:pt-48 md:pb-32 max-w-7xl mx-auto overflow-hidden">
         {/* Animated Background Visuals */}
@@ -186,6 +201,7 @@ const Training: React.FC = () => {
       </section>
 
     </Layout>
+    </>
   );
 };
 
