@@ -70,7 +70,21 @@ const ConnectCard: React.FC<ConnectCardProps> = ({ title, description, buttonTex
 };
 
 const Connect: React.FC = () => {
-    const [imageError, setImageError] = useState(false);
+    const [imageIndex, setImageIndex] = useState(0);
+    const imageSources = [
+        "/images/joshua-portrait.jpg",
+        "/images/joshua-portrait.JPG",
+        "/joshua-portrait.jpg",
+        "/joshua-portrait.JPG",
+    ];
+
+    const handleImageError = () => {
+        if (imageIndex < imageSources.length - 1) {
+            setImageIndex(imageIndex + 1);
+        } else {
+            setImageIndex(-1); // Show fallback UI
+        }
+    };
 
     useEffect(() => {
         document.title = "Connect | Joshua Omole";
@@ -87,13 +101,13 @@ const Connect: React.FC = () => {
                         <div className="absolute inset-0 bg-blue/20 rounded-[2.5rem] blur-[20px] transition-all duration-700 group-hover:bg-blue/30"></div>
                         
                         <div className="relative w-full h-full bg-midnight rounded-[2rem] border border-navy shadow-lg overflow-hidden z-10 p-1 flex items-center justify-center">
-                            {!imageError ? (
+                            {imageIndex !== -1 ? (
                                 <img 
-                                    src="/images/joshua-portrait.jpg" 
+                                    src={imageSources[imageIndex]} 
                                     alt="Joshua Omole — Business Operations and AI Systems Strategist" 
                                     referrerPolicy="no-referrer"
                                     className="w-full h-full object-cover rounded-[1.75rem]"
-                                    onError={() => setImageError(true)}
+                                    onError={handleImageError}
                                 />
                             ) : (
                                 <div className="w-full h-full bg-gradient-to-tr from-blue to-purple rounded-[1.75rem] flex items-center justify-center shadow-glow">

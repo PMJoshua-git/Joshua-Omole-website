@@ -9,7 +9,21 @@ import { Helmet } from 'react-helmet-async';
 import { LayoutTemplate, ShieldCheck, Users, BrainCircuit, ArrowUpRight, PlayCircle, Code2, Cpu } from 'lucide-react';
 
 const Home: React.FC = () => {
-  const [imageError, setImageError] = useState(false);
+  const [imageIndex, setImageIndex] = useState(0);
+  const imageSources = [
+    "/images/joshua-portrait.jpg",
+    "/images/joshua-portrait.JPG",
+    "/joshua-portrait.jpg",
+    "/joshua-portrait.JPG",
+  ];
+
+  const handleImageError = () => {
+    if (imageIndex < imageSources.length - 1) {
+      setImageIndex(imageIndex + 1);
+    } else {
+      setImageIndex(-1); // Show fallback UI
+    }
+  };
 
   return (
     <>
@@ -63,13 +77,13 @@ const Home: React.FC = () => {
              <FadeIn direction="right" delay={200} className="w-full h-full relative">
                  {/* Main Image */}
                  <div className="absolute inset-0 z-0 rounded-[3rem] overflow-hidden border border-navy/50 shadow-glow bg-midnight flex items-center justify-center">
-                    {!imageError ? (
+                    {imageIndex !== -1 ? (
                        <img 
-                           src="/images/joshua-portrait.jpg" 
+                           src={imageSources[imageIndex]} 
                            alt="Joshua Omole — Business Operations and AI Systems Strategist" 
                            referrerPolicy="no-referrer"
                            className="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-700"
-                           onError={() => setImageError(true)}
+                           onError={handleImageError}
                        />
                     ) : (
                        <div className="w-full h-full bg-gradient-to-br from-midnight via-navy/40 to-purple/20 flex flex-col items-center justify-center p-8 text-center">
