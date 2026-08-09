@@ -73,7 +73,7 @@ app.post("/api/save-contact", async (req, res) => {
   }
 
   const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
-  const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+  const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN || process.env.AIRTABLE_API_KEY;
 
   if (!AIRTABLE_BASE_ID || !AIRTABLE_TOKEN) {
     console.error("Missing Airtable environment variables");
