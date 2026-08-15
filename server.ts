@@ -28,7 +28,7 @@ app.use("/api/book-training", bookTrainingRouter);
 
 // Secure proxy routes matching the Vercel Serverless Functions
 app.post("/api/subscribe", async (req, res) => {
-  const { email, firstName, lastName, mailingLists, userGroup } = req.body;
+  const { email, firstName, lastName, mailingLists, userGroup, company, country, companySize } = req.body;
 
   if (!email) {
     return res.status(400).json({ error: "Email is required" });
@@ -47,6 +47,9 @@ app.post("/api/subscribe", async (req, res) => {
         lastName: lastName || "",
         mailingLists: mailingLists || {},
         userGroup: userGroup || "",
+        company: company || "",
+        country: country || "",
+        companySize: companySize || "",
         source: "joshuaomole.com",
       }),
     });

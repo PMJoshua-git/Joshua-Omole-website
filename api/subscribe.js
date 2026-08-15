@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { email, firstName, lastName, mailingLists, userGroup } = req.body;
+  const { email, firstName, lastName, mailingLists, userGroup, company, country, companySize } = req.body;
 
   if (!email) {
     return res.status(400).json({ error: 'Email is required' });
@@ -22,6 +22,9 @@ export default async function handler(req, res) {
         lastName: lastName || '',
         mailingLists: mailingLists || {},
         userGroup: userGroup || '',
+        company: company || '',
+        country: country || '',
+        companySize: companySize || '',
         source: 'joshuaomole.com',
       }),
     });

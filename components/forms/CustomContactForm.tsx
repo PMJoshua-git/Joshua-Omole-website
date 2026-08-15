@@ -118,6 +118,9 @@ const CustomContactForm: React.FC = () => {
             lastName: data.lastName,
             userGroup: serviceChosen,
             mailingLists: {},
+            company: data.companyName || '',
+            country: data.country || '',
+            companySize: data.companySize || '',
           })
         });
       } catch (loopsErr) {
