@@ -1,12 +1,20 @@
 import React from 'react';
 import Layout from '../components/Layout';
 import FadeIn from '../components/FadeIn';
+import { Helmet } from 'react-helmet-async';
 
 import CustomContactForm from '../components/forms/CustomContactForm';
 
 const Contact: React.FC = () => {
   return (
-    <Layout>
+    <>
+      <Helmet>
+        <title>Book a session | Joshua Omole</title>
+        <meta name="description" content="Find out exactly where your operation is leaking time, money, and momentum and walk away with three things you can act on immediately. Book a free 30-minute Systems Clarity Audit with Joshua Omole." />
+        <meta property="og:title" content="Book a session | Joshua Omole" />
+        <meta property="og:description" content="Find out exactly where your operation is leaking time, money, and momentum and walk away with three things you can act on immediately. Book a free 30-minute Systems Clarity Audit with Joshua Omole." />
+      </Helmet>
+      <Layout>
       <section className="py-24 px-4 max-w-4xl mx-auto">
         <FadeIn direction="up">
           <div className="text-center mb-16">
@@ -21,7 +29,8 @@ const Contact: React.FC = () => {
           <CustomContactForm />
         </FadeIn>
       </section>
-    </Layout>
+      </Layout>
+    </>
   );
 };
 

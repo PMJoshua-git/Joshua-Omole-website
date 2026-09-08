@@ -5,6 +5,7 @@ import Layout from '../components/Layout';
 import QuoteBlock from '../components/QuoteBlock';
 import NewsletterModal from '../components/NewsletterModal';
 import { getAttributionData } from '../utils/attribution';
+import { Helmet } from 'react-helmet-async';
 
 const Newsletter: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -12,10 +13,6 @@ const Newsletter: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    useEffect(() => {
-        document.title = "Newsletter | Joshua Omole";
-    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -57,7 +54,14 @@ const Newsletter: React.FC = () => {
     };
 
     return (
-        <Layout>
+        <>
+            <Helmet>
+                <title>Newsletter | Joshua Omole</title>
+                <meta name="description" content="Join professionals, founders, and decision-makers receiving practical insights on AI, technology, systems thinking, project execution, and business transformation" />
+                <meta property="og:title" content="Newsletter | Joshua Omole" />
+                <meta property="og:description" content="Join professionals, founders, and decision-makers receiving practical insights on AI, technology, systems thinking, project execution, and business transformation" />
+            </Helmet>
+            <Layout>
             <div className="min-h-screen bg-obsidian relative overflow-hidden">
                 {/* Background Ambient Effects */}
                 <div className="absolute inset-0 pointer-events-none z-0">
@@ -257,7 +261,8 @@ const Newsletter: React.FC = () => {
                 <NewsletterModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
             </div>
         </Layout>
-    );
+    </>
+  );
 };
 
 export default Newsletter;

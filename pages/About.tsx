@@ -2,10 +2,18 @@ import React from 'react';
 import Layout from '../components/Layout';
 import Button from '../components/Button';
 import FadeIn from '../components/FadeIn';
+import { Helmet } from 'react-helmet-async';
 
 const About: React.FC = () => {
   return (
-    <Layout>
+    <>
+      <Helmet>
+        <title>About | Joshua Omole | Business Operations & AI Systems Strategist</title>
+        <meta name="description" content="Joshua Omole helps small and mid-sized businesses fix Their operational problems and design smarter operations using Systems and operational Thinking, Technical Tools, AI, and automation." />
+        <meta property="og:title" content="About | Joshua Omole | Business Operations & AI Systems Strategist" />
+        <meta property="og:description" content="Joshua Omole helps small and mid-sized businesses fix Their operational problems and design smarter operations using Systems and operational Thinking, Technical Tools, AI, and automation." />
+      </Helmet>
+      <Layout>
       {/* Hero */}
       <section className="py-24 px-4 md:py-32 bg-midnight/30 rounded-b-[3rem] border-b border-navy">
         <FadeIn className="max-w-4xl mx-auto text-center">
@@ -126,6 +134,7 @@ const About: React.FC = () => {
         </FadeIn>
       </section>
     </Layout>
+    </>
   );
 };
 

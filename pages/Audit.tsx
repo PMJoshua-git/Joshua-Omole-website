@@ -9,9 +9,9 @@ const Audit: React.FC = () => {
     <>
       <Helmet>
         <title>Free Systems Clarity Audit | Joshua Omole</title>
-        <meta name="description" content="Book a free 30-minute Systems Clarity Audit with Joshua Omole. Find out exactly where your operation is leaking time, money, and momentum — and walk away with three things you can act on immediately." />
+        <meta name="description" content="Find out exactly where your operation is leaking time, money, and momentum and walk away with three things you can act on immediately. Book a free 30-minute Systems Clarity Audit with Joshua Omole." />
         <meta property="og:title" content="Free Systems Clarity Audit | Joshua Omole" />
-        <meta property="og:description" content="Book a free 30-minute Systems Clarity Audit. Find out where your operation is breaking down and walk away with three immediate actions — no pitch, no commitment." />
+        <meta property="og:description" content="Find out exactly where your operation is leaking time, money, and momentum and walk away with three things you can act on immediately. Book a free 30-minute Systems Clarity Audit with Joshua Omole." />
         <meta property="og:url" content="https://joshuaomole.com/audit" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://joshuaomole.com/images/joshua-portrait.jpg" />

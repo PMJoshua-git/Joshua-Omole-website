@@ -9,6 +9,7 @@ export const ROUTES: RouteItem[] = [
   { name: 'Audit', path: '/audit' },
   { name: 'Connect', path: '/connect' },
   { name: 'Newsletter', path: '/newsletter' },
+  { name: 'Workflow Fixes', path: '/business-workflow-fixes' },
   { name: 'Contact', path: '/contact' },
 ];
 

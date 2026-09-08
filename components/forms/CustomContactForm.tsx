@@ -63,7 +63,38 @@ const CustomContactForm: React.FC = () => {
 
   const saveLead = async (data: any, bookingTime?: string) => {
     try {
+      console.log('--- STARTING CUSTOM CONTACT FORM LEAD SAVE ---');
       const attribution = getAttributionData();
+      
+      const airtablePayload = {
+        tableName: 'Leads',
+        fields: {
+          "Created Date": new Date().toISOString(),
+          "Lead Type": "Service Inquiry",
+          "First Name": data.firstName,
+          "Last Name": data.lastName,
+          "Email": data.email,
+          "Phone Number": data.phone || "",
+          "Company Name": data.companyName || "",
+          "Position": data.position || "",
+          "Country": data.country || "",
+          "Company Size": data.companySize || "",
+          "Service Selected": data.service,
+          "Business Goal": data.businessChallenge || "",
+          "Newsletter Opt-In": data.newsletterOptIn || false,
+          "Booking Time": bookingTime || "",
+          "Lead Source": attribution.lead_source || "direct",
+          "Landing Page": attribution.landing_page || "",
+          "UTM Source": attribution.utm_source || "",
+          "UTM Medium": attribution.utm_medium || "",
+          "UTM Campaign": attribution.utm_campaign || "",
+          "Referrer": attribution.referrer || "",
+          "Status": "New"
+        }
+      };
+
+      console.log('Airtable Lead Payload:', airtablePayload);
+      console.log('Sending request to /api/save-contact...');
       
       // 1. Save to Airtable Leads using save-contact
       const airtableResponse = await fetch('/api/save-contact', {
@@ -71,63 +102,59 @@ const CustomContactForm: React.FC = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          tableName: 'Leads',
-          fields: {
-            "Created Date": new Date().toISOString(),
-            "Lead Type": "Service Inquiry",
-            "First Name": data.firstName,
-            "Last Name": data.lastName,
-            "Email": data.email,
-            "Phone Number": data.phone || "",
-            "Company Name": data.companyName || "",
-            "Position": data.position || "",
-            "Country": data.country || "",
-            "Company Size": data.companySize || "",
-            "Service Selected": data.service,
-            "Business Goal": data.businessChallenge || "",
-            "Newsletter Opt-In": data.newsletterOptIn || false,
-            "Booking Time": bookingTime || "",
-            "Lead Source": attribution.lead_source || "direct",
-            "Landing Page": attribution.landing_page || "",
-            "UTM Source": attribution.utm_source || "",
-            "UTM Medium": attribution.utm_medium || "",
-            "UTM Campaign": attribution.utm_campaign || "",
-            "Referrer": attribution.referrer || "",
-            "Status": "New"
-          }
-        })
+        body: JSON.stringify(airtablePayload)
       });
 
+      console.log('Airtable Response Status:', airtableResponse.status);
+      const airtableResult = await airtableResponse.json().catch(() => ({}));
+      console.log('Airtable Response Body:', airtableResult);
+
       if (!airtableResponse.ok) {
-        const errData = await airtableResponse.json();
-        console.error('Airtable save error:', errData);
+        console.error('Airtable save error:', airtableResult);
+      } else {
+        console.log('Airtable saved successfully!');
       }
 
       // 2. Add to Loops using subscribe
       const serviceChosen = (data.service || '').split(',')[0].trim();
+      const loopsPayload = {
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        userGroup: serviceChosen,
+        mailingLists: {},
+        company: data.companyName || '',
+        country: data.country || '',
+        companySize: data.companySize || '',
+      };
+
+      console.log('Loops Subscription Payload:', loopsPayload);
+      console.log('Sending request to /api/subscribe...');
+
       try {
-        await fetch('/api/subscribe', {
+        const loopsResponse = await fetch('/api/subscribe', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({
-            email: data.email,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            userGroup: serviceChosen,
-            mailingLists: {},
-            company: data.companyName || '',
-            country: data.country || '',
-            companySize: data.companySize || '',
-          })
+          body: JSON.stringify(loopsPayload)
         });
+
+        console.log('Loops Response Status:', loopsResponse.status);
+        const loopsResult = await loopsResponse.json().catch(() => ({}));
+        console.log('Loops Response Body:', loopsResult);
+
+        if (!loopsResponse.ok) {
+          console.error('Loops subscribe error:', loopsResult);
+        } else {
+          console.log('Loops subscribed successfully!');
+        }
       } catch (loopsErr) {
-        console.error('Loops subscribe error:', loopsErr);
+        console.error('Loops subscribe network error:', loopsErr);
       }
+      console.log('--- CUSTOM CONTACT FORM LEAD SAVE COMPLETED ---');
     } catch (err) {
-      console.error('Submission error:', err);
+      console.error('Submission error in saveLead:', err);
     }
   };
 
@@ -158,6 +185,8 @@ const CustomContactForm: React.FC = () => {
   const onSubmit = async (data: ContactFormValues) => {
     setIsSubmitting(true);
     setSubmittedData(data);
+    // Capture contact details immediately so we don't lose the lead if they drop off before booking a slot
+    await saveLead(data, "Pending Schedule");
     setShowCalendar(true);
     setIsSubmitting(false);
   };
@@ -192,7 +221,7 @@ const CustomContactForm: React.FC = () => {
         <button 
           onClick={() => {
             if (submittedData) {
-              saveLead(submittedData);
+              saveLead(submittedData, "Skipped / Already Booked");
             }
             setShowCalendar(false);
             setIsSuccess(true);

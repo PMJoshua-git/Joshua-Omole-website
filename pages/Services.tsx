@@ -3,10 +3,18 @@ import Layout from '../components/Layout';
 import Button from '../components/Button';
 import FadeIn from '../components/FadeIn';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 const Services: React.FC = () => {
   return (
-    <Layout>
+    <>
+      <Helmet>
+        <title>Services | Joshua Omole | Business Operations & AI Systems Strategist</title>
+        <meta name="description" content="Every service starts by understanding how your business actually runs then building the clearest, most direct path to making it run better." />
+        <meta property="og:title" content="Services | Joshua Omole | Business Operations & AI Systems Strategist" />
+        <meta property="og:description" content="Every service starts by understanding how your business actually runs then building the clearest, most direct path to making it run better." />
+      </Helmet>
+      <Layout>
       <section className="py-20 px-4 bg-midnight/30 border-b border-navy">
         <FadeIn className="max-w-7xl mx-auto text-center">
           <div className="inline-block text-blue font-mono text-sm tracking-widest uppercase mb-6 px-3 py-1 rounded-full bg-blue/10 border border-blue/30">
@@ -171,6 +179,7 @@ const Services: React.FC = () => {
 
       </section>
     </Layout>
+    </>
   );
 };
 

@@ -9,6 +9,7 @@ import Contact from './pages/Contact';
 import Connect from './pages/Connect';
 import Newsletter from './pages/Newsletter';
 import KnowledgeHub from './pages/KnowledgeHub';
+import BusinessWorkflowFixes from './pages/BusinessWorkflowFixes';
 import FloatingAssistant from './components/FloatingAssistant';
 import { captureAttributionData } from './utils/attribution';
 
@@ -18,11 +19,12 @@ const TITLE_MAP: Record<string, string> = {
   "/services": "Services | Joshua Omole | Business Operations & AI Systems Strategist",
   "/training": "Training | Joshua Omole | Business Operations & AI Systems Strategist",
   "/audit": "Free Systems Clarity Audit | Joshua Omole",
-  "/contact": "Book a Call | Joshua Omole",
+  "/contact": "Book a session | Joshua Omole",
   "/connect": "Connect & Resources | Joshua Omole",
   "/newsletter": "Newsletter | Joshua Omole",
   "/knowledge-hub": "Knowledge Hub | Joshua Omole",
   "/knowledge": "Knowledge Hub | Joshua Omole",
+  "/business-workflow-fixes": "Business Workflow Fixes | Joshua Omole",
 };
 
 const PageTitleUpdater = () => {
@@ -74,6 +76,7 @@ const App: React.FC = () => {
         <Route path="/newsletter" element={<Newsletter />} />
         <Route path="/knowledge-hub" element={<KnowledgeHub />} />
         <Route path="/knowledge" element={<KnowledgeHub />} />
+        <Route path="/business-workflow-fixes" element={<BusinessWorkflowFixes />} />
       </Routes>
     </Router>
   );

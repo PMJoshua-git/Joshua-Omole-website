@@ -5,6 +5,7 @@ import QuoteBlock from '../components/QuoteBlock';
 import ServiceCard from '../components/ServiceCard';
 import ProcessStep from '../components/ProcessStep';
 import FadeIn from '../components/FadeIn';
+import TestimonialCarousel from '../components/TestimonialCarousel';
 import { Helmet } from 'react-helmet-async';
 import { LayoutTemplate, ShieldCheck, Users, BrainCircuit, ArrowUpRight, PlayCircle, Code2, Cpu } from 'lucide-react';
 
@@ -29,9 +30,9 @@ const Home: React.FC = () => {
     <>
       <Helmet>
         <title>Joshua Omole | Business Operations and AI Systems Strategist</title>
-        <meta name="description" content="Joshua Omole helps small and mid-sized businesses design smarter operations using AI, automation, and systems thinking. The bridge between business strategy and technical execution." />
+        <meta name="description" content="Joshua Omole helps small and mid-sized businesses fix Their operational problems and design smarter operations using Systems and operational Thinking, Technical Tools, AI, and automation." />
         <meta property="og:title" content="Joshua Omole | Business Operations and AI Systems Strategist" />
-        <meta property="og:description" content="Helping growing businesses design smarter operations using AI, automation, and systems thinking. Start with a free Systems Clarity Audit." />
+        <meta property="og:description" content="Joshua Omole helps small and mid-sized businesses fix Their operational problems and design smarter operations using Systems and operational Thinking, Technical Tools, AI, and automation." />
         <meta property="og:url" content="https://joshuaomole.com" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://joshuaomole.com/images/joshua-portrait.jpg" />
@@ -199,6 +200,9 @@ const Home: React.FC = () => {
             </FadeIn>
         </div>
       </section>
+
+      {/* Section 4: Client Testimonials Carousel */}
+      <TestimonialCarousel />
 
       {/* Section 5: Services Overview */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
