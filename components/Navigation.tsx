@@ -1,21 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import Button from './Button';
 
 const Navigation: React.FC = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled]  = useState(false);
   const location = useLocation();
 
+  // Scroll detection — triggers subtle bottom-border shadow
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 80);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close the mobile menu whenever the route changes
+  // Close mobile drawer on route change
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
+
+  // Prevent background scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
 
   // Close mobile menu on Escape key
   useEffect(() => {
@@ -51,7 +63,6 @@ const Navigation: React.FC = () => {
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-[60px] lg:h-[64px]">
-
             {/* ── Logo / Brand ── */}
             <Link
               to="/"
@@ -104,22 +115,17 @@ const Navigation: React.FC = () => {
                 </Link>
               ))}
 
-              <Link
-                to="/audit"
-                className="ml-3 bg-sage-primary text-white
-                           font-body text-sm font-medium
-                           px-4 py-2 rounded-lg
-                           hover:bg-sage-primary-hover
-                           transition-all duration-200 ease-out
-                           hover:-translate-y-[1px] active:scale-[0.98]
-                           shadow-sm hover:shadow
-                           focus-visible:outline-none
-                           focus-visible:ring-2
-                           focus-visible:ring-sage-primary
-                           focus-visible:ring-offset-2"
-              >
-                Book Audit
-              </Link>
+              {/* Static Book Audit CTA button */}
+              <div className="ml-3">
+                <Button
+                  to="/audit"
+                  variant="primary"
+                  size="small"
+                  className="font-medium whitespace-nowrap"
+                >
+                  Book Audit
+                </Button>
+              </div>
             </nav>
 
             {/* ── Mobile menu toggle (hidden at lg+) ── */}
@@ -169,7 +175,6 @@ const Navigation: React.FC = () => {
                 </>
               )}
             </button>
-
           </div>
         </div>
 
@@ -217,21 +222,15 @@ const Navigation: React.FC = () => {
 
               {/* Mobile CTA */}
               <div className="p-4">
-                <Link
+                <Button
                   to="/audit"
-                  className="block w-full text-center
-                             bg-sage-primary text-white
-                             font-body text-sm font-medium
-                             py-3.5 rounded-lg
-                             hover:bg-sage-primary-hover
-                             transition-colors duration-150
-                             focus-visible:outline-none
-                             focus-visible:ring-2
-                             focus-visible:ring-sage-primary
-                             focus-visible:ring-offset-2"
+                  variant="primary"
+                  size="default"
+                  className="w-full justify-center font-medium"
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   Book Audit
-                </Link>
+                </Button>
               </div>
             </div>
           </div>

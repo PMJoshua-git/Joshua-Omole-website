@@ -21,11 +21,10 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 }) => {
   return (
     <div className={`
-        flex flex-col h-full p-10 
-        transition-all duration-300 rounded-xl border border-sage-border bg-sage-surface text-sage-text shadow-sm
-        hover:bg-sage-surface-2 hover:border-sage-primary/30 hover:-translate-y-1
+        card-interaction flex flex-col h-full p-10 
+        rounded-xl border border-sage-border bg-sage-surface text-sage-text shadow-sm
+        hover:bg-sage-surface-2 hover:border-sage-primary/40
     `}>
-
       <h3 className="text-2xl font-serif mb-4 min-h-[3rem] items-center flex relative z-10 text-sage-text">
         {title}
       </h3>
@@ -55,8 +54,8 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
           variant={isPrimary ? 'primary' : 'outline'} 
           className="w-full justify-between group"
         >
-          {ctaText}
-          <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+          <span>{ctaText}</span>
+          <ArrowRight className="w-4 h-4 ml-2 icon-shifter" />
         </Button>
       </div>
     </div>

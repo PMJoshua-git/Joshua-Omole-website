@@ -163,7 +163,18 @@ const Home: React.FC = () => {
                 const isExpanded = expandedTestimonial === idx;
                 return (
                   <FadeIn key={idx} delay={idx * 100} className="h-full">
-                    <div className="card-interaction bg-sage-surface rounded-xl border border-sage-border shadow-soft overflow-hidden flex flex-col h-full hover:border-sage-primary/40">
+                    <div 
+                      onClick={() => {
+                        if (!isExpanded) {
+                          setExpandedTestimonial(idx);
+                        }
+                      }}
+                      className={`testimonial-accordion-item card-interaction bg-sage-surface rounded-xl border shadow-soft overflow-hidden flex flex-col h-full ${
+                        isExpanded
+                          ? 'is-expanded border-sage-primary/40 ring-1 ring-sage-primary/20 shadow-md'
+                          : 'is-collapsed border-sage-border hover:border-sage-primary/40 cursor-pointer'
+                      }`}
+                    >
                       <div className="p-8 flex-grow flex flex-col">
                         {/* Metric badge */}
                         <div className="flex items-center gap-2 text-xs font-semibold tracking-wider text-sage-primary uppercase mb-6 bg-sage-soft border border-sage-border/30 px-3 py-1 rounded-full self-start">
@@ -177,23 +188,33 @@ const Home: React.FC = () => {
                         </p>
 
                         {/* Author name & title with subtle arrow toggle button */}
-                        <div className="flex items-center justify-between border-t border-sage-border pt-4 mt-auto">
+                        <div 
+                          onClick={() => setExpandedTestimonial(prev => prev === idx ? null : idx)}
+                          className="flex items-center justify-between border-t border-sage-border pt-4 mt-auto cursor-pointer group/toggle select-none"
+                        >
                           <div>
-                            <span className="text-xs font-bold text-sage-text block">{item.client.split(' — ')[0]}</span>
+                            <span className="text-xs font-bold text-sage-text block group-hover/toggle:text-sage-primary transition-colors duration-200">{item.client.split(' — ')[0]}</span>
                             <span className="text-[11px] text-sage-muted block">{item.client.split(' — ')[1] || ''}</span>
                           </div>
                           <button
                             type="button"
-                            onClick={() => setExpandedTestimonial(prev => prev === idx ? null : idx)}
-                            className={`p-2 rounded-full transition-transform duration-250 ease-out cursor-pointer active:scale-95 ${
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedTestimonial(prev => prev === idx ? null : idx);
+                            }}
+                            className={`p-2 rounded-full transition-all duration-300 ease-out cursor-pointer active:scale-95 ${
                               isExpanded
-                                ? 'bg-sage-primary text-white rotate-180 shadow-xs'
-                                : 'bg-sage-surface-2 text-sage-muted hover:text-sage-text hover:bg-sage-soft'
+                                ? 'bg-sage-primary text-white shadow-xs'
+                                : 'bg-sage-surface-2 text-sage-muted group-hover/toggle:text-sage-text group-hover/toggle:bg-sage-soft'
                             }`}
                             aria-expanded={isExpanded}
                             aria-label={isExpanded ? "Collapse case details" : "Expand case details"}
                           >
-                            <ChevronDown className="w-4 h-4 transition-transform duration-250" />
+                            <ChevronDown 
+                              className={`w-4 h-4 transition-transform duration-300 ease-out will-change-transform ${
+                                isExpanded ? 'rotate-180' : 'rotate-0'
+                              }`} 
+                            />
                           </button>
                         </div>
 
