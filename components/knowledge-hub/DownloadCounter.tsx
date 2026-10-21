@@ -27,10 +27,10 @@ const DownloadCounter: React.FC<DownloadCounterProps> = ({ value }) => {
   }, [value]);
 
   return (
-    <div className="flex items-center gap-2 mt-4 text-sm text-silver">
+    <div className="flex items-center gap-2 mt-4 text-sm text-sage-muted">
       <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
       <span>
-        Viewed by <motion.span className="font-bold text-white">{count}</motion.span> professionals recently
+        Viewed by <motion.span className="font-bold text-sage-text">{count}</motion.span> professionals recently
       </span>
     </div>
   );

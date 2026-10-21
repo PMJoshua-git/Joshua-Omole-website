@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Network, 
   MessageCircle, 
   Mail, 
-  GraduationCap, 
   Briefcase, 
   BookOpen,
   Search,
@@ -33,32 +31,32 @@ const ConnectCard: React.FC<ConnectCardProps> = ({ title, description, buttonTex
     
     return (
         <Component {...linkProps} className="block group w-full">
-            <div className={`relative p-6 sm:p-8 rounded-[2rem] border transition-all duration-500 overflow-hidden ${
+            <div className={`relative p-6 sm:p-8 rounded-xl border transition-all duration-300 overflow-hidden ${
                 isPrimary 
-                ? 'bg-midnight/80 border-blue/40 shadow-glow hover:shadow-glow-hover hover:-translate-y-2' 
-                : 'bg-midnight/40 border-navy/50 hover:border-blue/30 hover:bg-midnight/70 hover:-translate-y-1'
+                ? 'bg-sage-primary border-sage-primary shadow-sm hover:-translate-y-1 text-white' 
+                : 'bg-sage-surface border-sage-border hover:border-sage-primary/40 hover:bg-sage-surface-2 hover:-translate-y-1 text-sage-text'
             }`}>
                 <div className="relative z-10 flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
-                    <div className={`shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${
+                    <div className={`shrink-0 w-14 h-14 rounded-xl flex items-center justify-center transition-colors ${
                         isPrimary 
-                        ? 'bg-blue/10 text-blue border border-blue/20 shadow-[0_0_15px_rgba(60,117,165,0.2)]' 
-                        : 'bg-obsidian border border-navy/50 text-silver group-hover:text-blue group-hover:border-blue/30'
+                        ? 'bg-white/20 text-white border border-white/20 shadow-sm' 
+                        : 'bg-sage-bg border border-sage-border text-sage-primary group-hover:bg-sage-surface'
                     }`}>
                         <Icon className="w-7 h-7" />
                     </div>
                     
                     <div className="flex-1 text-left w-full">
-                        <h3 className={`text-xl sm:text-2xl font-serif mb-2 ${isPrimary ? 'text-white' : 'text-white group-hover:text-white transition-colors'}`}>
+                        <h3 className={`text-xl sm:text-2xl font-serif mb-2 ${isPrimary ? 'text-white' : 'text-sage-text'}`}>
                             {title}
                         </h3>
-                        <p className={`text-sm sm:text-base leading-relaxed mb-4 ${isPrimary ? 'text-silver' : 'text-silver/90'}`}>
+                        <p className={`text-sm sm:text-base leading-relaxed mb-4 ${isPrimary ? 'text-white/80' : 'text-sage-muted'}`}>
                             {description}
                         </p>
                         
                         <div className={`inline-flex items-center text-sm font-semibold transition-all ${
                             isPrimary 
-                            ? 'text-white bg-blue/20 border border-blue/30 px-5 py-2.5 rounded-full hover:bg-blue/30' 
-                            : 'text-blue group-hover:text-white'
+                            ? 'text-white bg-white/20 border border-white/30 px-5 py-2.5 rounded-md hover:bg-white/30' 
+                            : 'text-sage-primary hover:text-sage-primary-hover'
                         }`}>
                             {buttonText} {isPrimary ? <ArrowUpRight className="w-4 h-4 ml-2" /> : <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />}
                         </div>
@@ -97,40 +95,35 @@ const Connect: React.FC = () => {
                 {/* Profile Hero Section */}
                 <FadeIn className="flex flex-col items-center text-center mb-16">
                     <div className="relative w-32 h-32 md:w-40 md:h-40 mb-8 mx-auto group">
-                        {/* Soft glow behind portrait */}
-                        <div className="absolute inset-0 bg-blue/20 rounded-[2.5rem] blur-[20px] transition-all duration-700 group-hover:bg-blue/30"></div>
-                        
-                        <div className="relative w-full h-full bg-midnight rounded-[2rem] border border-navy shadow-lg overflow-hidden z-10 p-1 flex items-center justify-center">
+                        <div className="relative w-full h-full bg-sage-surface rounded-xl border border-sage-border shadow-sm overflow-hidden z-10 p-1 flex items-center justify-center">
                             {imageIndex !== -1 ? (
                                 <img 
                                     src={imageSources[imageIndex]} 
                                     alt="Joshua Omole — Business Operations and AI Systems Strategist" 
                                     referrerPolicy="no-referrer"
-                                    className="w-full h-full object-cover rounded-[1.75rem]"
+                                    className="w-full h-full object-cover rounded-xl"
                                     onError={handleImageError}
                                 />
                             ) : (
-                                <div className="w-full h-full bg-gradient-to-tr from-blue to-purple rounded-[1.75rem] flex items-center justify-center shadow-glow">
+                                <div className="w-full h-full bg-gradient-to-tr from-sage-primary to-sage-primary-hover rounded-xl flex items-center justify-center shadow-sm">
                                     <span className="text-white font-serif italic font-bold text-4xl">J.O</span>
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    <h1 className="text-3xl md:text-5xl font-serif text-white leading-tight tracking-tight max-w-2xl mx-auto">
+                    <h1 className="text-3xl md:text-5xl font-serif text-sage-text leading-tight tracking-tight max-w-2xl mx-auto">
                         I help businesses design smarter operations
-                        <span className="block text-xl md:text-2xl text-silver font-sans font-light mt-4 leading-relaxed">
+                        <span className="block text-xl md:text-2xl text-sage-muted font-sans font-light mt-4 leading-relaxed">
                             using technical tools, AI, systems thinking and practical execution.
                         </span>
                     </h1>
                 </FadeIn>
 
-                {/* Primary CTA removed to be inside the list */}
-
                 {/* Further Steps */}
                 <FadeIn delay={200} className="mb-8 text-center sm:text-left pl-2">
-                    <h2 className="text-2xl font-serif text-white mb-2">Choose Your Next Step</h2>
-                    <p className="text-silver text-sm max-w-sm mx-auto sm:mx-0">
+                    <h2 className="text-2xl font-serif text-sage-text mb-2">Choose Your Next Step</h2>
+                    <p className="text-sage-muted text-sm max-w-sm mx-auto sm:mx-0">
                         Explore resources, training, community, and services designed to help you grow and work smarter.
                     </p>
                 </FadeIn>
@@ -191,7 +184,7 @@ const Connect: React.FC = () => {
                 {/* Large Background Quote */}
                 <div className="relative py-32 mb-16 overflow-hidden flex items-center justify-center -mx-4 sm:-mx-6">
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03]">
-                        <span className="text-[5rem] sm:text-[8rem] font-serif font-black text-white whitespace-nowrap -rotate-2">
+                        <span className="text-[5rem] sm:text-[8rem] font-serif font-black text-sage-primary whitespace-nowrap -rotate-2">
                             ADAPTATION
                         </span>
                     </div>
@@ -204,16 +197,13 @@ const Connect: React.FC = () => {
 
                 {/* Footer CTA specifically for Connect Page */}
                 <FadeIn delay={200} className="mb-8">
-                    <div className="p-8 md:p-12 text-center rounded-[3rem] bg-gradient-to-br from-midnight to-obsidian border border-navy relative overflow-hidden backdrop-blur-xl">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-blue/10 blur-[80px] rounded-full pointer-events-none"></div>
-                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple/10 blur-[80px] rounded-full pointer-events-none"></div>
-                        
+                    <div className="p-8 md:p-12 text-center rounded-xl bg-sage-primary border border-sage-border relative overflow-hidden text-white shadow-sm">
                         <h2 className="relative z-10 text-2xl md:text-4xl font-serif text-white mb-4">Ready to Build Smarter Systems?</h2>
-                        <p className="relative z-10 text-silver mb-8 max-w-lg mx-auto">
+                        <p className="relative z-10 text-sage-bg mb-8 max-w-lg mx-auto">
                             Whether you're exploring AI, improving operations, or building new capabilities, start with a conversation.
                         </p>
                         <div className="relative z-10">
-                            <Button to="/contact" variant="primary" size="large" className="shadow-lg hover:shadow-glow-hover transition-all duration-300 hover:-translate-y-1">
+                            <Button to="/audit" size="large" className="bg-sage-accent text-white hover:bg-sage-accent-hover shadow-sm hover:-translate-y-0.5 transition-all">
                                 Book a Strategy Call
                             </Button>
                         </div>

@@ -5,6 +5,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../constants';
 import { Linkedin, Facebook } from 'lucide-react';
 import NewsletterModal from './NewsletterModal';
+import PageTransition from './PageTransition';
 
 const XIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -18,7 +19,11 @@ const MediumIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const Layout: React.FC<ChildrenProps> = ({ children }) => {
+interface LayoutProps extends ChildrenProps {
+  hideNav?: boolean;
+}
+
+const Layout: React.FC<LayoutProps> = ({ children, hideNav = false }) => {
   const [isNewsletterModalOpen, setIsNewsletterModalOpen] = useState(false);
   const location = useLocation();
 
@@ -47,7 +52,7 @@ const Layout: React.FC<ChildrenProps> = ({ children }) => {
       // Check if mouse left the top of the viewport (exit intent)
       if (e.clientY <= 0) {
         const exitShown = sessionStorage.getItem('exit_intent_shown') === 'true';
-        const excludedPaths = ['/newsletter', '/connect', '/contact'];
+        const excludedPaths = ['/newsletter', '/connect', '/audit'];
         
         if (!exitShown && !excludedPaths.includes(location.pathname)) {
           setIsNewsletterModalOpen(true);
@@ -67,23 +72,21 @@ const Layout: React.FC<ChildrenProps> = ({ children }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-obsidian text-white font-sans antialiased selection:bg-purple/30 selection:text-white">
-      <Navigation />
+    <div className="flex flex-col min-h-screen bg-sage-bg text-sage-text font-sans antialiased selection:bg-sage-primary/20 selection:text-sage-text">
+      {!hideNav && <Navigation />}
       
-      <main className="flex-grow pt-24 relative">
-        {children}
+      <main className={`flex-grow relative ${hideNav ? 'pt-6 md:pt-10' : 'pt-0'}`}>
+        <PageTransition key={location.pathname}>
+          {children}
+        </PageTransition>
       </main>
 
-      <footer className="bg-midnight/50 border-t border-navy mt-20 relative overflow-hidden backdrop-blur-lg">
-        {/* Glow effect */}
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-purple rounded-full blur-[128px] opacity-20 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-blue rounded-full blur-[128px] opacity-10 pointer-events-none"></div>
-
+      <footer className="bg-sage-text border-t border-sage-border mt-20 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
             <div className="col-span-1 md:col-span-2">
-              <h3 className="text-xl font-serif font-bold text-white mb-4">Joshua Omole</h3>
-              <p className="text-silver text-sm leading-relaxed max-w-sm mb-6">
+              <h3 className="text-xl font-serif font-bold text-sage-bg mb-4">Joshua Omole</h3>
+              <p className="text-sage-bg/80 text-sm leading-relaxed max-w-sm mb-6">
                 I help businesses design smarter operations using technical tools, AI, systems thinking and practical execution.
               </p>
               
@@ -93,7 +96,7 @@ const Layout: React.FC<ChildrenProps> = ({ children }) => {
                   href="https://www.linkedin.com/in/joshuaolaaduraomole" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-silver hover:text-white hover:bg-blue hover:border-blue transition-all duration-300 shadow-sm hover:shadow-glow"
+                  className="w-10 h-10 rounded-full bg-sage-bg/10 border border-sage-bg/20 flex items-center justify-center text-sage-bg hover:text-white hover:bg-sage-primary transition-all duration-300 shadow-sm"
                   aria-label="LinkedIn"
                 >
                   <Linkedin className="w-5 h-5" />
@@ -102,7 +105,7 @@ const Layout: React.FC<ChildrenProps> = ({ children }) => {
                   href="https://facebook.com/joshua.omole" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-silver hover:text-white hover:bg-[#1877F2] hover:border-[#1877F2] transition-all duration-300 shadow-sm hover:shadow-glow"
+                  className="w-10 h-10 rounded-full bg-sage-bg/10 border border-sage-bg/20 flex items-center justify-center text-sage-bg hover:text-white hover:bg-sage-primary transition-all duration-300 shadow-sm"
                   aria-label="Facebook"
                 >
                   <Facebook className="w-5 h-5" />
@@ -111,7 +114,7 @@ const Layout: React.FC<ChildrenProps> = ({ children }) => {
                   href="https://x.com/JO_JoshuaOmole" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-silver hover:text-white hover:bg-black hover:border-white/20 transition-all duration-300 shadow-sm hover:shadow-glow"
+                  className="w-10 h-10 rounded-full bg-sage-bg/10 border border-sage-bg/20 flex items-center justify-center text-sage-bg hover:text-white hover:bg-sage-primary transition-all duration-300 shadow-sm"
                   aria-label="X (Twitter)"
                 >
                   <XIcon className="w-4 h-4" />
@@ -120,7 +123,7 @@ const Layout: React.FC<ChildrenProps> = ({ children }) => {
                   href="https://medium.com/@joshuaomole" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-silver hover:text-white hover:bg-black hover:border-white/20 transition-all duration-300 shadow-sm hover:shadow-glow"
+                  className="w-10 h-10 rounded-full bg-sage-bg/10 border border-sage-bg/20 flex items-center justify-center text-sage-bg hover:text-white hover:bg-sage-primary transition-all duration-300 shadow-sm"
                   aria-label="Medium"
                 >
                   <MediumIcon className="w-5 h-5" />
@@ -129,11 +132,11 @@ const Layout: React.FC<ChildrenProps> = ({ children }) => {
             </div>
             
             <div>
-              <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Navigation</h4>
+              <h4 className="text-sm font-bold text-sage-bg uppercase tracking-wider mb-4">Navigation</h4>
               <ul className="space-y-3">
                 {ROUTES.map(route => (
                   <li key={route.path}>
-                    <Link to={route.path} className="text-sm text-silver hover:text-white hover:shadow-glow transition-all hover:translate-x-1 inline-block">
+                    <Link to={route.path} className="text-sm text-sage-bg/80 hover:text-white transition-all hover:translate-x-1 inline-block">
                       {route.name}
                     </Link>
                   </li>
@@ -142,14 +145,14 @@ const Layout: React.FC<ChildrenProps> = ({ children }) => {
             </div>
 
             <div>
-              <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Contact</h4>
-              <p className="text-sm text-silver mb-4">Book a strategy call to discuss your integration needs.</p>
-              <Link to="/contact" className="text-sm text-blue font-medium hover:text-purple transition-colors flex items-center group">
+              <h4 className="text-sm font-bold text-sage-bg uppercase tracking-wider mb-4">Contact</h4>
+              <p className="text-sm text-sage-bg/80 mb-4">Book a strategy call to discuss your integration needs.</p>
+              <Link to="/audit" className="text-sm text-sage-bg font-medium hover:text-white transition-colors flex items-center group">
                 Book a Strategy Call <span className="ml-1 transition-transform group-hover:translate-x-1">&rarr;</span>
               </Link>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-navy text-center md:text-left flex flex-col md:flex-row justify-between items-center text-xs text-silver/60">
+          <div className="mt-12 pt-8 border-t border-sage-bg/20 text-center md:text-left flex flex-col md:flex-row justify-between items-center text-xs text-sage-bg/60">
             <p>&copy; {new Date().getFullYear()} Joshua Omole. All rights reserved.</p>
             <p className="mt-2 md:mt-0">Business Operations & AI Systems Strategist</p>
           </div>

@@ -26,6 +26,11 @@ app.use("/api/resources", resourcesRouter);
 app.use("/api/training-sessions", trainingSessionsRouter);
 app.use("/api/book-training", bookTrainingRouter);
 
+// Permanent redirect from legacy /contact to /audit
+app.get('/contact', (_req, res) => {
+  res.redirect(301, '/audit');
+});
+
 // Secure proxy routes matching the Vercel Serverless Functions
 app.post("/api/subscribe", async (req, res) => {
   const { email, firstName, lastName, mailingLists, userGroup, company, country, companySize } = req.body;

@@ -31,9 +31,9 @@ const ResourceGrid: React.FC<ResourceGridProps> = ({ title, description, resourc
   return (
     <div className="mb-20">
       <div className="mb-8">
-        <h2 className="text-3xl font-serif text-white mb-2">{title}</h2>
-        {description && <p className="text-silver">{description}</p>}
-        <div className="w-20 h-1 bg-neon-gradient rounded-full mt-4"></div>
+        <h2 className="text-3xl font-serif text-sage-text mb-2">{title}</h2>
+        {description && <p className="text-sage-muted">{description}</p>}
+        <div className="w-20 h-1 bg-sage-primary rounded-full mt-4"></div>
       </div>
       
       <motion.div 

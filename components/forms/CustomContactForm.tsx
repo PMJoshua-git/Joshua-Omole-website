@@ -1,556 +1,596 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { motion, AnimatePresence } from 'framer-motion';
-import { contactFormSchema, ContactFormValues } from './schema';
 import { getAttributionData } from '../../utils/attribution';
-import { 
-  CheckCircle2, 
-  ChevronRight, 
-  Calendar, 
-  MessageSquare, 
-  User, 
-  Briefcase, 
-  Mail, 
-  Building2, 
-  Phone,
-  ArrowRight,
-  Globe,
-  Users
-} from 'lucide-react';
 import Cal, { getCalApi } from '@calcom/embed-react';
-import { countriesList } from '../../utils/countries';
-
-const SERVICES = [
-  'Free System clarity audit',
-  'Implementation Partnership',
-  'Operational Diagnostic Brief',
-  'Automation & Workflow Design',
-  'Training'
-];
-
-const POSITIONS = [
-  'CEO', 'Founder', 'Managing Director', 'COO', 'CTO', 'CIO', 
-  'Operations Manager', 'Project Manager', 'Department Head', 'Team Lead', 'Other'
-];
+import { X, CheckCircle2 } from 'lucide-react';
 
 const CustomContactForm: React.FC = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [submittedData, setSubmittedData] = useState<ContactFormValues | null>(null);
-  const submittedDataRef = useRef<ContactFormValues | null>(null);
-
-  useEffect(() => {
-    submittedDataRef.current = submittedData;
-  }, [submittedData]);
-
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors }
-  } = useForm<ContactFormValues>({
-    resolver: zodResolver(contactFormSchema),
-    defaultValues: {
-      service: '',
-      newsletterOptIn: false
-    }
+  const [formData, setFormData] = useState({
+    firstName:       '',
+    email:           '',
+    company:         '',
+    companySize:     '',
+    businessGoal:    '',
+    newsletterOptIn: false,
   });
 
-  const selectedService = watch('service') || '';
-
-  const saveLead = async (data: any, bookingTime?: string) => {
-    try {
-      console.log('--- STARTING CUSTOM CONTACT FORM LEAD SAVE ---');
-      const attribution = getAttributionData();
-      
-      const airtablePayload = {
-        tableName: 'Leads',
-        fields: {
-          "Created Date": new Date().toISOString(),
-          "Lead Type": "Service Inquiry",
-          "First Name": data.firstName,
-          "Last Name": data.lastName,
-          "Email": data.email,
-          "Phone Number": data.phone || "",
-          "Company Name": data.companyName || "",
-          "Position": data.position || "",
-          "Country": data.country || "",
-          "Company Size": data.companySize || "",
-          "Service Selected": data.service,
-          "Business Goal": data.businessChallenge || "",
-          "Newsletter Opt-In": data.newsletterOptIn || false,
-          "Booking Time": bookingTime || "",
-          "Lead Source": attribution.lead_source || "direct",
-          "Landing Page": attribution.landing_page || "",
-          "UTM Source": attribution.utm_source || "",
-          "UTM Medium": attribution.utm_medium || "",
-          "UTM Campaign": attribution.utm_campaign || "",
-          "Referrer": attribution.referrer || "",
-          "Status": "New"
-        }
-      };
-
-      console.log('Airtable Lead Payload:', airtablePayload);
-      console.log('Sending request to /api/save-contact...');
-      
-      // 1. Save to Airtable Leads using save-contact
-      const airtableResponse = await fetch('/api/save-contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(airtablePayload)
-      });
-
-      console.log('Airtable Response Status:', airtableResponse.status);
-      const airtableResult = await airtableResponse.json().catch(() => ({}));
-      console.log('Airtable Response Body:', airtableResult);
-
-      if (!airtableResponse.ok) {
-        console.error('Airtable save error:', airtableResult);
-      } else {
-        console.log('Airtable saved successfully!');
-      }
-
-      // 2. Add to Loops using subscribe
-      const serviceChosen = (data.service || '').split(',')[0].trim();
-      const loopsPayload = {
-        email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        userGroup: serviceChosen,
-        mailingLists: {},
-        company: data.companyName || '',
-        country: data.country || '',
-        companySize: data.companySize || '',
-      };
-
-      console.log('Loops Subscription Payload:', loopsPayload);
-      console.log('Sending request to /api/subscribe...');
-
-      try {
-        const loopsResponse = await fetch('/api/subscribe', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(loopsPayload)
-        });
-
-        console.log('Loops Response Status:', loopsResponse.status);
-        const loopsResult = await loopsResponse.json().catch(() => ({}));
-        console.log('Loops Response Body:', loopsResult);
-
-        if (!loopsResponse.ok) {
-          console.error('Loops subscribe error:', loopsResult);
-        } else {
-          console.log('Loops subscribed successfully!');
-        }
-      } catch (loopsErr) {
-        console.error('Loops subscribe network error:', loopsErr);
-      }
-      console.log('--- CUSTOM CONTACT FORM LEAD SAVE COMPLETED ---');
-    } catch (err) {
-      console.error('Submission error in saveLead:', err);
-    }
-  };
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted]   = useState(false);
+  const [showCalModal, setShowCalModal] = useState(false);
+  const [isCalLoading, setIsCalLoading] = useState(true);
+  const [leadId, setLeadId]             = useState<string | null>(null);
+  const [isSlotBooked, setIsSlotBooked] = useState(false);
+  const [attribution, setAttribution]   = useState<any>(null);
+  const calContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    (async function () {
-      const cal = await getCalApi({"namespace": "30min"});
-      cal("on", {
-        action: "bookingSuccessful",
-        callback: (e) => {
-          const bookingTime = e.detail?.data?.date || new Date().toISOString();
-          
-          if (submittedDataRef.current) {
-            saveLead(submittedDataRef.current, bookingTime);
-          }
-          
-          setShowCalendar(false);
-          setIsSuccess(true);
-        }
-      });
-      cal("ui", {"styles":{"branding":{"brandColor":"#3c75a5"}},"hideEventTypeDetails":false,"layout":"month_view"});
-    })();
+    try {
+      const data = getAttributionData();
+      setAttribution(data);
+    } catch (err) {
+      console.error('Failed to get attribution data', err);
+    }
   }, []);
 
-  const selectService = (service: string) => {
-    setValue('service', service, { shouldValidate: true });
-  };
+  // Listen for Cal.com booking confirmation events
+  useEffect(() => {
+    let isSubscribed = true;
 
-  const onSubmit = async (data: ContactFormValues) => {
-    setIsSubmitting(true);
-    setSubmittedData(data);
-    // Capture contact details immediately so we don't lose the lead if they drop off before booking a slot
-    await saveLead(data, "Pending Schedule");
-    setShowCalendar(true);
-    setIsSubmitting(false);
-  };
+    // 1. Listen via Cal.com Embed API
+    (async function initCalListener() {
+      try {
+        const cal = await getCalApi({ namespace: "30min" });
+        if (cal && isSubscribed) {
+          cal("on", {
+            action: "bookingSuccessful",
+            callback: (e: any) => {
+              if (!isSubscribed) return;
+              setIsSlotBooked(true);
+              const bookingDate = e?.detail?.data?.date || new Date().toISOString();
 
-  // The calendar screen
-  if (showCalendar && submittedData) {
-    return (
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-midnight/60 backdrop-blur-xl border border-navy/80 p-8 md:p-12 rounded-[2rem] shadow-glow max-w-4xl mx-auto w-full text-center relative overflow-hidden"
-      >
-        <div className="absolute top-0 left-1/2 -mt-16 -ml-16 w-32 h-32 bg-blue/20 rounded-full blur-3xl pointer-events-none"></div>
-        <h2 className="text-3xl md:text-4xl font-serif text-white mb-4">
-          Select a Time
-        </h2>
-        <p className="text-xl text-silver mb-8">Please choose a convenient time for our session.</p>
-        
-        <div className="w-full bg-white rounded-[2rem] overflow-hidden min-h-[600px] mb-8">
-          <Cal 
-            namespace="30min"
-            calLink="joshua-omole-d9c2vi/30min"
-            style={{ width: "100%", height: "100%", overflow: "scroll" }}
-            config={{ 
-              layout: "month_view",
-              name: `${submittedData.firstName} ${submittedData.lastName}`.trim(),
-              email: submittedData.email
-            }}
-          />
-        </div>
-
-        <button 
-          onClick={() => {
-            if (submittedData) {
-              saveLead(submittedData, "Skipped / Already Booked");
+              fetch('/api/book-consultation/confirm-booking', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  leadId: leadId || undefined,
+                  email: formData.email.trim().toLowerCase(),
+                  bookingTime: bookingDate
+                })
+              }).catch(err => console.error('Error confirming booking via Cal API:', err));
             }
-            setShowCalendar(false);
-            setIsSuccess(true);
-          }}
-          className="text-silver hover:text-white transition-colors"
-        >
-          Skip / I've already booked my time
-        </button>
-      </motion.div>
-    );
-  }
+          });
+        }
+      } catch (err) {
+        console.error('Failed to init Cal API listener:', err);
+      }
+    })();
 
-  // The success screen
-  if (isSuccess && submittedData) {
-    return (
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-midnight/60 backdrop-blur-xl border border-navy/80 p-8 md:p-12 rounded-[2rem] shadow-glow max-w-3xl mx-auto w-full text-center relative overflow-hidden"
-      >
-        <div className="absolute top-0 left-1/2 -mt-16 -ml-16 w-32 h-32 bg-blue/20 rounded-full blur-3xl pointer-events-none"></div>
-        
-        <div className="w-20 h-20 bg-blue/10 border border-blue/30 rounded-full flex items-center justify-center mx-auto mb-6 shadow-glow">
-          <CheckCircle2 className="w-10 h-10 text-blue" />
-        </div>
-        
-        <h2 className="text-3xl md:text-4xl font-serif text-white mb-4">
-          Thank You, {submittedData.firstName}
-        </h2>
-        <p className="text-xl text-silver mb-10">We've received your request.</p>
-        
-        <div className="bg-obsidian/80 border border-navy/50 rounded-2xl p-6 text-left mb-10 mx-auto max-w-xl">
-          <div className="mb-4">
-            <span className="text-sm text-silver/70 font-mono uppercase tracking-wider block mb-1">Service Selected</span>
-            <div className="text-white font-medium">
-              {submittedData.service || 'General Consultation'}
-            </div>
-          </div>
-          <div className="mb-4">
-            <span className="text-sm text-silver/70 font-mono uppercase tracking-wider block mb-1">Appointment</span>
-            <div className="text-white font-medium flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-blue" />
-              <span>Confirmed via Cal.com</span>
-            </div>
-          </div>
-          <div>
-             <span className="text-sm text-silver/70 font-mono uppercase tracking-wider block mb-1">Confirmation Email</span>
-             <div className="text-white font-medium">{submittedData.email}</div>
-          </div>
-        </div>
-        
-        <div className="mb-10 text-left max-w-xl mx-auto">
-          <h4 className="text-white font-serif text-xl mb-4">Next Steps:</h4>
-          <ul className="space-y-3 text-silver">
-            <li className="flex gap-3"><span className="text-blue">1.</span> Check your inbox for confirmation.</li>
-            <li className="flex gap-3"><span className="text-blue">2.</span> Add the appointment to your calendar (sent via email).</li>
-            <li className="flex gap-3"><span className="text-blue">3.</span> Prepare any relevant questions for our session.</li>
-          </ul>
-        </div>
-        
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <a href="/" className="w-full sm:w-auto px-8 py-4 bg-navy/40 border border-navy text-white rounded-xl font-medium hover:bg-navy/60 transition-all">
-            Return Home
-          </a>
-        </div>
-      </motion.div>
-    );
-  }
+    // 2. Direct postMessage listener fallback
+    const handleWindowMessage = (event: MessageEvent) => {
+      try {
+        const data = event.data;
+        const isBookingEvent =
+          data?.type === "cal:bookingSuccessful" ||
+          data?.action === "bookingSuccessful" ||
+          (typeof data === "string" && data.includes("bookingSuccessful"));
+
+        if (isBookingEvent && isSubscribed) {
+          setIsSlotBooked(true);
+
+          fetch('/api/book-consultation/confirm-booking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              leadId: leadId || undefined,
+              email: formData.email.trim().toLowerCase(),
+              bookingTime: new Date().toISOString()
+            })
+          }).catch(err => console.error('Error confirming booking via postMessage:', err));
+        }
+      } catch (err) {
+        console.error('Error processing window message:', err);
+      }
+    };
+
+    window.addEventListener('message', handleWindowMessage);
+
+    return () => {
+      isSubscribed = false;
+      window.removeEventListener('message', handleWindowMessage);
+    };
+  }, [leadId, formData.email]);
+
+  useEffect(() => {
+    if (!showCalModal) return;
+    setIsCalLoading(true);
+
+    const container = calContainerRef.current;
+    if (!container) return;
+
+    const handleIframeLoaded = () => {
+      setIsCalLoading(false);
+    };
+
+    const existingIframe = container.querySelector('iframe');
+    if (existingIframe) {
+      existingIframe.addEventListener('load', handleIframeLoaded, { once: true });
+    }
+
+    const observer = new MutationObserver(() => {
+      const injectedIframe = container.querySelector('iframe');
+      if (injectedIframe) {
+        injectedIframe.addEventListener('load', handleIframeLoaded, { once: true });
+      }
+    });
+
+    observer.observe(container, { childList: true, subtree: true });
+
+    // Safety timeout to ensure loader dismisses smoothly
+    const timer = setTimeout(() => {
+      setIsCalLoading(false);
+    }, 4000);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(timer);
+    };
+  }, [showCalModal]);
+
+  const validate = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'Please enter your first name';
+    }
+
+    if (!formData.email.trim() ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    if (!formData.company.trim()) {
+      newErrors.company = 'Please enter your company name';
+    }
+
+    if (!formData.companySize) {
+      newErrors.companySize = 'Please select your team size';
+    }
+
+    if (!formData.businessGoal.trim() ||
+        formData.businessGoal.trim().length < 10) {
+      newErrors.businessGoal =
+        'Please describe your challenge (at least 10 characters)';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const payload = {
+    // ── The 5 collected fields ──
+    firstName:      formData.firstName.trim(),
+    email:          formData.email.trim().toLowerCase(),
+    company:        formData.company.trim(),
+    companySize:    formData.companySize,
+    businessGoal:   formData.businessGoal.trim(),
+
+    // ── Auto-set fields (not collected from user) ──
+    leadType:       'Service Inquiry',
+    serviceType:    'Systems Clarity Audit',
+
+    // ── Empty defaults for Airtable schema compatibility ──
+    lastName:       '',
+    phone:          '',
+    position:       '',
+    country:        '',
+
+    // ── Optional consent ──
+    newsletterOptIn: formData.newsletterOptIn,
+
+    // ── Attribution (keep existing logic) ──
+    leadSource:     attribution?.lead_source     ?? '',
+    landingPage:    attribution?.landing_page    ?? '',
+    utmParameters:  attribution?.utm_source      ?? '',
+  };
+
+  const submitForm = async (body: typeof payload) => {
+    const response = await fetch('/api/book-consultation', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    
+    if (!response.ok) {
+      const errRes = await response.json().catch(() => ({}));
+      throw new Error(errRes.message || 'Failed to submit form');
+    }
+    const data = await response.json().catch(() => ({}));
+    return data;
+  };
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
-      {/* Trust Elements */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-         {[
-           'Business-focused conversations',
-           'Practical recommendations',
-           'No obligation',
-           'Tailored to your goals'
-         ].map((trust, idx) => (
-           <div key={idx} className="bg-midnight/40 border border-navy/30 rounded-xl p-3 flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-blue shrink-0 mt-0.5" />
-              <span className="text-xs text-silver/90 font-medium">{trust}</span>
-           </div>
-         ))}
-      </div>
-
-      <motion.form 
-        onSubmit={handleSubmit(onSubmit)} 
-        className="space-y-12"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Step 1: Personal Information */}
-        <section className="bg-midnight/30 border border-navy/40 rounded-[2rem] p-6 md:p-10 shadow-lg relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue/50 to-purple/50"></div>
-          <h2 className="text-2xl font-serif text-white mb-6 flex items-center gap-3">
-            <User className="text-blue/70 w-6 h-6" />
-            Personal Information
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm text-silver font-medium ml-1">First Name *</label>
-              <input 
-                {...register('firstName')} 
-                className="w-full bg-obsidian/60 border border-navy text-white px-5 py-4 rounded-xl focus:outline-none focus:border-blue focus:ring-1 focus:ring-blue transition-all"
-                placeholder="First Name"
-              />
-              {errors.firstName && <p className="text-red-400 text-xs ml-1">{errors.firstName.message}</p>}
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm text-silver font-medium ml-1">Last Name *</label>
-              <input 
-                {...register('lastName')} 
-                className="w-full bg-obsidian/60 border border-navy text-white px-5 py-4 rounded-xl focus:outline-none focus:border-blue focus:ring-1 focus:ring-blue transition-all"
-                placeholder="Last Name"
-              />
-              {errors.lastName && <p className="text-red-400 text-xs ml-1">{errors.lastName.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm text-silver font-medium ml-1">Business Email *</label>
-              <div className="relative">
-                 <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-navy group-focus-within:text-blue transition-colors pointer-events-none" />
-                 <input 
-                   {...register('email')} 
-                   className="w-full bg-obsidian/60 border border-navy text-white pl-12 pr-5 py-4 rounded-xl focus:outline-none focus:border-blue focus:ring-1 focus:ring-blue transition-all"
-                   placeholder="name@company.com"
-                 />
+    <div className="w-full max-w-xl mx-auto">
+      {/* ── Success state ── */}
+      {isSubmitted ? (
+        <div className="bg-sage-surface border border-sage-border rounded-xl p-8 text-center shadow-soft">
+          {isSlotBooked ? (
+            <>
+              <div className="w-14 h-14 bg-sage-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-sage-primary/20">
+                <CheckCircle2 className="w-8 h-8 text-sage-primary" />
               </div>
-              {errors.email && <p className="text-red-400 text-xs ml-1">{errors.email.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm text-silver font-medium ml-1">Phone Number (optional)</label>
-              <div className="relative">
-                 <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-navy pointer-events-none" />
-                 <input 
-                   {...register('phone')} 
-                   className="w-full bg-obsidian/60 border border-navy text-white pl-12 pr-5 py-4 rounded-xl focus:outline-none focus:border-blue transition-all"
-                   placeholder="+1 (555) 000-0000"
-                 />
-              </div>
-            </div>
-
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm text-silver font-medium ml-1">Company Name *</label>
-              <div className="relative">
-                 <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-navy pointer-events-none" />
-                 <input 
-                   {...register('companyName')} 
-                   className="w-full bg-obsidian/60 border border-navy text-white pl-12 pr-5 py-4 rounded-xl focus:outline-none focus:border-blue transition-all"
-                   placeholder="Your Company Ltd."
-                 />
-              </div>
-              {errors.companyName && <p className="text-red-400 text-xs ml-1">{errors.companyName.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm text-silver font-medium ml-1">Country *</label>
-              <div className="relative">
-                 <Globe className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-navy pointer-events-none" />
-                 <input 
-                   {...register('country')} 
-                   list="countries-list"
-                   className="w-full bg-obsidian/60 border border-navy text-white pl-12 pr-5 py-4 rounded-xl focus:outline-none focus:border-blue transition-all"
-                   placeholder="Country Your company is located"
-                   autoComplete="off"
-                 />
-                 <datalist id="countries-list">
-                   {countriesList.map(country => (
-                     <option key={country} value={country} />
-                   ))}
-                 </datalist>
-              </div>
-              {errors.country && <p className="text-red-400 text-xs ml-1">{errors.country.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm text-silver font-medium ml-1">Company Size *</label>
-              <div className="relative">
-                 <Users className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-navy pointer-events-none" />
-                 <select 
-                   {...register('companySize')} 
-                   className="w-full bg-obsidian/60 border border-navy text-white pl-12 pr-5 py-4 rounded-xl focus:outline-none focus:border-blue transition-all appearance-none"
-                 >
-                   <option value="" disabled>Select company size</option>
-                   <option value="1-15 employees">1-15 employees</option>
-                   <option value="16-50 employees">16-50 employees</option>
-                   <option value="50+ employees">50+ employees</option>
-                 </select>
-                 <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none">
-                   <ChevronRight className="w-5 h-5 text-navy rotate-90" />
-                 </div>
-              </div>
-              {errors.companySize && <p className="text-red-400 text-xs ml-1">{errors.companySize.message}</p>}
-            </div>
-          </div>
-        </section>
-
-        {/* Step 2: Service Selection */}
-        <section className="bg-midnight/30 border border-navy/40 rounded-[2rem] p-6 md:p-10 shadow-lg">
-          <h2 className="text-2xl font-serif text-white mb-2">What would you like help with?</h2>
-          <p className="text-silver/80 text-sm mb-6">Select the primary service you require.</p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             {SERVICES.map((service) => {
-               const isSelected = selectedService === service;
-               
-               return (
-                 <motion.button
-                   type="button"
-                   key={service}
-                   whileHover={{ y: -2 }}
-                   whileTap={{ scale: 0.98 }}
-                   onClick={() => selectService(service)}
-                   className={`
-                     relative p-6 rounded-2xl border text-left transition-all duration-300 overflow-hidden
-                     ${isSelected 
-                       ? 'bg-blue/10 border-blue shadow-[0_0_15px_rgba(60,117,165,0.2)]' 
-                       : 'bg-obsidian/60 border-navy hover:bg-midnight hover:border-blue/30'}
-                   `}
-                 >
-                   <div className="absolute top-0 right-0 w-16 h-16 bg-blue/10 rounded-bl-full blur-xl -mr-4 -mt-4 opacity-0 transition-opacity" style={{ opacity: isSelected ? 1 : 0 }}></div>
-                   
-                   <div className="flex items-start justify-between gap-4">
-                     <span className={`font-medium ${isSelected ? 'text-white' : 'text-silver'}`}>{service}</span>
-                     <div className={`shrink-0 w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${isSelected ? 'bg-blue border-blue text-white' : 'border-navy/80'}`}>
-                        {isSelected && <CheckCircle2 className="w-3.5 h-3.5" />}
-                     </div>
-                   </div>
-                 </motion.button>
-               );
-             })}
-          </div>
-          {errors.service && <p className="text-red-400 text-xs mt-4">{errors.service.message}</p>}
-        </section>
-
-        {/* Step 3: Role Selection */}
-        <section className="bg-midnight/30 border border-navy/40 rounded-[2rem] p-6 md:p-10 shadow-lg">
-          <h2 className="text-2xl font-serif text-white mb-6 flex items-center gap-3">
-             <Briefcase className="text-purple/70 w-6 h-6" />
-             Your Position
-          </h2>
-          <div className="max-w-md">
-             <label className="text-sm text-silver font-medium ml-1 block mb-2">Role *</label>
-             <div className="relative">
-                <select 
-                  {...register('position')} 
-                  className="w-full bg-obsidian/60 border border-navy text-white px-5 py-4 rounded-xl focus:outline-none focus:border-blue transition-all appearance-none"
-                >
-                  <option value="">Select your position...</option>
-                  {POSITIONS.map(pos => (
-                    <option key={pos} value={pos}>{pos}</option>
-                  ))}
-                </select>
-                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <ChevronRight className="w-5 h-5 text-silver rotate-90" />
+              <span className="text-xs font-bold text-sage-primary uppercase tracking-widest block mb-2 font-mono">
+                Session Confirmed
+              </span>
+              <h3 className="font-heading text-2xl font-semibold text-sage-text mb-2">
+                Time Slot Confirmed!
+              </h3>
+              <p className="font-body text-sm sm:text-base text-sage-text/90 leading-relaxed mb-5 max-w-lg mx-auto">
+                Your Systems Clarity Audit for <strong className="text-sage-text">{formData.company}</strong> is locked in.
+              </p>
+              <div className="bg-sage-surface-2 border border-sage-border rounded-xl p-5 mb-6 text-left space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-sage-primary mt-1.5 shrink-0" />
+                  <p className="font-body text-xs sm:text-sm text-sage-muted leading-relaxed">
+                    A calendar invitation with Google Meet details has been sent to <strong className="text-sage-text">{formData.email}</strong>.
+                  </p>
                 </div>
-             </div>
-             {errors.position && <p className="text-red-400 text-xs mt-2 ml-1">{errors.position.message}</p>}
-          </div>
-        </section>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-sage-primary mt-1.5 shrink-0" />
+                  <p className="font-body text-xs sm:text-sm text-sage-muted leading-relaxed">
+                    Joshua will review your operational notes before the call so you can dive straight into high-leverage findings.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCalModal(true)}
+                className="inline-flex items-center justify-center font-medium px-5 py-2.5 text-xs text-sage-muted hover:text-sage-text hover:bg-sage-surface-2 border border-sage-border rounded-lg transition-all"
+              >
+                View or Reschedule on Calendar
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="w-12 h-12 bg-sage-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                     viewBox="0 0 24 24" fill="none" stroke="#55745C"
+                     strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                     aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5"/>
+                </svg>
+              </div>
+              <h3 className="font-heading text-xl font-semibold text-sage-text mb-2">
+                You're booked in.
+              </h3>
+              <p className="font-body text-sm text-sage-muted mb-6">
+                Details for <strong className="text-sage-text">{formData.company}</strong> have been received. Please select your 30-minute session time on the calendar to finalize.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowCalModal(true)}
+                className="inline-flex items-center justify-center font-medium px-6 py-3 text-sm rounded-lg bg-sage-primary text-white hover:bg-sage-primary-hover shadow-sm transition-all"
+              >
+                Open Booking Calendar &rarr;
+              </button>
+            </>
+          )}
+        </div>
+      ) : (
 
-        {/* Step 4: Business Challenge */}
-        <section className="bg-midnight/30 border border-navy/40 rounded-[2rem] p-6 md:p-10 shadow-lg">
-          <h2 className="text-2xl font-serif text-white mb-6 flex items-center gap-3">
-             <MessageSquare className="text-blue/70 w-6 h-6" />
-             Tell me a little about your goals or challenges
-          </h2>
-          <div>
-            <textarea 
-              {...register('businessChallenge')}
-              rows={5}
-              className="w-full bg-obsidian/60 border border-navy text-white px-5 py-4 rounded-xl focus:outline-none focus:border-blue focus:ring-1 focus:ring-blue transition-all resize-none"
-              placeholder="What challenge are you trying to solve? What outcome are you hoping to achieve?"
+        /* ── Form ── */
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (!validate()) return;
+            setIsSubmitting(true);
+            try {
+              const resData = await submitForm(payload);
+              if (resData?.leadId) {
+                setLeadId(resData.leadId);
+              }
+              setIsSubmitted(true);
+              setShowCalModal(true);
+            } catch (err) {
+              console.error('Failed to submit booking:', err);
+              setErrors({ submit: 'Something went wrong. Please try again.' });
+            } finally {
+              setIsSubmitting(false);
+            }
+          }}
+          noValidate
+          className="flex flex-col gap-5 bg-sage-surface p-6 md:p-8 rounded-2xl border border-sage-border shadow-soft"
+        >
+
+          {/* Field 1: First name */}
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="firstName"
+                   className="font-body text-sm font-medium text-sage-text text-left">
+              First name <span className="text-sage-primary" aria-hidden="true">*</span>
+            </label>
+            <input
+              id="firstName"
+              type="text"
+              autoComplete="given-name"
+              value={formData.firstName}
+              onChange={(e) => {
+                setFormData(p => ({ ...p, firstName: e.target.value }));
+                if (errors.firstName) setErrors(p => ({ ...p, firstName: '' }));
+              }}
+              placeholder="e.g. Chidi"
+              className={`
+                w-full font-body text-sm text-sage-text
+                bg-sage-surface border rounded-lg px-4 py-3
+                placeholder:text-sage-muted/60
+                focus:outline-none focus:ring-2 focus:ring-sage-primary
+                focus:border-transparent transition-all duration-150
+                ${errors.firstName
+                  ? 'border-red-400 bg-red-50 animate-shake'
+                  : 'border-sage-border hover:border-sage-primary/40'}
+              `}
+              aria-describedby={errors.firstName ? 'firstName-error' : undefined}
+              aria-invalid={!!errors.firstName}
             />
-            {errors.businessChallenge && <p className="text-red-400 text-xs mt-2 ml-1">{errors.businessChallenge.message}</p>}
+            {errors.firstName && (
+              <p id="firstName-error" className="font-body text-xs text-red-600 text-left"
+                 role="alert">
+                {errors.firstName}
+              </p>
+            )}
           </div>
-        </section>
 
-        {/* Step 5: Newsletter Opt-In */}
-        <section className="bg-gradient-to-r from-blue/10 to-obsidian border border-blue/20 rounded-[2rem] p-6 md:p-8">
-           <label className="flex items-start gap-4 cursor-pointer group">
-              <div className="relative flex items-start pt-1">
-                 <input 
-                   type="checkbox" 
-                   {...register('newsletterOptIn')}
-                   className="w-6 h-6 rounded-md border-navy bg-obsidian text-blue focus:ring-blue focus:ring-offset-obsidian cursor-pointer"
-                 />
-              </div>
+          {/* Field 2: Email */}
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="email"
+                   className="font-body text-sm font-medium text-sage-text text-left">
+              Email address <span className="text-sage-primary" aria-hidden="true">*</span>
+            </label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={formData.email}
+              onChange={(e) => {
+                setFormData(p => ({ ...p, email: e.target.value }));
+                if (errors.email) setErrors(p => ({ ...p, email: '' }));
+              }}
+              placeholder="you@yourcompany.com"
+              className={`
+                w-full font-body text-sm text-sage-text
+                bg-sage-surface border rounded-lg px-4 py-3
+                placeholder:text-sage-muted/60
+                focus:outline-none focus:ring-2 focus:ring-sage-primary
+                focus:border-transparent transition-all duration-150
+                ${errors.email
+                  ? 'border-red-400 bg-red-50 animate-shake'
+                  : 'border-sage-border hover:border-sage-primary/40'}
+              `}
+              aria-describedby={errors.email ? 'email-error' : undefined}
+              aria-invalid={!!errors.email}
+            />
+            {errors.email && (
+              <p id="email-error" className="font-body text-xs text-red-600 text-left"
+                 role="alert">
+                {errors.email}
+              </p>
+            )}
+          </div>
+
+          {/* Field 3: Company name */}
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="company"
+                   className="font-body text-sm font-medium text-sage-text text-left">
+              Company name <span className="text-sage-primary" aria-hidden="true">*</span>
+            </label>
+            <input
+              id="company"
+              type="text"
+              autoComplete="organization"
+              value={formData.company}
+              onChange={(e) => {
+                setFormData(p => ({ ...p, company: e.target.value }));
+                if (errors.company) setErrors(p => ({ ...p, company: '' }));
+              }}
+              placeholder="e.g. Acme Studio"
+              className={`
+                w-full font-body text-sm text-sage-text
+                bg-sage-surface border rounded-lg px-4 py-3
+                placeholder:text-sage-muted/60
+                focus:outline-none focus:ring-2 focus:ring-sage-primary
+                focus:border-transparent transition-all duration-150
+                ${errors.company
+                  ? 'border-red-400 bg-red-50 animate-shake'
+                  : 'border-sage-border hover:border-sage-primary/40'}
+              `}
+              aria-describedby={errors.company ? 'company-error' : undefined}
+              aria-invalid={!!errors.company}
+            />
+            {errors.company && (
+              <p id="company-error" className="font-body text-xs text-red-600 text-left"
+                 role="alert">
+                {errors.company}
+              </p>
+            )}
+          </div>
+
+          {/* Field 4: Team size */}
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="companySize"
+                   className="font-body text-sm font-medium text-sage-text text-left">
+              Team size <span className="text-sage-primary" aria-hidden="true">*</span>
+            </label>
+            <select
+              id="companySize"
+              value={formData.companySize}
+              onChange={(e) => {
+                setFormData(p => ({ ...p, companySize: e.target.value }));
+                if (errors.companySize)
+                  setErrors(p => ({ ...p, companySize: '' }));
+              }}
+              className={`
+                w-full font-body text-sm text-sage-text
+                bg-sage-surface border rounded-lg px-4 py-3
+                focus:outline-none focus:ring-2 focus:ring-sage-primary
+                focus:border-transparent transition-colors
+                appearance-none cursor-pointer
+                ${errors.companySize
+                  ? 'border-red-400 bg-red-50'
+                  : 'border-sage-border hover:border-sage-primary/40'}
+                ${!formData.companySize ? 'text-sage-muted/60' : ''}
+              `}
+              aria-describedby={errors.companySize ? 'companySize-error' : undefined}
+              aria-invalid={!!errors.companySize}
+            >
+              <option value="" disabled>Select your team size</option>
+              <option value="Just me">Just me</option>
+              <option value="2-10">2–10 people</option>
+              <option value="11-50">11–50 people</option>
+              <option value="50+">50+ people</option>
+            </select>
+            {errors.companySize && (
+              <p id="companySize-error" className="font-body text-xs text-red-600 text-left"
+                 role="alert">
+                {errors.companySize}
+              </p>
+            )}
+          </div>
+
+          {/* Field 5: Biggest challenge */}
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="businessGoal"
+                   className="font-body text-sm font-medium text-sage-text text-left">
+              What is your biggest operational challenge right now?
+              <span className="text-sage-primary" aria-hidden="true"> *</span>
+            </label>
+            <textarea
+              id="businessGoal"
+              rows={4}
+              value={formData.businessGoal}
+              onChange={(e) => {
+                setFormData(p => ({ ...p, businessGoal: e.target.value }));
+                if (errors.businessGoal)
+                  setErrors(p => ({ ...p, businessGoal: '' }));
+              }}
+              placeholder="e.g. We spend too much time on manual tasks, our team doesn't follow a clear process, we're growing but struggling to keep up..."
+              className={`
+                w-full font-body text-sm text-sage-text
+                bg-sage-surface border rounded-lg px-4 py-3
+                placeholder:text-sage-muted/60
+                focus:outline-none focus:ring-2 focus:ring-sage-primary
+                focus:border-transparent transition-colors resize-none
+                ${errors.businessGoal
+                  ? 'border-red-400 bg-red-50'
+                  : 'border-sage-border hover:border-sage-primary/40'}
+              `}
+              aria-describedby={errors.businessGoal ? 'businessGoal-error' : undefined}
+              aria-invalid={!!errors.businessGoal}
+            />
+            {errors.businessGoal && (
+              <p id="businessGoal-error" className="font-body text-xs text-red-600 text-left"
+                 role="alert">
+                {errors.businessGoal}
+              </p>
+            )}
+          </div>
+
+          {/* Optional newsletter opt-in */}
+          <label className="flex items-start gap-3 cursor-pointer group text-left">
+            <input
+              type="checkbox"
+              checked={formData.newsletterOptIn}
+              onChange={(e) =>
+                setFormData(p => ({ ...p, newsletterOptIn: e.target.checked }))
+              }
+              className="mt-0.5 w-4 h-4 rounded border-sage-border accent-sage-primary flex-shrink-0"
+            />
+            <span className="font-body text-xs text-sage-muted leading-relaxed">
+              Send me occasional insights on operations and business systems. No spam, unsubscribe any time.
+            </span>
+          </label>
+
+          {errors.submit && (
+            <p className="font-body text-xs text-red-600 text-left" role="alert">
+              {errors.submit}
+            </p>
+          )}
+
+          {/* Submit button */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-sage-primary text-white font-body text-sm font-medium py-3.5 rounded-lg hover:bg-sage-primary-hover hover:-translate-y-[1px] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-primary focus-visible:ring-offset-2 cursor-pointer shadow-sm hover:shadow"
+          >
+            {isSubmitting ? 'Booking your session…' : 'Book My Free Audit →'}
+          </button>
+
+          {/* Micro-copy */}
+          <p className="font-body text-xs text-sage-muted text-center">
+            No pitch. No obligation. Just an honest look at your operations.
+          </p>
+
+        </form>
+      )}
+
+      {/* ── Cal.com Modal Popup Overlay ── */}
+      {showCalModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fade-in"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cal-modal-title"
+        >
+          <div className="relative w-full max-w-3xl bg-sage-surface border border-sage-border rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[92vh] animate-fade-in">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-sage-border bg-sage-surface-2">
               <div>
-                 <span className="text-white font-medium block mb-1">Stay updated with actionable insights</span>
-                 <p className="text-silver/80 text-sm leading-relaxed">
-                   I'd also like to receive practical insights on AI, technology, systems thinking, and smarter business operations.
-                 </p>
+                <h3 id="cal-modal-title" className="font-heading text-lg font-semibold text-sage-text">
+                  Choose Your Audit Date & Time
+                </h3>
+                <p className="font-body text-xs text-sage-muted">
+                  30-minute Systems Clarity Audit with Joshua Omole
+                </p>
               </div>
-           </label>
-        </section>
+              <button
+                type="button"
+                onClick={() => setShowCalModal(false)}
+                className="p-2 text-sage-muted hover:text-sage-text rounded-lg hover:bg-sage-surface transition-colors"
+                aria-label="Close booking modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div ref={calContainerRef} className="relative w-full h-[600px] overflow-hidden bg-white">
+              {/* Branded loading spinner with status text */}
+              {isCalLoading && (
+                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-sage-surface-2 p-6 transition-opacity duration-300">
+                  <div className="w-10 h-10 border-4 border-sage-border border-t-sage-primary rounded-full animate-spin mb-4" />
+                  <h4 className="font-heading text-base font-semibold text-sage-text text-center">
+                    Connecting to calendar…
+                  </h4>
+                  <p className="font-body text-xs text-sage-muted mt-1 text-center max-w-xs leading-relaxed">
+                    Finding available 30-minute time slots with Joshua Omole
+                  </p>
+                  <div className="mt-5 flex items-center gap-2 text-[11px] text-sage-primary font-mono font-medium">
+                    <span className="w-2 h-2 rounded-full bg-sage-primary animate-pulse" />
+                    <span>Cal.com live availability</span>
+                  </div>
+                </div>
+              )}
 
-        {/* Submit & Cal.com */}
-        <section className="pt-6 pb-10">
-          <div className="flex flex-col items-center max-w-md mx-auto">
-             <button
-               type="submit"
-               disabled={isSubmitting}
-               className="w-full py-5 px-8 rounded-2xl bg-blue text-white font-medium text-lg flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(60,117,165,0.4)] hover:shadow-[0_0_30px_rgba(60,117,165,0.6)] hover:-translate-y-1 transition-all duration-300 disabled:opacity-70 disabled:hover:translate-y-0 disabled:shadow-none"
-             >
-               {isSubmitting ? (
-                 <>
-                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                   Scheduling...
-                 </>
-               ) : (
-                 <>
-                   Schedule My Session
-                   <ArrowRight className="w-5 h-5" />
-                 </>
-               )}
-             </button>
-             <p className="text-silver/60 text-xs mt-4 text-center">
-               By proceeding, you will submit your inquiry and be prompted to pick a time slot.
-             </p>
+              <Cal
+                namespace="30min"
+                calLink="joshua-omole-d9c2vi/30min"
+                style={{ width: "100%", height: "100%", overflow: "scroll" }}
+                config={{
+                  layout: "month_view",
+                  name: formData.firstName.trim(),
+                  email: formData.email
+                }}
+              />
+            </div>
           </div>
-        </section>
-
-      </motion.form>
+        </div>
+      )}
     </div>
   );
 };

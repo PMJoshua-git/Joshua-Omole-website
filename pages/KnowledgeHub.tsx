@@ -63,16 +63,16 @@ const KnowledgeHub: React.FC = () => {
       {/* Hero Section */}
       <section className="relative px-4 sm:px-6 lg:px-8 pt-32 pb-20 max-w-7xl mx-auto overflow-hidden text-center min-h-[50vh] flex flex-col items-center justify-center">
         {/* Glow Backgrounds */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-blue rounded-full blur-[150px] opacity-10 pointer-events-none"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-sage-soft rounded-full blur-[150px] opacity-20 pointer-events-none"></div>
         
         <FadeIn direction="up" className="relative z-10 w-full max-w-4xl mx-auto">
-          <div className="font-mono text-purple mb-6 tracking-wider text-sm border border-purple/30 inline-block px-4 py-1.5 rounded-full bg-purple/10">
+          <div className="font-mono text-sage-primary mb-6 tracking-widest text-xs font-semibold uppercase border border-sage-border inline-block px-4 py-1.5 rounded-full bg-sage-surface-2">
             Resource Library
           </div>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white leading-tight mb-8">
-            Practical Resources for <br/> <span className="text-transparent bg-clip-text bg-neon-gradient">Smarter Business Operations</span>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-sage-text leading-tight mb-8">
+            Practical Resources for <br/> <span className="text-sage-primary">Smarter Business Operations</span>
           </h1>
-          <p className="text-lg md:text-xl text-silver leading-relaxed mb-12 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-sage-muted leading-relaxed mb-12 max-w-2xl mx-auto">
             Explore practical guides, frameworks, and implementation resources designed to help leaders understand AI, design better systems, and build operations that actually scale.
           </p>
           
@@ -96,8 +96,8 @@ const KnowledgeHub: React.FC = () => {
           <div className="space-y-16 animate-pulse">
             <div>
               <div className="mb-8">
-                <div className="shimmer h-10 w-64 bg-navy/20 rounded-xl mb-3"></div>
-                <div className="w-20 h-1 bg-neon-gradient rounded-full mt-4"></div>
+                <div className="shimmer h-10 w-64 bg-sage-surface-2 rounded-xl mb-3"></div>
+                <div className="w-20 h-1 bg-sage-primary rounded-full mt-4"></div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <ResourceCardSkeleton />
@@ -109,14 +109,14 @@ const KnowledgeHub: React.FC = () => {
         )}
 
         {error && !loading && (
-           <div className="flex flex-col items-center justify-center py-20 text-silver/70 border border-navy/50 rounded-[2rem] bg-midnight/30">
+           <div className="flex flex-col items-center justify-center py-20 text-sage-muted border border-sage-border rounded-xl bg-sage-surface shadow-sm">
              <AlertCircle className="w-8 h-8 text-red-500/80 mb-4" />
              <p>Unable to load resources at this time. Please check back later.</p>
            </div>
         )}
 
         {!loading && !error && resources.length === 0 && (
-           <div className="flex flex-col items-center justify-center py-20 text-silver/70 border border-navy/50 rounded-[2rem] bg-midnight/30">
+           <div className="flex flex-col items-center justify-center py-20 text-sage-muted border border-sage-border rounded-xl bg-sage-surface shadow-sm">
              <p>No resources available just yet. Check back soon!</p>
            </div>
         )}

@@ -14,17 +14,8 @@ const FloatingAssistant: React.FC = () => {
       }
     }, 5000);
 
-    // Periodic reminder interval (every 2 minutes)
-    // This ensures the agent engages the user periodically as they scroll/read
-    const intervalTimer = setInterval(() => {
-      if (!isOpen) {
-        setShowTeaser(true);
-      }
-    }, 120000); // 120,000 ms = 2 minutes
-
     return () => {
       clearTimeout(initialTimer);
-      clearInterval(intervalTimer);
     };
   }, [isOpen]);
 
@@ -61,13 +52,11 @@ const FloatingAssistant: React.FC = () => {
     setIsOpen(newState);
     if (newState) {
         setShowTeaser(false);
-        // We do not set sessionStorage here anymore to allow the interval to show it again later
     }
   };
 
   const handleDismissTeaser = () => {
     setShowTeaser(false);
-    // We do not set sessionStorage here anymore so it can pop up again
   };
 
   return (
@@ -75,7 +64,7 @@ const FloatingAssistant: React.FC = () => {
       {/* Floating Toggle Button */}
       <button 
         onClick={toggleOpen}
-        className={`fixed bottom-6 right-6 z-[60] w-14 h-14 rounded-full bg-gradient-to-br from-blue to-purple text-white shadow-glow hover:shadow-glow-hover flex items-center justify-center transition-all duration-300 transform hover:scale-105 active:scale-95 ${isOpen ? 'rotate-90' : 'rotate-0'}`}
+        className={`fixed bottom-6 right-6 z-[60] bg-sage-primary text-white hover:bg-sage-primary-hover rounded-full w-12 h-12 shadow-md transition-colors flex items-center justify-center ${isOpen ? 'rotate-90' : 'rotate-0'}`}
         aria-label={isOpen ? "Close Chat" : "Open Chat"}
       >
         {isOpen ? <X className="w-6 h-6" /> : <Bot className="w-7 h-7" />}
@@ -89,10 +78,10 @@ const FloatingAssistant: React.FC = () => {
             : 'opacity-0 scale-90 translate-y-8 pointer-events-none'
         }`}
       >
-        <div className="bg-midnight border border-navy shadow-2xl rounded-2xl overflow-hidden w-[90vw] md:w-[400px] h-[600px] max-h-[75vh] relative flex flex-col">
+        <div className="bg-sage-surface border border-sage-border shadow-2xl rounded-2xl overflow-hidden w-[90vw] md:w-[400px] h-[600px] max-h-[75vh] relative flex flex-col">
             {/* Loading Placeholder */}
-            <div className="absolute inset-0 flex items-center justify-center bg-midnight -z-10">
-                <div className="w-8 h-8 border-2 border-blue border-t-transparent rounded-full animate-spin"></div>
+            <div className="absolute inset-0 flex items-center justify-center bg-sage-surface -z-10">
+                <div className="w-8 h-8 border-2 border-sage-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
 
             {isOpen && (
@@ -116,22 +105,22 @@ const FloatingAssistant: React.FC = () => {
           showTeaser && !isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}
       >
-        <div className="pointer-events-auto bg-midnight border border-navy p-4 rounded-2xl shadow-glow relative glass-panel max-w-xs mb-2">
+        <div className="pointer-events-auto bg-sage-surface border border-sage-border p-4 rounded-2xl shadow-sm relative max-w-xs mb-2">
           <button 
             onClick={handleDismissTeaser}
-            className="absolute top-2 right-2 text-silver hover:text-white transition-colors p-1"
+            className="absolute top-2 right-2 text-sage-muted hover:text-sage-primary transition-colors p-1"
             aria-label="Dismiss assistant"
           >
             <X className="w-4 h-4" />
           </button>
           
           <div className="flex items-start gap-4 pr-6">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue to-purple flex items-center justify-center flex-shrink-0 shadow-lg border border-white/10">
+            <div className="w-10 h-10 rounded-full bg-sage-primary flex items-center justify-center flex-shrink-0 shadow-sm">
                <Bot className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-white font-medium text-sm mb-1">Hi there!</p>
-              <p className="text-silver text-xs leading-relaxed mb-3">
+              <p className="text-sage-text font-medium text-sm mb-1">Hi there!</p>
+              <p className="text-sage-muted text-xs leading-relaxed mb-3">
                 I'm Joshua's AI Assistant. Click the button below to chat!
               </p>
               <button 
@@ -139,7 +128,7 @@ const FloatingAssistant: React.FC = () => {
                     handleDismissTeaser();
                     setIsOpen(true);
                 }}
-                className="inline-flex items-center text-xs font-bold text-blue hover:text-purple transition-colors"
+                className="inline-flex items-center text-xs font-bold text-sage-primary hover:text-sage-primary-hover transition-colors"
               >
                 Start Chat
               </button>
@@ -147,7 +136,7 @@ const FloatingAssistant: React.FC = () => {
           </div>
           
           {/* Decorative Arrow/Tail pointing down to toggle button */}
-          <div className="absolute -bottom-2 right-6 w-4 h-4 bg-midnight border-b border-r border-navy transform rotate-45"></div>
+          <div className="absolute -bottom-2 right-6 w-4 h-4 bg-sage-surface border-b border-r border-sage-border transform rotate-45"></div>
         </div>
       </div>
     </>

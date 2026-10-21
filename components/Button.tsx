@@ -20,19 +20,19 @@ const Button: React.FC<ButtonProps> = ({
   onClick,
   type = 'button'
 }) => {
-  const baseStyles = "inline-flex items-center justify-center font-medium transition-all duration-300 transform active:scale-95";
+  const baseStyles = "inline-flex items-center justify-center font-medium transition-[transform,box-shadow,background-color,border-color,color] duration-200 ease-out active:scale-[0.98] md:hover:-translate-y-[1px]";
   
   const sizeStyles = {
-    small: "px-5 py-2 text-sm rounded-full", 
-    default: "px-8 py-3 text-base rounded-full",
-    large: "px-10 py-4 text-lg md:text-xl rounded-full tracking-wide", 
+    small: "px-4 py-2 text-sm rounded-md", 
+    default: "px-8 py-3 text-base rounded-md",
+    large: "px-10 py-4 text-lg md:text-xl rounded-md tracking-wide", 
   };
 
   const variants = {
-    primary: "border-transparent text-white bg-neon-gradient md:hover:bg-neon-gradient-hover shadow-glow md:hover:shadow-glow-hover md:hover:-translate-y-0.5",
-    secondary: "border-transparent text-white bg-white/10 md:hover:bg-white/20 backdrop-blur-md shadow-sm md:hover:shadow-md border border-white/5",
-    outline: "border border-navy text-silver bg-transparent md:hover:border-blue md:hover:text-white md:hover:bg-blue/10 md:hover:shadow-glow",
-    text: "border-transparent text-blue md:hover:text-purple px-0 rounded-none underline-offset-4 md:hover:underline"
+    primary: "border-transparent text-white bg-sage-primary hover:bg-sage-primary-hover shadow-sm hover:shadow",
+    secondary: "border border-sage-primary text-sage-primary bg-transparent hover:bg-sage-surface-2 hover:shadow-xs",
+    outline: "border border-sage-border text-sage-text bg-transparent hover:border-sage-primary hover:bg-sage-surface-2",
+    text: "border-transparent text-sage-primary hover:text-sage-primary-hover px-0 rounded-none underline-offset-4 hover:underline md:hover:translate-y-0"
   };
 
   const combinedClasses = `${baseStyles} ${sizeStyles[size]} ${variants[variant]} ${className}`;

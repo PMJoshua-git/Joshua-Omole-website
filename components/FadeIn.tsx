@@ -1,49 +1,34 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
+import RevealOnScroll, { RevealOnScrollProps } from './RevealOnScroll';
 
-interface FadeInProps {
+export interface FadeInProps extends Omit<RevealOnScrollProps, 'children'> {
   children: React.ReactNode;
-  delay?: number;
-  className?: string;
-  direction?: 'up' | 'left' | 'right' | 'none';
-  fullWidth?: boolean;
 }
 
-const FadeIn: React.FC<FadeInProps> = ({ children, delay = 0, className = "", direction = 'up', fullWidth = false }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const domRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          if (domRef.current) observer.unobserve(domRef.current);
-        }
-      });
-    }, { threshold: 0.1 });
-    if (domRef.current) observer.observe(domRef.current);
-    return () => {
-      if (domRef.current) observer.unobserve(domRef.current);
-    }
-  }, []);
-
-  const getTranslateClass = () => {
-      if (direction === 'up') return 'translate-y-8';
-      if (direction === 'left') return '-translate-x-8';
-      if (direction === 'right') return 'translate-x-8';
-      return '';
-  }
-
+const FadeIn: React.FC<FadeInProps> = ({
+  children,
+  delay = 0,
+  direction = 'up',
+  distance = 20,
+  duration = 550,
+  className = '',
+  fullWidth = false,
+  once = false, // defaults to re-triggering per user preference
+  ...rest
+}) => {
   return (
-    <div
-      ref={domRef}
-      style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-700 ease-out transform ${fullWidth ? 'w-full' : ''} ${
-        isVisible ? 'opacity-100 translate-y-0 translate-x-0' : `opacity-0 ${getTranslateClass()}`
-      } ${className}`}
+    <RevealOnScroll
+      delay={delay}
+      direction={direction}
+      distance={distance}
+      duration={duration}
+      className={className}
+      fullWidth={fullWidth}
+      once={once}
+      {...rest}
     >
       {children}
-    </div>
+    </RevealOnScroll>
   );
 };
 

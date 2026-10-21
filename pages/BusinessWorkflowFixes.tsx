@@ -296,8 +296,8 @@ const BusinessWorkflowFixes: React.FC = () => {
     const originalColor = document.body.style.color;
     
     // Smooth transition
-    document.body.style.backgroundColor = '#ffffff';
-    document.body.style.color = '#111111';
+    document.body.style.backgroundColor = '#EEF4EF';
+    document.body.style.color = '#202A24';
 
     return () => {
       // Revert upon component unmount
@@ -477,35 +477,33 @@ ${formData.desiredHappens}`,
         <meta name="description" content="Fix the small operational leaks that cost your business leads, sales, and time with custom, lightweight automations." />
       </Helmet>
 
-      <Layout>
+      <Layout hideNav={true}>
         {/* Hero Section */}
-        <section className="py-20 md:py-28 px-6 sm:px-8 relative overflow-hidden">
-          {/* Subtle glows to match the homepage */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue rounded-full blur-[150px] opacity-10 pointer-events-none -z-10"></div>
-          <div className="absolute top-1/3 left-1/3 w-[400px] h-[400px] bg-purple rounded-full blur-[150px] opacity-10 pointer-events-none -z-10"></div>
+        <section className="pt-8 pb-20 md:pt-12 md:pb-28 px-6 sm:px-8 relative overflow-hidden">
+          {/* No subtle glows */}
 
           <div className="max-w-4xl mx-auto text-left space-y-8">
             <FadeIn>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-blue/10 border border-blue/30 text-blue">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-widest text-sage-primary bg-sage-surface border border-sage-border">
                 <Sparkles className="w-3.5 h-3.5" />
                 BUSINESS WORKFLOW FIXES
               </span>
             </FadeIn>
             
             <FadeIn delay={100}>
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-semibold text-white leading-[1.12] tracking-tight max-w-3xl">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-semibold text-sage-text leading-[1.12] tracking-tight max-w-3xl">
                 Fix the small operational leaks that cost your business leads, sales and time.
               </h1>
             </FadeIn>
 
             <FadeIn delay={200}>
-              <p className="text-lg sm:text-xl text-silver max-w-2xl font-light leading-relaxed">
+              <p className="text-lg sm:text-xl text-sage-muted max-w-2xl font-light leading-relaxed">
                 Simple systems for small businesses that are tired of losing enquiries, forgetting follow-ups, repeating the same admin and leaving revenue on the table.
               </p>
             </FadeIn>
 
             <FadeIn delay={300}>
-              <p className="text-base text-silver/70 max-w-xl font-light">
+              <p className="text-base text-sage-muted/90 max-w-xl font-light">
                 I take one important process in your business, simplify it, connect the right tools and make it run with far less manual work.
               </p>
             </FadeIn>
@@ -514,12 +512,12 @@ ${formData.desiredHappens}`,
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <button
                   onClick={() => handleScrollToForm()}
-                  className="bg-gradient-to-tr from-blue to-purple text-white hover:opacity-90 shadow-glow text-center text-sm font-medium px-8 py-3.5 rounded-md transition-all duration-200 flex items-center justify-center gap-2"
+                  className="bg-sage-primary text-white hover:bg-sage-primary-hover shadow-sm text-center text-sm font-medium px-8 py-3.5 rounded-md transition-all duration-200 flex items-center justify-center gap-2"
                 >
                   Fix a Workflow
                   <ArrowRight className="w-4 h-4" />
                 </button>
-                <span className="text-xs text-silver/50 font-light max-w-xs sm:mt-0 mt-1">
+                <span className="text-xs text-sage-muted font-light max-w-xs sm:mt-0 mt-1">
                   Tell me what is slowing your business down. I’ll tell you what can be fixed.
                 </span>
               </div>
@@ -528,63 +526,63 @@ ${formData.desiredHappens}`,
         </section>
 
         {/* Section 2 — Introduce the Core Idea */}
-        <section className="py-20 md:py-28 px-6 sm:px-8 bg-midnight/30 border-y border-navy/40 relative">
+        <section className="py-20 md:py-28 px-6 sm:px-8 bg-sage-surface-2 border-y border-sage-border relative">
           <div className="max-w-4xl mx-auto space-y-16">
             {/* Visual Process Map */}
-            <FadeIn delay={150} className="bg-midnight/60 border border-navy/50 rounded-xl p-8 sm:p-10 shadow-glow space-y-8">
+            <FadeIn delay={150} className="bg-sage-surface border border-sage-border rounded-xl p-8 sm:p-10 shadow-sm space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center relative">
                 
                 {/* Step 1 */}
-                <div className="bg-obsidian border border-navy/40 rounded-lg p-5 text-center flex flex-col justify-center min-h-[110px] relative z-10">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-silver/40 block mb-1">Trigger</span>
-                  <span className="text-sm font-medium text-silver">Customer does something</span>
+                <div className="bg-sage-surface-2 border border-sage-border rounded-lg p-5 text-center flex flex-col justify-center min-h-[110px] relative z-10">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-sage-muted/70 block mb-1">Trigger</span>
+                  <span className="text-sm font-medium text-sage-text">Customer does something</span>
                 </div>
                 
                 {/* Connector */}
-                <div className="hidden md:flex justify-center text-navy">
+                <div className="hidden md:flex justify-center text-sage-primary">
                   <ArrowRight className="w-5 h-5" />
                 </div>
 
                 {/* Step 2 */}
-                <div className="bg-obsidian border border-navy/40 rounded-lg p-5 text-center flex flex-col justify-center min-h-[110px] relative z-10">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-silver/40 block mb-1">Action</span>
-                  <span className="text-sm font-medium text-silver">Your system responds</span>
+                <div className="bg-sage-surface-2 border border-sage-border rounded-lg p-5 text-center flex flex-col justify-center min-h-[110px] relative z-10">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-sage-muted/70 block mb-1">Action</span>
+                  <span className="text-sm font-medium text-sage-text">Your system responds</span>
                 </div>
 
                 {/* Connector */}
-                <div className="hidden md:flex justify-center text-navy">
+                <div className="hidden md:flex justify-center text-sage-primary">
                   <ArrowRight className="w-5 h-5" />
                 </div>
 
                 {/* Step 3 */}
-                <div className="bg-obsidian border border-navy/40 rounded-lg p-5 text-center flex flex-col justify-center min-h-[110px] relative z-10">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-silver/40 block mb-1">Capture</span>
-                  <span className="text-sm font-medium text-silver">Information is captured</span>
+                <div className="bg-sage-surface-2 border border-sage-border rounded-lg p-5 text-center flex flex-col justify-center min-h-[110px] relative z-10">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-sage-muted/70 block mb-1">Capture</span>
+                  <span className="text-sm font-medium text-sage-text">Information is captured</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
                 {/* Step 4 */}
-                <div className="md:col-start-2 bg-obsidian border border-navy/40 rounded-lg p-5 text-center flex flex-col justify-center min-h-[110px]">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-silver/40 block mb-1">Process</span>
-                  <span className="text-sm font-medium text-silver">Next step happens automatically</span>
+                <div className="md:col-start-2 bg-sage-surface-2 border border-sage-border rounded-lg p-5 text-center flex flex-col justify-center min-h-[110px]">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-sage-muted/70 block mb-1">Process</span>
+                  <span className="text-sm font-medium text-sage-text">Next step happens automatically</span>
                 </div>
 
                 {/* Connector */}
-                <div className="hidden md:flex justify-center text-navy">
+                <div className="hidden md:flex justify-center text-sage-primary">
                   <ArrowRight className="w-5 h-5" />
                 </div>
 
                 {/* Step 5 */}
-                <div className="bg-blue/10 border border-blue/30 rounded-lg p-5 text-center flex flex-col justify-center min-h-[110px]">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-blue block mb-1">Human</span>
-                  <span className="text-sm font-medium text-white">You step in only when you need to</span>
+                <div className="bg-sage-primary/10 border border-sage-border rounded-lg p-5 text-center flex flex-col justify-center min-h-[110px]">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-sage-accent block mb-1">Human</span>
+                  <span className="text-sm font-medium text-sage-text">You step in only when you need to</span>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-navy/40 flex flex-col sm:flex-row items-center justify-between text-xs text-silver/50 font-light gap-2">
+              <div className="pt-4 border-t border-sage-border flex flex-col sm:flex-row items-center justify-between text-xs text-sage-muted font-light gap-2">
                 <span>One problem. One workflow. One clear outcome.</span>
-                <span className="font-serif italic text-silver/40">Design with architectural intent</span>
+                <span className="font-serif italic text-sage-muted">Design with architectural intent</span>
               </div>
             </FadeIn>
           </div>
@@ -594,11 +592,11 @@ ${formData.desiredHappens}`,
         <section className="py-20 md:py-28 px-6 sm:px-8">
           <div className="max-w-7xl mx-auto space-y-16">
             <div className="max-w-2xl">
-              <span className="text-xs uppercase font-semibold tracking-widest text-blue">Core Framework</span>
-              <h2 className="text-3xl md:text-4xl font-serif text-white mt-2">
+              <span className="text-xs uppercase font-semibold tracking-widest text-sage-primary">Core Framework</span>
+              <h2 className="text-3xl md:text-4xl font-serif text-sage-text mt-2">
                 Five clear operational fixes.
               </h2>
-              <p className="text-silver/70 font-light text-sm md:text-base mt-2">
+              <p className="text-sage-muted font-light text-sm md:text-base mt-2">
                 No complex agency retainers or mystery consultation briefs. Choose one leak, and let's seal it.
               </p>
             </div>
@@ -610,35 +608,35 @@ ${formData.desiredHappens}`,
               {OFFERS.slice(0, 2).map((offer, index) => (
                 <div 
                   key={offer.id}
-                  className="lg:col-span-3 bg-midnight/50 border border-navy/60 rounded-xl p-8 md:p-10 flex flex-col justify-between hover:border-blue/40 transition-all duration-300 hover:shadow-glow"
+                  className="lg:col-span-3 bg-sage-surface border border-sage-border rounded-xl p-8 md:p-10 flex flex-col justify-between hover:border-sage-primary/40 hover:bg-sage-surface-2 transition-all duration-300 shadow-sm"
                 >
                   <div className="space-y-6">
                     {/* Label & Header */}
                     <div className="space-y-2">
-                      <span className="text-[10px] uppercase tracking-widest text-blue font-bold block">{offer.label}</span>
-                      <h3 className="text-2xl font-serif text-white font-medium">{offer.name}</h3>
-                      <p className="text-xs text-silver/50 italic">{offer.bestFor}</p>
+                      <span className="text-[10px] uppercase tracking-widest text-sage-primary font-bold block">{offer.label}</span>
+                      <h3 className="text-2xl font-serif text-sage-text font-medium">{offer.name}</h3>
+                      <p className="text-xs text-sage-muted italic">{offer.bestFor}</p>
                     </div>
 
                     {/* Problem Statement */}
-                    <div className="bg-obsidian/60 rounded-lg p-5 border border-navy/40 space-y-2">
-                      <h4 className="text-xs font-semibold text-white uppercase tracking-wider">{offer.problemHeading}</h4>
-                      <p className="text-xs text-silver/70 font-light leading-relaxed">{offer.problemCopy}</p>
+                    <div className="bg-sage-surface-2 rounded-lg p-5 border border-sage-border space-y-2 shadow-sm">
+                      <h4 className="text-xs font-semibold text-sage-text uppercase tracking-wider">{offer.problemHeading}</h4>
+                      <p className="text-xs text-sage-muted font-light leading-relaxed">{offer.problemCopy}</p>
                     </div>
 
                     {/* What I Build */}
                     <div className="space-y-2">
-                      <h4 className="text-xs uppercase font-bold text-silver/40 tracking-wider">What I Build</h4>
-                      <p className="text-sm text-silver leading-relaxed font-light">{offer.whatIBuild}</p>
+                      <h4 className="text-xs uppercase font-bold text-sage-muted tracking-wider">What I Build</h4>
+                      <p className="text-sm text-sage-text leading-relaxed font-light">{offer.whatIBuild}</p>
                     </div>
 
                     {/* What You Get List */}
                     <div className="space-y-3 pt-2">
-                      <h4 className="text-xs uppercase font-bold text-silver/40 tracking-wider">What You Get</h4>
+                      <h4 className="text-xs uppercase font-bold text-sage-muted tracking-wider">What You Get</h4>
                       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
                         {offer.whatYouGet.map((item, idx) => (
-                          <li key={idx} className="text-xs text-silver/70 flex items-start gap-1.5 font-light">
-                            <Check className="w-3.5 h-3.5 text-blue shrink-0 mt-0.5" />
+                          <li key={idx} className="text-xs text-sage-muted flex items-start gap-1.5 font-light">
+                            <Check className="w-3.5 h-3.5 text-sage-primary shrink-0 mt-0.5" />
                             <span>{item}</span>
                           </li>
                         ))}
@@ -646,26 +644,26 @@ ${formData.desiredHappens}`,
                     </div>
 
                     {/* Outcome */}
-                    <div className="pt-2 border-t border-navy/40">
-                      <span className="text-[10px] uppercase font-bold text-silver/40 tracking-wider block mb-1">Desired Result</span>
-                      <h5 className="text-sm font-semibold text-white">{offer.resultHeading}</h5>
-                      <p className="text-xs text-silver/70 font-light leading-relaxed mt-1">{offer.resultCopy}</p>
+                    <div className="pt-2 border-t border-sage-border">
+                      <span className="text-[10px] uppercase font-bold text-sage-muted tracking-wider block mb-1">Desired Result</span>
+                      <h5 className="text-sm font-semibold text-sage-primary">{offer.resultHeading}</h5>
+                      <p className="text-xs text-sage-muted font-light leading-relaxed mt-1">{offer.resultCopy}</p>
                     </div>
 
                     {/* Testimonials */}
                     {offer.testimonials && offer.testimonials.length > 0 && (
-                      <div className="pt-4 border-t border-navy/40 space-y-4">
-                        <span className="text-[10px] uppercase font-bold text-silver/40 tracking-wider block">Client Feedback</span>
+                      <div className="pt-4 border-t border-sage-border space-y-4">
+                        <span className="text-[10px] uppercase font-bold text-sage-muted tracking-wider block">Client Feedback</span>
                         <div className="grid grid-cols-1 gap-4">
                           {offer.testimonials.map((t, idx) => (
-                            <div key={idx} className="bg-obsidian/60 border border-navy/40 rounded-lg p-4 space-y-2">
-                              <span className="text-[9px] uppercase font-bold tracking-widest text-blue block">Client Review</span>
-                              <p className="text-[11px] text-silver/70 font-light italic leading-relaxed">
+                            <div key={idx} className="bg-sage-surface-2 border border-sage-border rounded-lg p-4 space-y-2 shadow-sm">
+                              <span className="text-[9px] uppercase font-bold tracking-widest text-sage-primary block">Client Review</span>
+                              <p className="text-[11px] text-sage-muted font-light italic leading-relaxed">
                                 “{t.quote}”
                               </p>
                               <div className="pt-1">
-                                <p className="text-[11px] font-semibold text-white">{t.name}</p>
-                                <p className="text-[10px] text-silver/50 font-light italic">{t.role}</p>
+                                <p className="text-[11px] font-semibold text-sage-text">{t.name}</p>
+                                <p className="text-[10px] text-sage-muted font-light italic">{t.role}</p>
                               </div>
                             </div>
                           ))}
@@ -674,12 +672,12 @@ ${formData.desiredHappens}`,
                     )}
 
                     {/* Bonuses */}
-                    <div className="bg-obsidian/40 border border-navy/40 rounded-lg p-5 pt-4 space-y-2">
-                      <span className="text-[9px] uppercase font-bold text-silver/40 tracking-widest block">BONUSES INCLUDED</span>
+                    <div className="bg-sage-surface-2 border border-sage-border rounded-lg p-5 pt-4 space-y-2 shadow-sm">
+                      <span className="text-[9px] uppercase font-bold text-sage-muted tracking-widest block">BONUSES INCLUDED</span>
                       <ul className="space-y-2">
                         {offer.bonuses.map((bonus, idx) => (
-                          <li key={idx} className="text-[11px] text-silver/70 flex items-start gap-1.5 leading-relaxed font-light">
-                            <Plus className="w-3 h-3 text-blue shrink-0 mt-0.5" />
+                          <li key={idx} className="text-[11px] text-sage-muted flex items-start gap-1.5 leading-relaxed font-light">
+                            <Plus className="w-3 h-3 text-sage-primary shrink-0 mt-0.5" />
                             <span>{bonus}</span>
                           </li>
                         ))}
@@ -688,17 +686,17 @@ ${formData.desiredHappens}`,
                   </div>
 
                   {/* Price and CTA */}
-                  <div className="pt-8 mt-8 border-t border-navy/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="pt-8 mt-8 border-t border-sage-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="space-y-1">
-                      <span className="text-[10px] uppercase font-semibold text-silver/40 block tracking-wider">Investment</span>
+                      <span className="text-[10px] uppercase font-semibold text-sage-muted block tracking-wider">Investment</span>
                       <div className="flex items-baseline gap-2 flex-wrap">
-                        <span className="text-xs text-silver/50 line-through font-light">{offer.originalPrice}</span>
-                        <span className="text-xs md:text-sm text-amber-300 font-medium">Ember 50% Drop Price: <span className="text-lg font-bold text-white">{offer.dropPrice}</span></span>
+                        <span className="text-xs text-sage-muted/70 line-through font-light">{offer.originalPrice}</span>
+                        <span className="text-xs md:text-sm text-sage-primary font-semibold">Ember 50% Drop Price: <span className="text-lg font-bold text-sage-primary">{offer.dropPrice}</span></span>
                       </div>
                     </div>
                     <button
                       onClick={() => handleScrollToForm(offer.name)}
-                      className="bg-gradient-to-tr from-blue to-purple text-white hover:opacity-90 shadow-glow text-center text-xs font-semibold px-6 py-3 rounded-md transition-colors"
+                      className="bg-sage-primary text-white hover:bg-sage-primary-hover shadow-sm text-center text-xs font-semibold px-6 py-3 rounded-md transition-colors"
                     >
                       {offer.ctaText}
                     </button>
@@ -710,35 +708,35 @@ ${formData.desiredHappens}`,
               {OFFERS.slice(2).map((offer, index) => (
                 <div 
                   key={offer.id}
-                  className="lg:col-span-2 bg-midnight/50 border border-navy/60 rounded-xl p-6 md:p-8 flex flex-col justify-between hover:border-blue/40 transition-all duration-300 hover:shadow-glow"
+                  className="lg:col-span-2 bg-sage-surface border border-sage-border rounded-xl p-6 md:p-8 flex flex-col justify-between hover:border-sage-primary/40 hover:bg-sage-surface-2 transition-all duration-300 shadow-sm"
                 >
                   <div className="space-y-6">
                     {/* Label & Header */}
                     <div className="space-y-2">
-                      <span className="text-[10px] uppercase tracking-widest text-blue font-bold block">{offer.label}</span>
-                      <h3 className="text-xl font-serif text-white font-medium">{offer.name}</h3>
-                      <p className="text-[11px] text-silver/50 italic leading-snug">{offer.bestFor}</p>
+                      <span className="text-[10px] uppercase tracking-widest text-sage-primary font-bold block">{offer.label}</span>
+                      <h3 className="text-xl font-serif text-sage-text font-medium">{offer.name}</h3>
+                      <p className="text-[11px] text-sage-muted italic leading-snug">{offer.bestFor}</p>
                     </div>
 
                     {/* Problem Statement */}
-                    <div className="bg-obsidian/60 rounded-lg p-4 border border-navy/40 space-y-1.5">
-                      <h4 className="text-[11px] font-semibold text-white uppercase tracking-wider">{offer.problemHeading}</h4>
-                      <p className="text-[11px] text-silver/70 font-light leading-relaxed">{offer.problemCopy}</p>
+                    <div className="bg-sage-surface-2 rounded-lg p-4 border border-sage-border space-y-1.5 shadow-sm">
+                      <h4 className="text-[11px] font-semibold text-sage-text uppercase tracking-wider">{offer.problemHeading}</h4>
+                      <p className="text-[11px] text-sage-muted font-light leading-relaxed">{offer.problemCopy}</p>
                     </div>
 
                     {/* What I Build */}
                     <div className="space-y-1.5">
-                      <h4 className="text-[10px] uppercase font-bold text-silver/40 tracking-wider">What I Build</h4>
-                      <p className="text-xs text-silver leading-relaxed font-light">{offer.whatIBuild}</p>
+                      <h4 className="text-[10px] uppercase font-bold text-sage-muted tracking-wider">What I Build</h4>
+                      <p className="text-xs text-sage-text leading-relaxed font-light">{offer.whatIBuild}</p>
                     </div>
 
                     {/* What You Get List */}
                     <div className="space-y-2 pt-1">
-                      <h4 className="text-[10px] uppercase font-bold text-silver/40 tracking-wider">What You Get</h4>
+                      <h4 className="text-[10px] uppercase font-bold text-sage-muted tracking-wider">What You Get</h4>
                       <ul className="space-y-1.5">
                         {offer.whatYouGet.map((item, idx) => (
-                          <li key={idx} className="text-xs text-silver/70 flex items-start gap-1.5 font-light">
-                            <Check className="w-3 h-3 text-blue shrink-0 mt-0.5" />
+                          <li key={idx} className="text-xs text-sage-muted flex items-start gap-1.5 font-light">
+                            <Check className="w-3 h-3 text-sage-primary shrink-0 mt-0.5" />
                             <span>{item}</span>
                           </li>
                         ))}
@@ -746,26 +744,26 @@ ${formData.desiredHappens}`,
                     </div>
 
                     {/* Outcome */}
-                    <div className="pt-2 border-t border-navy/40">
-                      <span className="text-[9px] uppercase font-bold text-silver/40 tracking-wider block mb-1">Desired Result</span>
-                      <h5 className="text-xs font-semibold text-white">{offer.resultHeading}</h5>
-                      <p className="text-[11px] text-silver/70 font-light leading-relaxed mt-1">{offer.resultCopy}</p>
+                    <div className="pt-2 border-t border-sage-border">
+                      <span className="text-[9px] uppercase font-bold text-sage-muted tracking-wider block mb-1">Desired Result</span>
+                      <h5 className="text-xs font-semibold text-sage-primary">{offer.resultHeading}</h5>
+                      <p className="text-[11px] text-sage-muted font-light leading-relaxed mt-1">{offer.resultCopy}</p>
                     </div>
 
                     {/* Testimonials */}
                     {offer.testimonials && offer.testimonials.length > 0 && (
-                      <div className="pt-4 border-t border-navy/40 space-y-4">
-                        <span className="text-[10px] uppercase font-bold text-silver/40 tracking-wider block">Client Feedback</span>
+                      <div className="pt-4 border-t border-sage-border space-y-4">
+                        <span className="text-[10px] uppercase font-bold text-sage-muted tracking-wider block">Client Feedback</span>
                         <div className="grid grid-cols-1 gap-4">
                           {offer.testimonials.map((t, idx) => (
-                            <div key={idx} className="bg-obsidian/60 border border-navy/40 rounded-lg p-4 space-y-2">
-                              <span className="text-[9px] uppercase font-bold tracking-widest text-blue block">Client Review</span>
-                              <p className="text-[11px] text-silver/70 font-light italic leading-relaxed">
+                            <div key={idx} className="bg-sage-surface-2 border border-sage-border rounded-lg p-4 space-y-2 shadow-sm">
+                              <span className="text-[9px] uppercase font-bold tracking-widest text-sage-primary block">Client Review</span>
+                              <p className="text-[11px] text-sage-muted font-light italic leading-relaxed">
                                 “{t.quote}”
                               </p>
                               <div className="pt-1">
-                                <p className="text-[11px] font-semibold text-white">{t.name}</p>
-                                <p className="text-[10px] text-silver/50 font-light italic">{t.role}</p>
+                                <p className="text-[11px] font-semibold text-sage-text">{t.name}</p>
+                                <p className="text-[10px] text-sage-muted font-light italic">{t.role}</p>
                               </div>
                             </div>
                           ))}
@@ -774,12 +772,12 @@ ${formData.desiredHappens}`,
                     )}
 
                     {/* Bonuses */}
-                    <div className="bg-obsidian/40 border border-navy/40 rounded-lg p-4 space-y-1.5">
-                      <span className="text-[9px] uppercase font-bold text-silver/40 tracking-widest block">BONUSES INCLUDED</span>
+                    <div className="bg-sage-surface-2 border border-sage-border rounded-lg p-4 space-y-1.5 shadow-sm">
+                      <span className="text-[9px] uppercase font-bold text-sage-muted tracking-widest block">BONUSES INCLUDED</span>
                       <ul className="space-y-1.5">
                         {offer.bonuses.map((bonus, idx) => (
-                          <li key={idx} className="text-[11px] text-silver/70 flex items-start gap-1.5 leading-relaxed font-light">
-                            <Plus className="w-2.5 h-2.5 text-blue shrink-0 mt-0.5" />
+                          <li key={idx} className="text-[11px] text-sage-muted flex items-start gap-1.5 leading-relaxed font-light">
+                            <Plus className="w-2.5 h-2.5 text-sage-primary shrink-0 mt-0.5" />
                             <span>{bonus}</span>
                           </li>
                         ))}
@@ -788,17 +786,17 @@ ${formData.desiredHappens}`,
                   </div>
 
                   {/* Price and CTA */}
-                  <div className="pt-6 mt-6 border-t border-navy/40 flex flex-col gap-3">
+                  <div className="pt-6 mt-6 border-t border-sage-border flex flex-col gap-3">
                     <div className="space-y-1">
-                      <span className="text-[10px] uppercase font-semibold text-silver/40 block tracking-wider">Investment</span>
+                      <span className="text-[10px] uppercase font-semibold text-sage-muted block tracking-wider">Investment</span>
                       <div className="flex items-baseline gap-2 flex-wrap">
-                        <span className="text-xs text-silver/50 line-through font-light">{offer.originalPrice}</span>
-                        <span className="text-xs text-amber-300 font-medium">Ember 50% Drop Price: <span className="text-base font-bold text-white">{offer.dropPrice}</span></span>
+                        <span className="text-xs text-sage-muted/70 line-through font-light">{offer.originalPrice}</span>
+                        <span className="text-xs text-sage-primary font-semibold">Ember 50% Drop Price: <span className="text-base font-bold text-sage-primary">{offer.dropPrice}</span></span>
                       </div>
                     </div>
                     <button
                       onClick={() => handleScrollToForm(offer.name)}
-                      className="w-full bg-gradient-to-tr from-blue to-purple text-white hover:opacity-90 shadow-glow text-center text-xs font-semibold py-3 rounded-md transition-colors"
+                      className="w-full bg-sage-primary text-white hover:bg-sage-primary-hover shadow-sm text-center text-xs font-semibold py-3 rounded-md transition-colors"
                     >
                       {offer.ctaText}
                     </button>
@@ -811,49 +809,49 @@ ${formData.desiredHappens}`,
         </section>
 
         {/* Section 4 — Differentiation */}
-        <section className="py-20 md:py-28 px-6 sm:px-8 bg-midnight/30 border-y border-navy/40">
+        <section className="py-20 md:py-28 px-6 sm:px-8 bg-sage-surface-2 border-y border-sage-border">
           <div className="max-w-4xl mx-auto space-y-16">
             <div className="space-y-4">
-              <span className="text-xs uppercase font-semibold tracking-widest text-blue">Execution Philosophy</span>
-              <h2 className="text-3xl md:text-4xl font-serif text-white">
+              <span className="text-xs uppercase font-semibold tracking-widest text-sage-primary">Execution Philosophy</span>
+              <h2 className="text-3xl md:text-4xl font-serif text-sage-text">
                 Not a giant automation project. <br className="hidden md:inline"/>Just the part of your business that shouldn't be manual.
               </h2>
-              <p className="text-silver/70 font-light text-sm md:text-base max-w-2xl">
+              <p className="text-sage-muted font-light text-sm md:text-base max-w-2xl">
                 You don't need a six-month digital transformation project to fix a frustrating process. Most of these systems can be built around the tools you already use.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-midnight/50 p-6 rounded-lg border border-navy/50 space-y-3">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-blue">01</span>
-                <h3 className="text-base font-semibold text-white uppercase">START SMALL</h3>
-                <p className="text-xs text-silver/70 font-light leading-relaxed">
+              <div className="bg-sage-surface p-6 rounded-lg border border-sage-border space-y-3 shadow-sm">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-sage-primary">01</span>
+                <h3 className="text-sage-text font-semibold uppercase">START SMALL</h3>
+                <p className="text-xs text-sage-muted font-light leading-relaxed">
                   We focus on one painful process first instead of trying to rebuild your entire business.
                 </p>
               </div>
               
-              <div className="bg-midnight/50 p-6 rounded-lg border border-navy/50 space-y-3">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-blue">02</span>
-                <h3 className="text-base font-semibold text-white uppercase">KEEP IT SIMPLE</h3>
-                <p className="text-xs text-silver/70 font-light leading-relaxed">
+              <div className="bg-sage-surface p-6 rounded-lg border border-sage-border space-y-3 shadow-sm">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-sage-primary">02</span>
+                <h3 className="text-sage-text font-semibold uppercase">KEEP IT SIMPLE</h3>
+                <p className="text-xs text-sage-muted font-light leading-relaxed">
                   The system should be easy for you and your team to understand, use and maintain.
                 </p>
               </div>
 
-              <div className="bg-midnight/50 p-6 rounded-lg border border-navy/50 space-y-3">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-blue">03</span>
-                <h3 className="text-base font-semibold text-white uppercase">BUILD FOR THE OUTCOME</h3>
-                <p className="text-xs text-silver/70 font-light leading-relaxed">
+              <div className="bg-sage-surface p-6 rounded-lg border border-sage-border space-y-3 shadow-sm">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-sage-primary">03</span>
+                <h3 className="text-sage-text font-semibold uppercase">BUILD FOR THE OUTCOME</h3>
+                <p className="text-xs text-sage-muted font-light leading-relaxed">
                   The goal isn't another piece of software. The goal is less chasing, fewer missed opportunities and less repetitive work.
                 </p>
               </div>
             </div>
 
-            <div className="pt-8 border-t border-navy/40 text-center space-y-2">
-              <p className="text-sm font-medium tracking-wide text-silver">
+            <div className="pt-8 border-t border-sage-border text-center space-y-2">
+              <p className="text-sage-muted font-medium tracking-wide">
                 Forms. CRM. Email. Scheduling. Payments. AI. Automation.
               </p>
-              <p className="text-xs text-silver/50 font-light">
+              <p className="text-xs text-sage-muted/70 font-light">
                 The tools are simply the machinery behind the result.
               </p>
             </div>
@@ -864,8 +862,8 @@ ${formData.desiredHappens}`,
         <section className="py-20 md:py-28 px-6 sm:px-8">
           <div className="max-w-4xl mx-auto space-y-16">
             <div className="space-y-2">
-              <span className="text-xs uppercase font-semibold tracking-widest text-blue">Direct Engagement</span>
-              <h2 className="text-3xl md:text-4xl font-serif text-white">
+              <span className="text-xs uppercase font-semibold tracking-widest text-sage-primary">Direct Engagement</span>
+              <h2 className="text-3xl md:text-4xl font-serif text-sage-text">
                 Three steps. That's it.
               </h2>
             </div>
@@ -873,83 +871,83 @@ ${formData.desiredHappens}`,
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <span className="w-7 h-7 rounded-full bg-blue/10 text-blue border border-blue/30 text-xs font-semibold flex items-center justify-center">1</span>
-                  <h3 className="text-sm font-semibold text-white uppercase">Tell me where the leak is.</h3>
+                  <span className="w-7 h-7 rounded-full bg-sage-primary/10 text-sage-primary border border-sage-primary/20 text-xs font-semibold flex items-center justify-center">1</span>
+                  <h3 className="text-sage-text font-semibold uppercase">Tell me where the leak is.</h3>
                 </div>
-                <p className="text-xs text-silver/70 font-light leading-relaxed pl-10">
+                <p className="text-xs text-sage-muted font-light leading-relaxed pl-10">
                   You explain what's currently happening, what's frustrating you and what you wish happened instead.
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <span className="w-7 h-7 rounded-full bg-blue/10 text-blue border border-blue/30 text-xs font-semibold flex items-center justify-center">2</span>
-                  <h3 className="text-sm font-semibold text-white uppercase">I design the simplest fix.</h3>
+                  <span className="w-7 h-7 rounded-full bg-sage-primary/10 text-sage-primary border border-sage-primary/20 text-xs font-semibold flex items-center justify-center">2</span>
+                  <h3 className="text-sage-text font-semibold uppercase">I design the simplest fix.</h3>
                 </div>
-                <p className="text-xs text-silver/70 font-light leading-relaxed pl-10">
+                <p className="text-xs text-sage-muted font-light leading-relaxed pl-10">
                   I map the process, remove unnecessary steps and choose the simplest practical way to make it work.
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <span className="w-7 h-7 rounded-full bg-blue/10 text-blue border border-blue/30 text-xs font-semibold flex items-center justify-center">3</span>
-                  <h3 className="text-sm font-semibold text-white uppercase">You get a working system.</h3>
+                  <span className="w-7 h-7 rounded-full bg-sage-primary/10 text-sage-primary border border-sage-primary/20 text-xs font-semibold flex items-center justify-center">3</span>
+                  <h3 className="text-sage-text font-semibold uppercase">You get a working system.</h3>
                 </div>
-                <p className="text-xs text-silver/70 font-light leading-relaxed pl-10">
+                <p className="text-xs text-sage-muted font-light leading-relaxed pl-10">
                   I build it, test it, hand it over and show you how it works.
                 </p>
               </div>
             </div>
 
-            <div className="bg-midnight/40 rounded-lg p-6 text-center border border-navy/40 flex flex-col md:flex-row items-center justify-center gap-4 text-xs font-medium text-silver">
+            <div className="bg-sage-surface rounded-lg p-6 text-center border border-sage-border flex flex-col md:flex-row items-center justify-center gap-4 text-xs font-medium text-sage-text">
               <span>Problem</span>
-              <ArrowRight className="w-3.5 h-3.5 text-silver/40 rotate-90 md:rotate-0" />
+              <ArrowRight className="w-3.5 h-3.5 text-sage-muted rotate-90 md:rotate-0" />
               <span>Process</span>
-              <ArrowRight className="w-3.5 h-3.5 text-silver/40 rotate-90 md:rotate-0" />
+              <ArrowRight className="w-3.5 h-3.5 text-sage-muted rotate-90 md:rotate-0" />
               <span>System</span>
-              <ArrowRight className="w-3.5 h-3.5 text-silver/40 rotate-90 md:rotate-0" />
-              <span className="text-blue">Result</span>
+              <ArrowRight className="w-3.5 h-3.5 text-sage-muted rotate-90 md:rotate-0" />
+              <span className="text-sage-primary">Result</span>
             </div>
 
             <div className="text-center space-y-1">
-              <p className="text-sm font-semibold text-silver">You don't need to become an automation expert.</p>
-              <p className="text-xs text-silver/50 font-light">You just need the problem solved.</p>
+              <p className="text-sage-text font-semibold">You don't need to become an automation expert.</p>
+              <p className="text-xs text-sage-muted/70 font-light">You just need the problem solved.</p>
             </div>
           </div>
         </section>
 
         {/* Section 6 — Value / Risk Reversal */}
-        <section className="py-20 md:py-28 px-6 sm:px-8 bg-midnight/30 border-y border-navy/40">
+        <section className="py-20 md:py-28 px-6 sm:px-8 bg-sage-surface-2 border-y border-sage-border">
           <div className="max-w-4xl mx-auto space-y-16">
             <div className="space-y-4">
-              <span className="text-xs uppercase font-semibold tracking-widest text-blue">Guaranteed Delivery</span>
-              <h2 className="text-3xl md:text-4xl font-serif text-white">
+              <span className="text-xs uppercase font-semibold tracking-widest text-sage-primary">Guaranteed Delivery</span>
+              <h2 className="text-3xl md:text-4xl font-serif text-sage-text">
                 You shouldn't have to buy a mystery box.
               </h2>
-              <p className="text-silver/70 font-light text-sm md:text-base">
+              <p className="text-sage-muted font-light text-sm md:text-base">
                 Before anything is built, we'll agree on exactly what process is being fixed, what the system will do and what you'll receive.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-midnight/50 p-6 rounded-lg border border-navy/50 space-y-3">
-                <h3 className="text-xs font-semibold text-white uppercase tracking-wider">THE CLEAR-SCOPE GUARANTEE</h3>
-                <p className="text-xs text-silver/70 font-light leading-relaxed">
+              <div className="bg-sage-surface p-6 rounded-lg border border-sage-border space-y-3 shadow-sm">
+                <h3 className="text-xs font-semibold text-sage-text uppercase tracking-wider">THE CLEAR-SCOPE GUARANTEE</h3>
+                <p className="text-xs text-sage-muted font-light leading-relaxed">
                   You will know exactly what is being built before work begins.
                 </p>
               </div>
 
-              <div className="bg-midnight/50 p-6 rounded-lg border border-navy/50 space-y-3">
-                <h3 className="text-xs font-semibold text-white uppercase tracking-wider">THE WORKING-SYSTEM GUARANTEE</h3>
-                <p className="text-xs text-silver/70 font-light leading-relaxed">
+              <div className="bg-sage-surface p-6 rounded-lg border border-sage-border space-y-3 shadow-sm">
+                <h3 className="text-xs font-semibold text-sage-text uppercase tracking-wider">THE WORKING-SYSTEM GUARANTEE</h3>
+                <p className="text-xs text-sage-muted font-light leading-relaxed">
                   I'll test the agreed workflow before handover so the key steps work as designed.
                 </p>
               </div>
 
-              <div className="bg-midnight/50 p-6 rounded-lg border border-navy/50 space-y-3">
-                <h3 className="text-xs font-semibold text-white uppercase tracking-wider">THE SUPPORT GUARANTEE</h3>
-                <p className="text-xs text-silver/70 font-light leading-relaxed">
+              <div className="bg-sage-surface p-6 rounded-lg border border-sage-border space-y-3 shadow-sm">
+                <h3 className="text-xs font-semibold text-sage-text uppercase tracking-wider">THE SUPPORT GUARANTEE</h3>
+                <p className="text-xs text-sage-muted font-light leading-relaxed">
                   After delivery, you'll get a short walkthrough and a defined period for fixing implementation issues related to the agreed workflow.
                 </p>
               </div>
@@ -958,26 +956,26 @@ ${formData.desiredHappens}`,
         </section>
 
         {/* Section 7 — Final CTA */}
-        <section className="py-20 md:py-24 px-6 sm:px-8 border-b border-navy/30">
+        <section className="py-20 md:py-24 px-6 sm:px-8 border-b border-sage-border">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-white leading-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-sage-text leading-tight">
               What is one process in your business that you wish would just run itself?
             </h2>
-            <p className="text-sm md:text-base text-silver/70 font-light max-w-xl mx-auto">
+            <p className="text-sm md:text-base text-sage-muted font-light max-w-xl mx-auto">
               Tell me what's happening today. I'll look at the process and tell you what I would fix first.
             </p>
             
             <div className="pt-4 space-y-3">
               <button
                 onClick={() => handleScrollToForm()}
-                className="bg-gradient-to-tr from-blue to-purple text-white hover:opacity-90 shadow-glow text-sm font-semibold px-8 py-3.5 rounded-md transition-colors"
+                className="bg-sage-primary text-white hover:bg-sage-primary-hover shadow-sm text-sm font-semibold px-8 py-3.5 rounded-md transition-colors"
               >
                 Start With Your Workflow
               </button>
-              <p className="text-xs text-silver/40 font-light">
+              <p className="text-xs text-sage-muted font-light">
                 No long proposal. No complicated discovery process. Just tell me the problem.
               </p>
-              <p className="text-[10px] text-silver/40 font-light">
+              <p className="text-[10px] text-sage-muted font-light">
                 Takes about 3 minutes.
               </p>
             </div>
@@ -985,26 +983,26 @@ ${formData.desiredHappens}`,
         </section>
 
         {/* Section 8 — Intake Form */}
-        <section ref={formRef} id="intake-form" className="py-20 md:py-28 px-6 sm:px-8 bg-midnight/20 flex-grow">
+        <section ref={formRef} id="intake-form" className="py-20 md:py-28 px-6 sm:px-8 bg-sage-bg flex-grow">
           <div className="max-w-xl mx-auto space-y-10">
             <div className="space-y-3 text-center">
-              <span className="text-xs uppercase font-semibold tracking-widest text-blue">Intake Form</span>
-              <h2 className="text-3xl font-serif text-white">Let's find the leak.</h2>
-              <p className="text-xs text-silver/60 font-light">
+              <span className="text-xs uppercase font-semibold tracking-widest text-sage-primary">Intake Form</span>
+              <h2 className="text-3xl font-serif text-sage-text">Let's find the leak.</h2>
+              <p className="text-xs text-sage-muted font-light">
                 Tell me what currently takes too much time, causes missed opportunities or requires too much manual work.
               </p>
             </div>
 
             {submitSuccess ? (
-              <div className="bg-blue/10 border border-blue/20 rounded-xl p-8 text-center space-y-4">
-                <Check className="w-10 h-10 text-blue mx-auto" />
-                <h3 className="text-lg font-serif font-bold text-white">Form Submitted</h3>
-                <p className="text-sm text-silver/70 font-light leading-relaxed">
+              <div className="bg-sage-surface border border-sage-border rounded-xl p-8 text-center space-y-4 shadow-sm">
+                <Check className="w-10 h-10 text-sage-primary mx-auto" />
+                <h3 className="text-lg font-serif font-bold text-sage-text">Form Submitted</h3>
+                <p className="text-sm text-sage-muted font-light leading-relaxed">
                   Got it. I'll review the workflow and get back to you with the simplest practical next step.
                 </p>
                 <button
                   onClick={() => setSubmitSuccess(false)}
-                  className="text-xs text-blue font-semibold underline mt-2"
+                  className="text-xs text-sage-primary font-semibold underline mt-2"
                 >
                   Submit another request
                 </button>
@@ -1021,7 +1019,7 @@ ${formData.desiredHappens}`,
 
                 {/* Your Name */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-silver uppercase tracking-wider block">
+                  <label className="text-xs font-semibold text-sage-text uppercase tracking-wider block">
                     Your Name <span className="text-red-400">*</span>
                   </label>
                   <input 
@@ -1029,8 +1027,8 @@ ${formData.desiredHappens}`,
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-2.5 rounded-md border text-xs bg-obsidian text-white focus:outline-none focus:ring-1 focus:ring-blue transition-all ${
-                      formErrors.name ? 'border-red-400' : 'border-navy/50'
+                    className={`w-full px-4 py-2.5 rounded-md border text-xs bg-sage-surface text-sage-text border-sage-border focus:outline-none focus:ring-1 focus:ring-sage-primary transition-all ${
+                      formErrors.name ? 'border-red-400' : 'border-sage-border'
                     }`}
                     placeholder="John Doe"
                   />
@@ -1039,7 +1037,7 @@ ${formData.desiredHappens}`,
 
                 {/* Business Name */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-silver uppercase tracking-wider block">
+                  <label className="text-xs font-semibold text-sage-text uppercase tracking-wider block">
                     Business Name <span className="text-red-400">*</span>
                   </label>
                   <input 
@@ -1047,8 +1045,8 @@ ${formData.desiredHappens}`,
                     name="businessName"
                     value={formData.businessName}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-2.5 rounded-md border text-xs bg-obsidian text-white focus:outline-none focus:ring-1 focus:ring-blue transition-all ${
-                      formErrors.businessName ? 'border-red-400' : 'border-navy/50'
+                    className={`w-full px-4 py-2.5 rounded-md border text-xs bg-sage-surface text-sage-text border-sage-border focus:outline-none focus:ring-1 focus:ring-sage-primary transition-all ${
+                      formErrors.businessName ? 'border-red-400' : 'border-sage-border'
                     }`}
                     placeholder="Example Brands"
                   />
@@ -1057,7 +1055,7 @@ ${formData.desiredHappens}`,
 
                 {/* Business Website */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-silver uppercase tracking-wider block">
+                  <label className="text-xs font-semibold text-sage-text uppercase tracking-wider block">
                     Business Website
                   </label>
                   <input 
@@ -1065,14 +1063,14 @@ ${formData.desiredHappens}`,
                     name="businessWebsite"
                     value={formData.businessWebsite}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 rounded-md border border-navy/50 text-xs bg-obsidian text-white focus:outline-none focus:ring-1 focus:ring-blue transition-all"
+                    className="w-full px-4 py-2.5 rounded-md border border-sage-border text-xs bg-sage-surface text-sage-text focus:outline-none focus:ring-1 focus:ring-sage-primary transition-all"
                     placeholder="https://example.com"
                   />
                 </div>
 
                 {/* Email Address */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-silver uppercase tracking-wider block">
+                  <label className="text-xs font-semibold text-sage-text uppercase tracking-wider block">
                     Email Address <span className="text-red-400">*</span>
                   </label>
                   <input 
@@ -1080,8 +1078,8 @@ ${formData.desiredHappens}`,
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-2.5 rounded-md border text-xs bg-obsidian text-white focus:outline-none focus:ring-1 focus:ring-blue transition-all ${
-                      formErrors.email ? 'border-red-400' : 'border-navy/50'
+                    className={`w-full px-4 py-2.5 rounded-md border text-xs bg-sage-surface text-sage-text border-sage-border focus:outline-none focus:ring-1 focus:ring-sage-primary transition-all ${
+                      formErrors.email ? 'border-red-400' : 'border-sage-border'
                     }`}
                     placeholder="john@example.com"
                   />
@@ -1090,7 +1088,7 @@ ${formData.desiredHappens}`,
 
                 {/* What type of business do you run? */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-silver uppercase tracking-wider block">
+                  <label className="text-xs font-semibold text-sage-text uppercase tracking-wider block">
                     What type of business do you run?
                   </label>
                   <div className="relative">
@@ -1098,7 +1096,7 @@ ${formData.desiredHappens}`,
                       name="businessType"
                       value={formData.businessType}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2.5 rounded-md border border-navy/50 text-xs bg-obsidian text-white focus:outline-none focus:ring-1 focus:ring-blue transition-all appearance-none cursor-pointer"
+                      className="w-full px-4 py-2.5 rounded-md border border-sage-border text-xs bg-sage-surface text-sage-text focus:outline-none focus:ring-1 focus:ring-sage-primary transition-all appearance-none cursor-pointer"
                     >
                       <option value="Ecommerce">Ecommerce</option>
                       <option value="Real Estate">Real Estate</option>
@@ -1108,20 +1106,20 @@ ${formData.desiredHappens}`,
                       <option value="Service Business">Service Business</option>
                       <option value="Other">Other</option>
                     </select>
-                    <ChevronDown className="w-4 h-4 text-silver/50 absolute right-3 top-3 pointer-events-none" />
+                    <ChevronDown className="w-4 h-4 text-sage-muted/50 absolute right-3 top-3 pointer-events-none" />
                   </div>
                 </div>
 
                 {/* Which problem are you trying to fix? */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-silver uppercase tracking-wider block">
+                  <label className="text-xs font-semibold text-sage-text uppercase tracking-wider block">
                     Which problem are you trying to fix?
                   </label>
                   <div className="relative">
                     <select 
                       value={selectedProblem}
                       onChange={(e) => setSelectedProblem(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-md border border-navy/50 text-xs bg-obsidian text-white focus:outline-none focus:ring-1 focus:ring-blue transition-all appearance-none cursor-pointer"
+                      className="w-full px-4 py-2.5 rounded-md border border-sage-border text-xs bg-sage-surface text-sage-text focus:outline-none focus:ring-1 focus:ring-sage-primary transition-all appearance-none cursor-pointer"
                     >
                       <option value="Lead Follow-Up">Lead Follow-Up</option>
                       <option value="Client Onboarding">Client Onboarding</option>
@@ -1130,13 +1128,13 @@ ${formData.desiredHappens}`,
                       <option value="Repetitive Admin">Repetitive Admin</option>
                       <option value="Something Else">Something Else</option>
                     </select>
-                    <ChevronDown className="w-4 h-4 text-silver/50 absolute right-3 top-3 pointer-events-none" />
+                    <ChevronDown className="w-4 h-4 text-sage-muted/50 absolute right-3 top-3 pointer-events-none" />
                   </div>
                 </div>
 
                 {/* Tell me what currently happens */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-silver uppercase tracking-wider block">
+                  <label className="text-xs font-semibold text-sage-text uppercase tracking-wider block">
                     Tell me what currently happens <span className="text-red-400">*</span>
                   </label>
                   <textarea 
@@ -1144,12 +1142,12 @@ ${formData.desiredHappens}`,
                     rows={4}
                     value={formData.currentHappens}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-2.5 rounded-md border text-xs bg-obsidian text-white focus:outline-none focus:ring-1 focus:ring-blue transition-all ${
-                      formErrors.currentHappens ? 'border-red-400' : 'border-navy/50'
+                    className={`w-full px-4 py-2.5 rounded-md border text-xs bg-sage-surface text-sage-text border-sage-border focus:outline-none focus:ring-1 focus:ring-sage-primary transition-all ${
+                      formErrors.currentHappens ? 'border-red-400' : 'border-sage-border'
                     }`}
                     placeholder="Describe your current manual steps..."
                   />
-                  <span className="text-[10px] text-silver/40 font-light block mt-0.5">
+                  <span className="text-[10px] text-sage-muted font-light block mt-0.5">
                     Don't worry about explaining it perfectly. Just describe what you currently do manually.
                   </span>
                   {formErrors.currentHappens && <p className="text-red-400 text-[10px] font-medium">{formErrors.currentHappens}</p>}
@@ -1157,7 +1155,7 @@ ${formData.desiredHappens}`,
 
                 {/* What would you like to happen instead */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-silver uppercase tracking-wider block">
+                  <label className="text-xs font-semibold text-sage-text uppercase tracking-wider block">
                     What would you like to happen instead? <span className="text-red-400">*</span>
                   </label>
                   <textarea 
@@ -1165,8 +1163,8 @@ ${formData.desiredHappens}`,
                     rows={4}
                     value={formData.desiredHappens}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-2.5 rounded-md border text-xs bg-obsidian text-white focus:outline-none focus:ring-1 focus:ring-blue transition-all ${
-                      formErrors.desiredHappens ? 'border-red-400' : 'border-navy/50'
+                    className={`w-full px-4 py-2.5 rounded-md border text-xs bg-sage-surface text-sage-text border-sage-border focus:outline-none focus:ring-1 focus:ring-sage-primary transition-all ${
+                      formErrors.desiredHappens ? 'border-red-400' : 'border-sage-border'
                     }`}
                     placeholder="Describe your ideal automatic workflow outcome..."
                   />
@@ -1175,7 +1173,7 @@ ${formData.desiredHappens}`,
 
                 {/* Which tools are you currently using */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-silver uppercase tracking-wider block">
+                  <label className="text-xs font-semibold text-sage-text uppercase tracking-wider block">
                     Which tools are you currently using?
                   </label>
                   <input 
@@ -1183,17 +1181,17 @@ ${formData.desiredHappens}`,
                     name="tools"
                     value={formData.tools}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 rounded-md border border-navy/50 text-xs bg-obsidian text-white focus:outline-none focus:ring-1 focus:ring-blue transition-all"
+                    className="w-full px-4 py-2.5 rounded-md border border-sage-border text-xs bg-sage-surface text-sage-text focus:outline-none focus:ring-1 focus:ring-sage-primary transition-all"
                     placeholder="Shopify, WordPress, Calendly, Stripe, HubSpot..."
                   />
-                  <span className="text-[10px] text-silver/40 font-light block mt-0.5">
+                  <span className="text-[10px] text-sage-muted font-light block mt-0.5">
                     Examples: Shopify, WordPress, HubSpot, Gmail, Calendly, Stripe, Airtable, Zapier, Make, etc.
                   </span>
                 </div>
 
                 {/* How soon would you like this fixed? */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-silver uppercase tracking-wider block">
+                  <label className="text-xs font-semibold text-sage-text uppercase tracking-wider block">
                     How soon would you like this fixed?
                   </label>
                   <div className="relative">
@@ -1201,21 +1199,21 @@ ${formData.desiredHappens}`,
                       name="timeline"
                       value={formData.timeline}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2.5 rounded-md border border-navy/50 text-xs bg-obsidian text-white focus:outline-none focus:ring-1 focus:ring-blue transition-all appearance-none cursor-pointer"
+                      className="w-full px-4 py-2.5 rounded-md border border-sage-border text-xs bg-sage-surface text-sage-text focus:outline-none focus:ring-1 focus:ring-sage-primary transition-all appearance-none cursor-pointer"
                     >
                       <option value="ASAP">ASAP</option>
                       <option value="Within 2 weeks">Within 2 weeks</option>
                       <option value="This month">This month</option>
                       <option value="Just exploring">Just exploring</option>
                     </select>
-                    <ChevronDown className="w-4 h-4 text-silver/50 absolute right-3 top-3 pointer-events-none" />
+                    <ChevronDown className="w-4 h-4 text-sage-muted/50 absolute right-3 top-3 pointer-events-none" />
                   </div>
                 </div>
 
                 <button 
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-tr from-blue to-purple text-white hover:opacity-90 disabled:opacity-50 text-sm font-semibold py-3.5 rounded-md shadow-glow transition-all duration-300 flex items-center justify-center gap-2 mt-4"
+                  className="w-full bg-sage-primary text-white hover:bg-sage-primary-hover disabled:opacity-50 text-sm font-semibold py-3.5 rounded-md shadow-sm transition-all duration-300 flex items-center justify-center gap-2 mt-4"
                 >
                   {isSubmitting ? (
                     <>

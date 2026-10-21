@@ -31,33 +31,37 @@
     <link rel="icon" type="image/jpeg" href="/images/joshua-portrait.jpg" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             fontFamily: {
-              serif: ['"Playfair Display"', 'Georgia', 'serif'],
+              serif: ['"Manrope"', 'system-ui', 'sans-serif'],
               sans: ['Inter', 'system-ui', 'sans-serif'],
+              mono: ['"IBM Plex Mono"', 'monospace'],
             },
             colors: {
-              // New Palette
-              obsidian: '#000102',      // Deepest Black
-              midnight: '#0e142c',      // Main Background/Card
-              navy: '#283856',          // Borders/Secondary
-              purple: '#554182',        // Primary Accent 1
-              blue: '#3c75a5',          // Primary Accent 2
-              silver: '#9a9aaa',        // Text
-              white: '#ffffff',
-            },
-            backgroundImage: {
-              'neon-gradient': 'linear-gradient(to right, #3c75a5, #554182)',
-              'neon-gradient-hover': 'linear-gradient(to right, #4d8bbd, #6a539b)',
+              sage: {
+                primary:       '#55745C',  // Primary Sage
+                'primary-hover': '#405A46', // Primary Dark / Hover
+                soft:          '#EEF4EF',  // Primary Soft
+                bg:            '#FBFAF7',  // Warm White / Main Background
+                surface:       '#FFFFFF',  // Pure White / Cards
+                'surface-2':   '#F4F5F2',  // Soft Surface
+                text:          '#202A24',  // Main Text
+                sec:           '#5F6861',  // Secondary Text
+                muted:         '#7B827D',  // Muted Text
+                border:        '#DDE3DE',  // Border
+                accent:        '#3B82F6',  // Secondary Blue
+                'accent-soft': '#EFF6FF',  // Secondary Blue Soft
+                'accent-hover': '#2563EB',  // Darker Blue
+              }
             },
             boxShadow: {
-              'glow': '0 0 20px rgba(60, 117, 165, 0.3), 0 0 10px rgba(85, 65, 130, 0.2)',
-              'glow-hover': '0 0 30px rgba(60, 117, 165, 0.5), 0 0 15px rgba(85, 65, 130, 0.4)',
+              'soft': '0 2px 8px -2px rgba(85, 116, 92, 0.05), 0 4px 16px -4px rgba(85, 116, 92, 0.03)',
+              'medium': '0 4px 16px -4px rgba(85, 116, 92, 0.08), 0 8px 32px -8px rgba(85, 116, 92, 0.04)',
             },
             borderRadius: {
               '4xl': '2rem',
@@ -68,13 +72,26 @@
       }
     </script>
     <style>
+      :root {
+        --color-bg:            #FBFAF7; /* Warm White */
+        --color-surface:       #FFFFFF; /* Pure White */
+        --color-surface-2:     #F4F5F2; /* Soft Surface */
+        --color-primary:       #55745C; /* Primary Sage */
+        --color-primary-hover: #405A46; /* Primary Dark */
+        --color-text:          #202A24; /* Main Text */
+        --color-text-sec:      #5F6861; /* Secondary Text */
+        --color-text-muted:    #7B827D; /* Muted Text */
+        --color-accent:        #3B82F6; /* Secondary Blue */
+        --color-accent-hover:  #2563EB; /* Darker Blue */
+        --color-border:        #DDE3DE; /* Border */
+      }
       html {
         scroll-behavior: smooth;
         scroll-padding-top: 120px;
       }
       body {
-        background-color: #000102;
-        color: #ffffff;
+        background-color: var(--color-bg);
+        color: var(--color-text);
         -webkit-font-smoothing: antialiased;
       }
       /* Hide scrollbar for clean horizontal scrolls if needed */
@@ -84,13 +101,6 @@
       .no-scrollbar {
         -ms-overflow-style: none;
         scrollbar-width: none;
-      }
-      
-      .glass-panel {
-        background: rgba(14, 20, 44, 0.6);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(40, 56, 86, 0.5);
       }
 
       @keyframes shimmer {

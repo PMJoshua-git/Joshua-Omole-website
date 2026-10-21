@@ -131,41 +131,41 @@ const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ resource, isOpen, o
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-obsidian/90 backdrop-blur-md"
+          className="absolute inset-0 bg-sage-bg/80 backdrop-blur-sm"
         />
         
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="relative z-10 w-full max-w-lg bg-midnight border border-navy shadow-glow rounded-[2.5rem] overflow-hidden pointer-events-auto"
+          className="relative z-10 w-full max-w-lg bg-sage-surface border border-sage-border shadow-sm rounded-2xl overflow-hidden pointer-events-auto"
         >
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 z-50 p-2 text-silver md:hover:text-white bg-obsidian rounded-full transition-colors border border-navy"
+            className="absolute top-6 right-6 z-50 p-2 text-sage-muted hover:text-sage-primary bg-sage-surface-2 rounded-full transition-colors border border-sage-border"
           >
             <X className="w-5 h-5" />
           </button>
 
           <div className="p-8 md:p-10">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue/20 to-purple/20 flex items-center justify-center mb-6 border border-white/10 shadow-inner">
-              <Mail className="w-7 h-7 text-white" />
+            <div className="w-14 h-14 rounded-xl bg-sage-primary/10 flex items-center justify-center mb-6 border border-sage-border">
+              <Mail className="w-7 h-7 text-sage-primary" />
             </div>
             
-            <h3 className="text-2xl md:text-3xl font-serif text-white mb-2">Get Instant Access</h3>
-            <p className="text-silver mb-8 leading-relaxed">
-              Enter your details to access <span className="text-white font-medium">"{resource.title}"</span>. We'll send it directly to your inbox.
+            <h3 className="text-2xl md:text-3xl font-serif text-sage-text mb-2">Get Instant Access</h3>
+            <p className="text-sage-muted mb-8 leading-relaxed">
+              Enter your details to access <span className="text-sage-text font-medium">"{resource.title}"</span>. We'll send it directly to your inbox.
             </p>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
-                  <label htmlFor="firstName" className="text-sm font-medium text-silver pl-2">First Name</label>
+                  <label htmlFor="firstName" className="text-sm font-medium text-sage-muted pl-2">First Name</label>
                   <input
                     {...register('firstName')}
                     type="text"
                     id="firstName"
-                    className="w-full bg-obsidian border border-navy rounded-2xl px-5 py-3.5 text-white placeholder-silver/50 focus:outline-none focus:border-blue transition-colors shadow-inner"
+                    className="w-full bg-sage-surface-2 border border-sage-border rounded-xl px-5 py-3.5 text-sage-text placeholder-sage-muted/50 focus:outline-none focus:border-sage-primary transition-colors"
                     placeholder="Jane"
                   />
                   {errors.firstName && (
@@ -173,12 +173,12 @@ const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ resource, isOpen, o
                   )}
                 </div>
                 <div className="space-y-1.5">
-                  <label htmlFor="lastName" className="text-sm font-medium text-silver pl-2">Last Name</label>
+                  <label htmlFor="lastName" className="text-sm font-medium text-sage-muted pl-2">Last Name</label>
                   <input
                     {...register('lastName')}
                     type="text"
                     id="lastName"
-                    className="w-full bg-obsidian border border-navy rounded-2xl px-5 py-3.5 text-white placeholder-silver/50 focus:outline-none focus:border-blue transition-colors shadow-inner"
+                    className="w-full bg-sage-surface-2 border border-sage-border rounded-xl px-5 py-3.5 text-sage-text placeholder-sage-muted/50 focus:outline-none focus:border-sage-primary transition-colors"
                     placeholder="Doe"
                   />
                   {errors.lastName && (
@@ -188,12 +188,12 @@ const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ resource, isOpen, o
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="email" className="text-sm font-medium text-silver pl-2">Email Address</label>
+                <label htmlFor="email" className="text-sm font-medium text-sage-muted pl-2">Email Address</label>
                 <input
                   {...register('email')}
                   type="email"
                   id="email"
-                  className="w-full bg-obsidian border border-navy rounded-2xl px-5 py-3.5 text-white placeholder-silver/50 focus:outline-none focus:border-blue transition-colors shadow-inner"
+                  className="w-full bg-sage-surface-2 border border-sage-border rounded-xl px-5 py-3.5 text-sage-text placeholder-sage-muted/50 focus:outline-none focus:border-sage-primary transition-colors"
                   placeholder="jane@company.com"
                 />
                 {errors.email && (
@@ -221,14 +221,14 @@ const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ resource, isOpen, o
                   )}
                 </Button>
               </div>
-              <p className="text-xs text-silver/60 text-center mt-4">
+              <p className="text-xs text-sage-muted text-center mt-4">
                 By downloading, you agree to receive occasional updates. We will never share your email.
               </p>
             </form>
           </div>
           
           {/* Bottom decorative bar */}
-          <div className="h-2 w-full bg-neon-gradient"></div>
+          <div className="h-2 w-full bg-sage-primary"></div>
         </motion.div>
       </div>
     </AnimatePresence>

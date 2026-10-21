@@ -1,105 +1,243 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
-import { ROUTES } from '../constants';
-import Button from './Button';
 
 const Navigation: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled]  = useState(false);
   const location = useLocation();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 80);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close the mobile menu whenever the route changes
   useEffect(() => {
-    setIsOpen(false);
-  }, [location]);
+    setIsMenuOpen(false);
+  }, [location.pathname]);
+
+  // Close mobile menu on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsMenuOpen(false);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Define the nav links in a single array — single source of truth
+  const navLinks = [
+    { label: 'About',    href: '/about'         },
+    { label: 'Services', href: '/services'       },
+    { label: 'Insights',  href: '/knowledge-hub'  },
+  ];
+
+  // Helper: is this link the active page?
+  const isActive = (href: string) =>
+    location.pathname === href ||
+    (href !== '/' && location.pathname.startsWith(href));
 
   return (
-    <nav className={`fixed w-full z-[70] pointer-events-none transition-all duration-300 ${scrolled ? 'py-4' : 'py-6'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pointer-events-auto">
-        <div className={`
-            flex justify-between items-center px-6 py-4 rounded-full transition-all duration-300
-            ${scrolled ? 'glass-panel shadow-glow' : 'bg-transparent border border-transparent'}
-        `}>
-          {/* Logo */}
-          <Link to="/" className="flex flex-col group">
-            <div className="flex items-center gap-2">
-                {/* Logo Icon */}
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue to-purple flex items-center justify-center shadow-glow">
-                    <span className="text-white font-serif italic font-bold text-xs">J.O</span>
-                </div>
-                <span className="text-xl md:text-2xl font-serif font-bold text-white tracking-tight group-hover:text-blue transition-colors">Joshua Omole</span>
-            </div>
-            <span className="hidden md:block text-[10px] text-silver tracking-widest uppercase mt-0.5 font-medium pl-10">Business Operations & AI Systems Strategist</span>
-          </Link>
+    <>
+      {/* ─── Nav bar ─── */}
+      <header
+        className={`
+          sticky top-0 z-50 w-full
+          bg-sage-bg border-b border-sage-border
+          transition-shadow duration-200
+          ${isScrolled ? 'shadow-[0_1px_8px_rgba(0,0,0,0.06)]' : ''}
+        `}
+      >
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-[60px] lg:h-[64px]">
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center space-x-2 bg-midnight/40 rounded-full p-1.5 border border-navy/50 backdrop-blur-md">
-            {ROUTES.filter(r => r.name !== 'Contact').map((route) => (
-              <Link
-                key={route.path}
-                to={route.path}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                  location.pathname === route.path 
-                    ? 'bg-navy/50 text-white shadow-sm border border-navy' 
-                    : 'text-silver hover:text-white hover:bg-white/5'
-                }`}
-              >
-                {route.name}
-              </Link>
-            ))}
-          </div>
-
-          <div className="hidden md:flex items-center">
-             <Button to="/contact" variant="primary" size="small" className="text-sm font-semibold">
-                Book Strategy Call
-              </Button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-white hover:text-blue focus:outline-none p-2 bg-white/5 rounded-full border border-navy"
+            {/* ── Logo / Brand ── */}
+            <Link
+              to="/"
+              className="font-heading font-semibold text-[15px]
+                         text-sage-primary hover:text-sage-primary-hover
+                         transition-colors tracking-[-0.01em]
+                         focus-visible:outline-none
+                         focus-visible:ring-2
+                         focus-visible:ring-sage-primary
+                         focus-visible:ring-offset-2
+                         rounded-sm"
+              aria-label="Joshua Omole — Home"
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              Joshua Omole
+            </Link>
+
+            {/* ── Desktop links + CTA (hidden below lg) ── */}
+            <nav
+              className="hidden lg:flex items-center gap-1"
+              aria-label="Primary navigation"
+            >
+              {navLinks.map(({ label, href }) => (
+                <Link
+                  key={href}
+                  to={href}
+                  className={`
+                    relative font-body text-sm px-3 py-1.5
+                    transition-colors duration-150 rounded-md
+                    active:scale-[0.98]
+                    focus-visible:outline-none
+                    focus-visible:ring-2
+                    focus-visible:ring-sage-primary
+                    focus-visible:ring-offset-1
+                    ${isActive(href)
+                      ? 'text-sage-primary font-medium'
+                      : 'text-sage-text hover:text-sage-primary'
+                    }
+                  `}
+                >
+                  {label}
+                  {/* Active underline indicator */}
+                  {isActive(href) && (
+                    <span
+                      className="absolute bottom-0 left-3 right-3
+                                 h-[2px] bg-sage-primary rounded-full
+                                 transition-all duration-200"
+                      aria-hidden="true"
+                    />
+                  )}
+                </Link>
+              ))}
+
+              <Link
+                to="/audit"
+                className="ml-3 bg-sage-primary text-white
+                           font-body text-sm font-medium
+                           px-4 py-2 rounded-lg
+                           hover:bg-sage-primary-hover
+                           transition-all duration-200 ease-out
+                           hover:-translate-y-[1px] active:scale-[0.98]
+                           shadow-sm hover:shadow
+                           focus-visible:outline-none
+                           focus-visible:ring-2
+                           focus-visible:ring-sage-primary
+                           focus-visible:ring-offset-2"
+              >
+                Book Audit
+              </Link>
+            </nav>
+
+            {/* ── Mobile menu toggle (hidden at lg+) ── */}
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen(prev => !prev)}
+              className="lg:hidden flex items-center gap-1.5
+                         text-sage-text hover:text-sage-primary
+                         transition-colors duration-150
+                         p-2 -mr-2 rounded-md
+                         focus-visible:outline-none
+                         focus-visible:ring-2
+                         focus-visible:ring-sage-primary"
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-menu"
+              aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            >
+              {isMenuOpen ? (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18" height="18" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor"
+                    strokeWidth="2" strokeLinecap="round"
+                    strokeLinejoin="round" aria-hidden="true"
+                  >
+                    <path d="M18 6 6 18M6 6l12 12" />
+                  </svg>
+                  <span className="font-body text-sm font-medium">
+                    Close
+                  </span>
+                </>
+              ) : (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18" height="18" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor"
+                    strokeWidth="2" strokeLinecap="round"
+                    strokeLinejoin="round" aria-hidden="true"
+                  >
+                    <path d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                  <span className="font-body text-sm font-medium">
+                    Menu
+                  </span>
+                </>
+              )}
             </button>
+
           </div>
         </div>
-      </div>
 
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden absolute top-24 left-4 right-4 bg-midnight/95 backdrop-blur-xl border border-navy/50 shadow-2xl rounded-3xl animate-in slide-in-from-top-4 p-4 z-[70] max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain pointer-events-auto">
-          <div className="flex flex-col space-y-2">
-            {ROUTES.filter(r => r.name !== 'Contact').map((route) => (
-              <Link
-                key={route.path}
-                to={route.path}
-                className={`block px-5 py-4 rounded-2xl text-base font-medium text-center ${
-                  location.pathname === route.path ? 'bg-navy/80 text-white border border-blue/30 shadow-glow' : 'text-silver hover:text-white hover:bg-white/5'
-                }`}
-                onClick={() => setIsOpen(false)}
-              >
-                {route.name}
-              </Link>
-            ))}
-            <div className="pt-4 pb-2">
-               <Button to="/contact" variant="primary" className="w-full justify-center" onClick={() => setIsOpen(false)}>
-                Book Strategy Call
-               </Button>
+        {/* ─── Mobile drop panel ─── */}
+        {isMenuOpen && (
+          <div
+            id="mobile-menu"
+            className="lg:hidden border-t border-sage-border
+                       bg-sage-bg animate-fade-in"
+            role="navigation"
+            aria-label="Mobile navigation menu"
+          >
+            <div className="max-w-6xl mx-auto">
+              {navLinks.map(({ label, href }) => (
+                <Link
+                  key={href}
+                  to={href}
+                  className={`
+                    flex items-center min-h-[52px] px-5
+                    font-body text-sm
+                    border-b border-sage-border
+                    transition-colors duration-150
+                    focus-visible:outline-none
+                    focus-visible:ring-2
+                    focus-visible:ring-inset
+                    focus-visible:ring-sage-primary
+                    ${isActive(href)
+                      ? 'text-sage-primary font-medium bg-sage-surface-2'
+                      : 'text-sage-text hover:bg-sage-surface-2'
+                    }
+                  `}
+                >
+                  {/* Active left border indicator */}
+                  <span
+                    className={`
+                      w-[3px] h-[18px] rounded-full mr-4 flex-shrink-0
+                      transition-colors
+                      ${isActive(href) ? 'bg-sage-primary' : 'bg-transparent'}
+                    `}
+                    aria-hidden="true"
+                  />
+                  {label}
+                </Link>
+              ))}
+
+              {/* Mobile CTA */}
+              <div className="p-4">
+                <Link
+                  to="/audit"
+                  className="block w-full text-center
+                             bg-sage-primary text-white
+                             font-body text-sm font-medium
+                             py-3.5 rounded-lg
+                             hover:bg-sage-primary-hover
+                             transition-colors duration-150
+                             focus-visible:outline-none
+                             focus-visible:ring-2
+                             focus-visible:ring-sage-primary
+                             focus-visible:ring-offset-2"
+                >
+                  Book Audit
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </nav>
+        )}
+      </header>
+    </>
   );
 };
 

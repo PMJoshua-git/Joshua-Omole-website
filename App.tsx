@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';
@@ -71,7 +71,7 @@ const App: React.FC = () => {
         <Route path="/services" element={<Services />} />
         <Route path="/training" element={<Training />} />
         <Route path="/audit" element={<Audit />} />
-        <Route path="/contact" element={<Contact />} />
+        <Route path="/contact" element={<Navigate to="/audit" replace />} />
         <Route path="/connect" element={<Connect />} />
         <Route path="/newsletter" element={<Newsletter />} />
         <Route path="/knowledge-hub" element={<KnowledgeHub />} />
