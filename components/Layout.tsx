@@ -6,6 +6,7 @@ import { ROUTES } from '../constants';
 import { Linkedin, Facebook } from 'lucide-react';
 import NewsletterModal from './NewsletterModal';
 import PageTransition from './PageTransition';
+import ScrollProgressBar from './ScrollProgressBar';
 
 const XIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -73,6 +74,7 @@ const Layout: React.FC<LayoutProps> = ({ children, hideNav = false }) => {
 
   return (
     <div className="flex flex-col min-h-screen bg-sage-bg text-sage-text font-sans antialiased selection:bg-sage-primary/20 selection:text-sage-text">
+      <ScrollProgressBar />
       {!hideNav && <Navigation />}
       
       <main className={`flex-grow relative ${hideNav ? 'pt-6 md:pt-10' : 'pt-0'}`}>
