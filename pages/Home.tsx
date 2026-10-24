@@ -27,9 +27,17 @@ const Home: React.FC = () => {
   const [expandedTestimonial, setExpandedTestimonial] = React.useState<number | null>(null);
   const [imageIndex, setImageIndex] = React.useState(0);
   const imageSources = [
+    "/images/joshua-portrait.png",
+    "/joshua-portrait.png",
     "/images/joshua-portrait.jpg",
+    "/images/joshua-portrait.jpeg",
+    "/images/joshua-portrait.webp",
+    "/images/joshua-portrait.PNG",
     "/images/joshua-portrait.JPG",
     "/joshua-portrait.jpg",
+    "/joshua-portrait.jpeg",
+    "/joshua-portrait.webp",
+    "/joshua-portrait.PNG",
     "/joshua-portrait.JPG",
   ];
 
@@ -55,7 +63,7 @@ const Home: React.FC = () => {
         <meta property="og:description" content="I help growing businesses build operations that are easier to run and easier to scale." />
         <meta property="og:url" content="https://joshuaomole.com" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://joshuaomole.com/images/joshua-portrait.jpg" />
+        <meta property="og:image" content="https://joshuaomole.com/images/joshua-portrait.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Joshua Omole | Business Operations and AI Systems Strategist" />
         <meta name="twitter:description" content="I help growing businesses build operations that are easier to run and easier to scale." />
@@ -92,15 +100,15 @@ const Home: React.FC = () => {
             </div>
             
             {/* Right Visual Content */}
-            <div className="lg:col-span-5 relative h-[400px] sm:h-[480px] lg:h-[540px] flex items-center justify-center">
-              <FadeIn direction="up" delay={400} className="w-full h-full relative">
-                <div className="absolute inset-0 z-0 rounded-[2.5rem] overflow-hidden border border-sage-border shadow-soft bg-sage-surface flex items-center justify-center">
+            <div className="lg:col-span-5 relative flex items-center justify-center w-full max-w-[380px] sm:max-w-[420px] lg:max-w-none mx-auto">
+              <FadeIn direction="up" delay={400} className="w-full relative">
+                <div className="relative aspect-[4/5] sm:aspect-[3/4] lg:h-[490px] w-full rounded-[2.5rem] overflow-hidden border border-sage-border shadow-soft bg-sage-surface flex items-center justify-center">
                   {imageIndex !== -1 ? (
                     <img 
                       src={imageSources[imageIndex]} 
                       alt="Joshua Omole — Business Operations and AI Systems Strategist" 
                       referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover opacity-95 hover:scale-102 transition-transform duration-700"
+                      className="w-full h-full object-cover object-top opacity-95 hover:scale-102 transition-transform duration-700"
                       onError={handleImageError}
                     />
                   ) : (
@@ -430,15 +438,15 @@ const Home: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
               
               {/* Left Column Portrait */}
-              <div className="lg:col-span-5 relative h-[380px] sm:h-[460px] lg:h-[500px] flex items-center justify-center">
-                <FadeIn direction="left" className="w-full h-full relative">
-                  <div className="absolute inset-0 z-0 rounded-[2.5rem] overflow-hidden border border-sage-border shadow-soft bg-sage-surface flex items-center justify-center">
+              <div className="lg:col-span-5 relative flex items-center justify-center w-full max-w-[380px] sm:max-w-[420px] lg:max-w-none mx-auto">
+                <FadeIn direction="left" className="w-full relative">
+                  <div className="relative aspect-[4/5] sm:aspect-[3/4] lg:h-[480px] w-full rounded-[2.5rem] overflow-hidden border border-sage-border shadow-soft bg-sage-surface flex items-center justify-center">
                     {imageIndex !== -1 ? (
                       <img 
                         src={imageSources[imageIndex]} 
                         alt="Joshua Omole — Business Operations and AI Systems Strategist" 
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover opacity-95 hover:scale-102 transition-transform duration-700"
+                        className="w-full h-full object-cover object-top opacity-95 hover:scale-102 transition-transform duration-700"
                         onError={handleImageError}
                       />
                     ) : (

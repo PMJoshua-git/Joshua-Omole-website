@@ -20,9 +20,17 @@ import {
 const About: React.FC = () => {
   const [imageIndex, setImageIndex] = useState(0);
   const imageSources = [
+    "/images/joshua-portrait.png",
+    "/joshua-portrait.png",
     "/images/joshua-portrait.jpg",
+    "/images/joshua-portrait.jpeg",
+    "/images/joshua-portrait.webp",
+    "/images/joshua-portrait.PNG",
     "/images/joshua-portrait.JPG",
     "/joshua-portrait.jpg",
+    "/joshua-portrait.jpeg",
+    "/joshua-portrait.webp",
+    "/joshua-portrait.PNG",
     "/joshua-portrait.JPG",
   ];
 
@@ -82,13 +90,13 @@ const About: React.FC = () => {
               {/* Image column (40%) */}
               <div className="w-full max-w-[300px] sm:max-w-[360px] lg:w-[380px] lg:max-w-none flex-shrink-0">
                 <FadeIn direction="right" delay={200}>
-                  <div className="rounded-[2rem] overflow-hidden border border-sage-border shadow-soft bg-sage-surface aspect-square flex items-center justify-center">
+                  <div className="rounded-[2rem] overflow-hidden border border-sage-border shadow-soft bg-sage-surface aspect-[4/5] sm:aspect-[3/4] flex items-center justify-center">
                     {imageIndex !== -1 ? (
                       <img
                         src={imageSources[imageIndex]}
                         alt="Joshua Omole — Business Operations & AI Systems Strategist"
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover opacity-95 hover:scale-102 transition-transform duration-500"
+                        className="w-full h-full object-cover object-top opacity-95 hover:scale-102 transition-transform duration-500"
                         onError={handleImageError}
                       />
                     ) : (
