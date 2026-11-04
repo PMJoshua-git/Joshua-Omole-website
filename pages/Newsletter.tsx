@@ -139,7 +139,7 @@ const Newsletter: React.FC = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {[
-                                { title: "AI & Technology Insights", desc: "Understand emerging technologies without getting lost in trends." },
+                                { title: "AI & Technology Resources", desc: "Understand emerging technologies without getting lost in trends." },
                                 { title: "Systems Thinking", desc: "Learn frameworks that help organisations work smarter." },
                                 { title: "Project & Execution Lessons", desc: "Practical lessons from technology delivery and implementation." },
                                 { title: "Business Applications", desc: "Real-world examples of how AI and technology create value." },
@@ -181,10 +181,10 @@ const Newsletter: React.FC = () => {
                         </div>
                     </FadeIn>
 
-                    {/* Recent Insights Preview Section (CMS Ready Structure) */}
+                    {/* Recent Resources Preview Section (CMS Ready Structure) */}
                     <FadeIn delay={600} className="mb-24">
                         <div className="text-center mb-12">
-                            <h2 className="text-3xl md:text-4xl font-serif text-sage-text mb-4">Recent Insights</h2>
+                            <h2 className="text-3xl md:text-4xl font-serif text-sage-text mb-4">Recent Resources</h2>
                             <p className="text-sage-muted">Explore previous editions.</p>
                         </div>
                         

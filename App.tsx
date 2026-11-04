@@ -9,6 +9,7 @@ import Contact from './pages/Contact';
 import Connect from './pages/Connect';
 import Newsletter from './pages/Newsletter';
 import KnowledgeHub from './pages/KnowledgeHub';
+import ResourceDetail from './pages/ResourceDetail';
 import BusinessWorkflowFixes from './pages/BusinessWorkflowFixes';
 import FloatingAssistant from './components/FloatingAssistant';
 import { captureAttributionData } from './utils/attribution';
@@ -22,8 +23,9 @@ const TITLE_MAP: Record<string, string> = {
   "/contact": "Book a session | Joshua Omole",
   "/connect": "Connect & Resources | Joshua Omole",
   "/newsletter": "Newsletter | Joshua Omole",
-  "/knowledge-hub": "Knowledge Hub | Joshua Omole",
-  "/knowledge": "Knowledge Hub | Joshua Omole",
+  "/resources": "Resources | Joshua Omole",
+  "/knowledge-hub": "Resources | Joshua Omole",
+  "/knowledge": "Resources | Joshua Omole",
   "/business-workflow-fixes": "Business Workflow Fixes | Joshua Omole",
 };
 
@@ -74,8 +76,10 @@ const App: React.FC = () => {
         <Route path="/contact" element={<Navigate to="/audit" replace />} />
         <Route path="/connect" element={<Connect />} />
         <Route path="/newsletter" element={<Newsletter />} />
-        <Route path="/knowledge-hub" element={<KnowledgeHub />} />
-        <Route path="/knowledge" element={<KnowledgeHub />} />
+        <Route path="/resources" element={<KnowledgeHub />} />
+        <Route path="/resources/:slug" element={<ResourceDetail />} />
+        <Route path="/knowledge-hub" element={<Navigate to="/resources" replace />} />
+        <Route path="/knowledge" element={<Navigate to="/resources" replace />} />
         <Route path="/business-workflow-fixes" element={<BusinessWorkflowFixes />} />
       </Routes>
     </Router>

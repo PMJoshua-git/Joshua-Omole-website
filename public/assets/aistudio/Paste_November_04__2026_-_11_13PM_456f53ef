@@ -1,0 +1,665 @@
+You are a senior full-stack developer working on joshuaomole.com.
+Stack: React + TypeScript (SPA) · Vite · Tailwind CSS · Express (server.ts)
+· Zod · Loops.so · Airtable (do not modify schema).
+The sage colour tokens and the Manrope (headings) + Inter (body) font
+system are already applied. The sticky Navbar (4 items + "Book Audit"
+CTA) already exists.
+
+TASK: Rebuild the Resources system in six parts:
+  A. Navbar: "Resources" becomes a dropdown (Blog / Resources)
+  B. Files live in the codebase (private), described by one registry
+  C. "Get your free copy" pop-up (first name + email only)
+  D. On submit: add the contact to Loops AND email the file via Resend
+  E. Every resource gets its own shareable link: /resources/:slug
+  F. Redesign how resources are displayed (listing page + resource page)
+
+POSITIONING RULE: Joshua sells operational transformation. Do not add
+AI-first language anywhere. Copy focuses on operations, systems,
+clarity, execution.
+
+Read the whole prompt before writing code. Do not invent final copy
+where a TODO is marked.
+
+═══════════════════════════════════════════════════════
+STEP 0 — READ THE CURRENT STATE FIRST
+═══════════════════════════════════════════════════════
+
+Before changing anything, find and read:
+  - The current Navbar component and its navLinks array
+  - KnowledgeHub.tsx and every component it uses (ResourceCard,
+    ResourceModal, LeadCaptureModal, SuccessModal)
+  - The useResources hook
+  - In server.ts: /api/resources, /api/resource-access, the Loops helper,
+    the Zod schemas, META_MAP and the SEO injector
+  - utils/attribution.ts (what it exposes, how forms read it)
+  - Run: grep -rn "knowledge-hub\|/knowledge\|Knowledge Hub\|Writing" src/ server.ts
+    and keep the list. You will update every hit in Step 9.
+
+Summarise in 5 lines what you found, then proceed.
+
+═══════════════════════════════════════════════════════
+STEP 1 — DEPENDENCIES AND ENVIRONMENT
+═══════════════════════════════════════════════════════
+
+Install:
+  npm install resend express-rate-limit
+
+Add to the server's environment config (and .env.example, with empty
+values; never commit real keys):
+  RESEND_API_KEY=
+  RESEND_FROM_EMAIL="Joshua Omole <hello@joshuaomole.com>"
+  RESEND_REPLY_TO=hello@joshuaomole.com
+  SITE_URL=https://joshuaomole.com
+  (LOOPS_API_KEY already exists. Reuse it.)
+
+All secrets stay server-side. Nothing sensitive reaches the client.
+
+═══════════════════════════════════════════════════════
+STEP 2 — PRIVATE FILE STORE + RESOURCE REGISTRY
+═══════════════════════════════════════════════════════
+
+2a. Create a folder at the PROJECT ROOT:  resources-private/
+    This is where every downloadable file (PDF, DOCX, PPTX, XLSX, etc.)
+    lives.
+
+    CRITICAL: this folder must NEVER be inside public/, dist/, or any
+    Vite publicDir, and must not be served by express.static. If a file
+    is reachable by URL, anyone can skip the form. After the build,
+    confirm that requesting /resources-private/anything returns the SPA
+    fallback or a 404, never a file.
+    Also make sure the folder is included in the deployment bundle
+    (check Dockerfile / .dockerignore / .vercelignore / build config) and
+    is NOT in .gitignore.
+
+2b. Create server/resources/registry.ts (if the project keeps server code
+    flat beside server.ts, put it beside server.ts instead).
+    It is the single source of truth for all resources.
+
+    export type ResourceStatus = 'published' | 'coming-soon' | 'draft';
+
+    export interface ResourceEntry {
+      // ── public fields (sent to the browser) ──
+      slug: string;            // kebab-case, unique, permanent: it is the shareable URL
+      title: string;
+      summary: string;         // max ~140 chars, used on cards and social previews
+      description: string[];   // long description, one string per paragraph
+      includes?: string[];     // "What's inside": 3 to 5 short bullets
+      category: string;        // e.g. 'Operations', 'Systems Thinking', 'Frameworks'
+      format: string;          // 'PDF' | 'DOCX' | 'PPTX' | 'XLSX' | 'Checklist' | ...
+      readingTime?: string;    // e.g. '8 min read'. Optional.
+      coverImage?: string;     // e.g. '/images/resources/sop-template.jpg'. Optional.
+      status: ResourceStatus;
+      featured?: boolean;
+      order: number;           // lower shows first
+
+      // ── server-only fields (NEVER sent to the browser) ──
+      fileName: string;        // exact file name inside resources-private/
+      loopsGroup: string;      // the Loops userGroup value, used EXACTLY as written
+      emailSubject?: string;   // optional override of the default subject
+    }
+
+    export const resources: ResourceEntry[] = [
+      // EXAMPLE ONLY: status 'draft' so it never appears on the site.
+      // Joshua replaces this with real entries.
+      {
+        slug: 'example-resource',
+        title: 'Example Resource',
+        summary: 'One-line summary of what the reader gets.',
+        description: ['First paragraph.', 'Second paragraph.'],
+        includes: ['First item', 'Second item', 'Third item'],
+        category: 'Operations',
+        format: 'PDF',
+        readingTime: '5 min read',
+        status: 'draft',
+        featured: false,
+        order: 99,
+        fileName: 'example-resource.pdf',
+        loopsGroup: 'Example Resource',
+      },
+    ];
+
+    Export helpers:
+      getResourceBySlug(slug: string): ResourceEntry | undefined
+      getPublicResources(): ResourcePublic[]   // status published or coming-soon only;
+                                               // sorted featured desc, then order asc;
+                                               // STRIPS fileName, loopsGroup, emailSubject
+      type ResourcePublic = Omit<ResourceEntry, 'fileName' | 'loopsGroup' | 'emailSubject'>
+
+2c. Startup validation (runs once when the server boots; log, do not crash):
+      - slugs unique and kebab-case
+      - every 'published' entry has its file present in resources-private/
+      - warn if any file is larger than 25MB (Resend allows 40MB per email
+        after Base64 encoding, which inflates size by about a third)
+      - warn if loopsGroup is empty
+
+2d. Create src/types/resources.ts and export the ResourcePublic type for
+    the frontend (duplicate the public fields; do not import server code
+    into the client bundle).
+
+═══════════════════════════════════════════════════════
+STEP 3 — BACKEND (server.ts)
+═══════════════════════════════════════════════════════
+
+3a. REPLACE the Airtable-backed GET /api/resources handler with:
+
+    app.get('/api/resources', (_req, res) => {
+      res.set('Cache-Control', 'public, max-age=300');
+      res.json(getPublicResources());
+    });
+
+    Remove the node-cache usage for this route (the registry is in memory).
+    Do NOT remove node-cache for /api/training-sessions.
+
+3b. Replace /api/resource-access with a NEW route: POST /api/resource-request.
+    Remove the old route entirely.
+
+    Zod schema:
+      const resourceRequestSchema = z.object({
+        slug:          z.string().min(1).max(100),
+        firstName:     z.string().trim().min(1).max(80),
+        email:         z.string().trim().toLowerCase().email().max(254),
+        website:       z.string().optional().default(''),   // honeypot
+        leadSource:    z.string().optional().default(''),
+        landingPage:   z.string().optional().default(''),
+        utmParameters: z.string().optional().default(''),
+      });
+
+    Rate limit this route only: 10 requests per 15 minutes per IP
+    (express-rate-limit). If the app runs behind a proxy, configure
+    'trust proxy' so the limiter sees real client IPs. Check how the app is
+    hosted before changing it.
+
+    Handler logic, in this order:
+      1. Validate the body with Zod. On failure respond 400 with
+         { error: 'Please check your details and try again.' }.
+      2. If the honeypot field "website" is non-empty, respond 200
+         { ok: true } and do nothing else.
+      3. Look up the resource with getResourceBySlug. If it is missing or
+         its status is not 'published', respond 404.
+      4. Resolve the file path:
+           const filePath = path.resolve(RESOURCES_DIR, resource.fileName);
+         Reject if filePath does not start with RESOURCES_DIR (path
+         traversal guard). Read the file with fs.promises.readFile.
+         If the read fails, log the error and respond 500 with a friendly
+         message.
+      5. Run both side effects in parallel with Promise.allSettled:
+           a. sendResourceEmail(...)   (Step 4)
+           b. addToLoops(...)
+      6. If the email send REJECTED: log it, respond 502 with
+         { error: "We couldn't send your copy. Please try again in a moment." }
+         Do not show a success state.
+      7. If only the Loops call rejected: log it server-side and still
+         respond { ok: true }. The reader must receive their file even if
+         the CRM call fails.
+      8. Otherwise respond { ok: true }.
+
+    addToLoops:
+      Reuse the existing Loops helper if there is one. It must:
+        - POST https://app.loops.so/api/v1/contacts/create with
+          { email, firstName, userGroup: resource.loopsGroup, source: leadSource }
+        - If Loops answers 409 (contact exists), PUT
+          https://app.loops.so/api/v1/contacts/update with the same body,
+          so the group is applied to existing contacts too
+        - Throw on any other non-2xx response
+      Use resource.loopsGroup exactly as written. No prefixes, no
+      reformatting.
+
+3c. Redirects. Add BEFORE the catch-all handler:
+      app.get(['/knowledge-hub', '/knowledge'], (_req, res) => res.redirect(301, '/resources'));
+    And in App.tsx replace those two routes' elements with
+      <Navigate to="/resources" replace />
+
+3d. Routes. In App.tsx register:
+      /resources         → Resources page (Step 6)
+      /resources/:slug   → ResourceDetail page (Step 7)
+
+3e. SEO injector. Extend the existing META_MAP logic:
+      - /resources gets its own title and description.
+      - /resources/:slug: look the slug up in the registry. If found and
+        published, inject:
+          title:        "{title} | Free {format} from Joshua Omole"
+          description:  resource.summary
+          og:title / twitter:title / og:description / twitter:description
+          og:url:       SITE_URL + '/resources/' + slug
+          og:image:     SITE_URL + coverImage, or the site's default OG
+                        image if coverImage is missing
+        HTML-escape every injected value. If the slug is unknown, serve the
+        default meta.
+      - If the project has a sitemap, add /resources/:slug for every
+        published resource.
+
+═══════════════════════════════════════════════════════
+STEP 4 — THE EMAIL (Resend)
+═══════════════════════════════════════════════════════
+
+Create server/resources/email.ts.
+
+  import { Resend } from 'resend';
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  export async function sendResourceEmail(opts: {
+    to: string; firstName: string; resource: ResourceEntry; file: Buffer;
+  }) {
+    const { data, error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL!,
+      to: opts.to,
+      replyTo: process.env.RESEND_REPLY_TO,
+      subject: opts.resource.emailSubject ?? `Your copy of ${opts.resource.title}`,
+      html: renderHtml(opts.firstName, opts.resource),
+      text: renderText(opts.firstName, opts.resource),
+      attachments: [{ filename: opts.resource.fileName, content: opts.file }],
+    });
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
+The message body is Joshua's EXISTING resource message. He will paste
+it. Until then:
+  - Put the body in one template constant, EMAIL_MESSAGE, with the
+    placeholders {{firstName}} and {{resourceTitle}}.
+  - Fill it with a clearly marked neutral placeholder and a visible
+    // TODO: replace with Joshua's established resource email message.
+  - Do NOT invent the final wording.
+  - HTML: simple, single-column, max-width 560px, inline styles only
+    (email clients ignore Tailwind), sage-primary #55745C for the
+    heading/accent, text #202A24, system-font fallback stack. A plain-text
+    version is required.
+  - Escape firstName and resource fields before inserting into HTML.
+
+═══════════════════════════════════════════════════════
+STEP 5 — NAVBAR: THE RESOURCES DROPDOWN
+═══════════════════════════════════════════════════════
+
+Edit the existing Navbar component only. Keep the logo, About, Services,
+Book Audit CTA, scroll shadow, sticky behaviour and all existing hooks.
+
+5a. In navLinks, REMOVE the "Writing" entry. "Resources" is no longer a
+    plain link. It is a dropdown trigger rendered after Services.
+
+5b. DESKTOP (lg and up). Add state and refs:
+
+      const [isResourcesOpen, setIsResourcesOpen] = useState(false);
+      const closeTimer = useRef<number | null>(null);
+      const resourcesRef = useRef<HTMLDivElement>(null);
+
+      const openResources = () => {
+        if (closeTimer.current) window.clearTimeout(closeTimer.current);
+        setIsResourcesOpen(true);
+      };
+      const scheduleClose = () => {
+        closeTimer.current = window.setTimeout(() => setIsResourcesOpen(false), 150);
+      };
+
+    Behaviour:
+      - Opens on hover (onMouseEnter on the wrapper) and closes 150ms
+        after the pointer leaves (the delay prevents flicker when moving
+        from the trigger to the panel).
+      - Also opens/closes on click and Enter/Space of the trigger button
+        (keyboard and touch-laptop support).
+      - Escape closes it and returns focus to the trigger.
+      - Clicking outside closes it (mousedown listener on document).
+      - Closes on route change (add setIsResourcesOpen(false) to the
+        existing pathname effect).
+      - Trigger is a <button> with aria-haspopup="menu",
+        aria-expanded={isResourcesOpen}, and a small chevron that rotates
+        180° when open. Same typography and spacing as the other nav links.
+      - The trigger shows the active state (2px underline + sage-primary
+        text) when pathname starts with /resources.
+
+    Panel (absolute, left-0, top-full, wrapped in pt-2 so there is no hover
+    gap), w-72, bg-sage-surface, border border-sage-border, rounded-xl,
+    shadow-md, p-2, z-50. Two items, each a block with a title and a
+    one-line helper:
+
+      Item 1: "Blog"       helper: "Articles on operations and systems"
+        → <a href="https://blog.joshuaomole.com"> (plain anchor, same tab),
+          with a small ↗ mark after the title
+      Item 2: "Resources"  helper: "Free templates, guides and frameworks"
+        → <Link to="/resources">
+
+    Item styles: rounded-lg px-3 py-2.5, title font-body text-sm
+    font-medium text-sage-text, helper font-body text-xs text-sage-muted,
+    hover:bg-sage-surface-2, focus-visible ring in sage-primary. Give the
+    panel role="menu" and each item role="menuitem".
+
+5c. MOBILE (below lg). In the mobile drop panel, replace the old "Writing"
+    row with an accordion row labelled "Resources":
+      - Same row style as the other mobile links (min-h-[52px], px-5,
+        border-b border-sage-border), with a chevron at the right end.
+      - Tapping toggles local state isResourcesMobileOpen. The trigger has
+        aria-expanded and aria-controls.
+      - When expanded, show two indented sub-links directly beneath it
+        (pl-9, min-h-[48px], text-sm): "Blog" → https://blog.joshuaomole.com
+        and "Resources" → /resources. Each has its helper text in
+        text-xs text-sage-muted underneath the label.
+      - The row shows the active state (left indicator + tinted row) when
+        pathname starts with /resources.
+      - The whole mobile menu closing on route change must also collapse
+        this accordion.
+    The Book Audit button stays full-width at the bottom of the panel.
+
+═══════════════════════════════════════════════════════
+STEP 6 — RESOURCES LISTING PAGE (/resources)
+═══════════════════════════════════════════════════════
+
+Rebuild the page from KnowledgeHub.tsx (keep the file or rename it to
+Resources.tsx, and make sure the route in App.tsx points to it). Data
+comes from the useResources hook, which now calls the registry-backed
+GET /api/resources. Keep the hook, drop any Airtable-specific fields.
+
+Use the Layout wrapper and the standard container:
+  max-w-6xl mx-auto px-4 sm:px-6 lg:px-8, with sections at
+  py-14 sm:py-18 lg:py-24.
+
+Page structure:
+  1. Header (bg-sage-bg)
+       eyebrow:  "Resources"
+       H1:       "Free resources for running a clearer operation"
+       body:     "Templates, checklists and frameworks you can put to work
+                  this week."
+     Typography: eyebrow = font-heading text-xs font-semibold
+     tracking-[0.12em] uppercase text-sage-primary; H1 = font-heading
+     text-3xl sm:text-4xl lg:text-5xl font-bold text-sage-text; body =
+     font-body text-base sm:text-lg text-sage-text/75 max-w-xl.
+     Center on mobile, left from lg.
+
+  2. Featured (only if at least one resource is featured)
+       One large horizontal card per featured resource (max 2 shown).
+       Layout: stacked on mobile, image-left/text-right from md.
+
+  3. Category filter (only if there is more than one category)
+       A row of chips: "All" plus each category. Client-side filtering.
+       Mobile: horizontal scroll, no wrapping, no page overflow
+       (overflow-x-auto inside its own container, whitespace-nowrap).
+       Active chip: bg-sage-primary text-white. Inactive: bg-sage-surface
+       border border-sage-border text-sage-text hover:border-sage-primary/40.
+
+  4. Grid (bg-sage-bg)
+       grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6.
+
+  5. Closing strip (bg-sage-primary, white text, same pattern as other
+     pages): "Want this built into how your business runs?" with a button
+     "Book a free audit" → /audit.
+
+ResourceCard (redesign; replaces the old card):
+  Structure: <article> with TWO siblings, never nested interactive
+  elements:
+    (a) A <Link to={`/resources/${slug}`}> wrapping the cover, the
+        badges, the title and the summary
+    (b) A footer row with a <button> "Get your free copy" that opens the
+        modal for this resource directly
+
+  Card styling: bg-sage-surface border border-sage-border rounded-xl
+  overflow-hidden flex flex-col, hover:border-sage-primary/40
+  hover:shadow-sm transition. No glass, no glow, no blur.
+
+  Cover area (aspect-[4/3]):
+    - If coverImage exists: <img> with object-cover, loading="lazy",
+      alt = the title.
+    - If not: a designed placeholder: bg-sage-surface-2 with the format
+      in large muted type (font-heading text-4xl font-bold
+      text-sage-primary/30), e.g. "PDF". No emoji, no stock icons.
+    - Format badge top-left over the cover: text-xs font-medium
+      bg-sage-surface border border-sage-border text-sage-primary
+      rounded-full px-2.5 py-1.
+
+  Body (p-5): category eyebrow (font-heading text-[11px] font-semibold
+  tracking-[0.12em] uppercase text-sage-primary), H3 title
+  (font-heading text-lg font-semibold text-sage-text), summary
+  (font-body text-sm text-sage-muted, line-clamp-3), then a meta line:
+  readingTime if present.
+
+  Footer (px-5 pb-5 mt-auto): button "Get your free copy", w-full,
+  bg-sage-primary text-white font-body text-sm font-medium py-2.5
+  rounded-lg hover:bg-sage-primary-hover. Min height 44px.
+
+  'coming-soon' status: the card is NOT a link. Show a "Coming soon"
+  badge instead of the format badge and replace the button with a
+  disabled-looking line of text: "Coming soon". No modal.
+
+  REMOVE the old "Downloaded 120+ times" counter. There is no database
+  behind it anymore and it must not be faked.
+
+The page holds one piece of state, the resource currently being
+requested, and renders a single <GetCopyModal /> (Step 8). Pass an
+onRequest(resource) callback to each card.
+
+═══════════════════════════════════════════════════════
+STEP 7 — RESOURCE PAGE (/resources/:slug)
+═══════════════════════════════════════════════════════
+
+Create src/pages/ResourceDetail.tsx. Look up the resource by slug from
+the same useResources data (show a simple skeleton while loading). If
+the slug is unknown or the resource is not 'published', navigate to
+/resources with replace.
+
+Layout (inside Layout, standard container):
+  - Back link at the top: "← All resources" → /resources
+    (font-body text-sm text-sage-primary).
+  - Two-column from lg: content left (flex-1), sticky aside on the right
+    (lg:w-[380px], lg:sticky lg:top-24). Stacked on mobile in this order:
+    title block, CTA, cover, content.
+
+  Content column:
+    - category eyebrow
+    - H1 = title (font-heading text-3xl sm:text-4xl font-bold)
+    - summary (font-body text-base sm:text-lg text-sage-text/75)
+    - meta row: format badge, readingTime if present
+    - "What's inside" (only if includes exists): H2 text-xl, then a
+      checklist with a sage-primary check icon per item
+    - description paragraphs, max-w-prose, font-body text-base
+      leading-relaxed text-sage-text/85, mb-5 between paragraphs
+
+  Aside card (bg-sage-surface border border-sage-border rounded-2xl p-5):
+    - cover image or the format placeholder (aspect-[4/3], rounded-xl)
+    - PRIMARY CTA: button "Get your free copy", full width, bg-sage-primary
+      text-white, py-3.5. Opens the modal.
+    - micro-copy under it: "We'll email it to you right away. No spam."
+    - "Copy link" button (text button with a link icon). On click it
+      copies the canonical URL (SITE_URL + /resources/slug) to the
+      clipboard (navigator.clipboard with a safe fallback) and its label
+      changes to "Link copied" for 2 seconds.
+
+  Below the main block: "More resources", 2 other published resources as
+  ResourceCards (skip the whole block if there are none). Then the same
+  closing audit strip as the listing page.
+
+  Set document.title for the client-side navigation case. The server
+  already injects the meta for direct visits (Step 3e).
+
+═══════════════════════════════════════════════════════
+STEP 8 — THE "GET YOUR FREE COPY" MODAL
+═══════════════════════════════════════════════════════
+
+Create src/components/resources/GetCopyModal.tsx. It replaces
+LeadCaptureModal, ResourceModal and SuccessModal.
+
+Props: { resource: ResourcePublic | null; onClose: () => void }
+
+Fields (ONLY these two, plus the hidden honeypot):
+  - First name (required)
+  - Email address (required, basic format check)
+  - Hidden honeypot input named "website": visually hidden, tabIndex -1,
+    autoComplete="off", aria-hidden. Real users never fill it.
+
+Copy:
+  - Title: "Get your free copy"
+  - Sub: "Enter your details and we'll send {resource.title} to your inbox."
+  - Submit button: "Send it to me" (while sending: "Sending…")
+  - Micro-copy: "You'll also get occasional insights on operations and
+    business systems from Joshua. Unsubscribe any time."
+  - Success state: heading "It's on its way." and body "Check your inbox at
+    {email}. If you don't see it within a few minutes, look in your spam or
+    promotions folder." plus a "Close" button.
+  - Error state: inline message from the server's error field, with the
+    form kept filled so the reader can retry.
+
+Submit: POST /api/resource-request with
+  { slug, firstName, email, website, leadSource, landingPage, utmParameters }
+where the last three come from utils/attribution.ts exactly as the audit
+form already does.
+
+Behaviour and accessibility:
+  - role="dialog", aria-modal="true", aria-labelledby pointing at the title
+  - Focus moves to the first field on open; Tab is trapped inside; Escape
+    and a click on the backdrop close it; focus returns to the element
+    that opened it
+  - Lock body scroll while open
+  - Inline field errors below each field (same pattern as the audit form),
+    cleared when the user edits
+  - Disable the submit button while sending
+
+Layout:
+  - Mobile: bottom sheet (fixed inset-x-0 bottom-0, rounded-t-2xl,
+    max-h-[90vh] overflow-y-auto)
+  - sm and up: centered, max-w-md, rounded-2xl
+  - Panel: bg-sage-surface border border-sage-border shadow-lg
+  - Backdrop: bg-sage-text/40. No blur.
+  - All inputs: w-full, py-3, text-base (16px minimum, so iOS does not
+    zoom on focus), same input styling as the audit form
+  - Submit button: w-full bg-sage-primary text-white py-3.5 rounded-lg
+
+═══════════════════════════════════════════════════════
+STEP 9 — CLEAN UP THE OLD FLOW
+═══════════════════════════════════════════════════════
+
+  - Delete LeadCaptureModal, ResourceModal and SuccessModal after
+    confirming with grep that nothing else imports them.
+  - Remove the /api/resource-access route.
+  - LEAVE the Airtable service file and the Resource Downloads /
+    Resources Library table definitions in place. Do not delete them. Just
+    stop calling the resource functions.
+  - Update every hit from the Step 0 grep: any link to /knowledge-hub or
+    /knowledge becomes /resources, and the label "Knowledge Hub" becomes
+    "Resources". This includes the footer, the /connect page, and any
+    homepage resource-preview section. If a homepage preview section
+    exists, point it at the new ResourceCard and /resources/:slug.
+
+═══════════════════════════════════════════════════════
+STEP 10 — RESOURCES.md (THE REUSABLE PATH)
+═══════════════════════════════════════════════════════
+
+Create RESOURCES.md at the project root so Joshua (or any future agent)
+can add a resource in minutes.
+
+Contents:
+  HOW TO ADD A RESOURCE
+    1. Put the file in resources-private/ (never in public/).
+    2. Add one entry to server/resources/registry.ts.
+    3. (Optional) Add a cover image to public/images/resources/ and set
+       coverImage.
+    4. Deploy. The card, the page, the share link, the pop-up, the Loops
+       tagging and the email delivery all work automatically.
+
+  BRIEF TEMPLATE TO GIVE THE CODING AGENT FOR EACH NEW RESOURCE
+    slug:
+    title:
+    summary (max 140 chars):
+    description (paragraphs):
+    includes (3 to 5 bullets):
+    category:
+    format:
+    readingTime (optional):
+    file name (as saved in resources-private/):
+    loopsGroup (EXACT string for the Loops userGroup, short):
+    emailSubject (optional):
+    featured (yes/no) and order:
+
+  RULES
+    - slug is permanent once shared. Changing it breaks old links.
+    - loopsGroup is used exactly as written.
+    - Files above 25MB: tell Joshua before adding (email size limit).
+
+═══════════════════════════════════════════════════════
+RWD RULES (EVERYTHING ABOVE)
+═══════════════════════════════════════════════════════
+
+RWD-RES-01 · Grid: grid-cols-1 sm:grid-cols-2 lg:grid-cols-3. Never two
+  columns on a 375px screen.
+RWD-RES-02 · The detail page stacks on mobile in this order: title block,
+  CTA, cover, content. Two columns only from lg.
+RWD-RES-03 · All tappable targets are at least 44px tall (nav accordion
+  rows 52px, sub-links 48px).
+RWD-RES-04 · Modal is a bottom sheet on mobile, centered from sm. Inputs
+  use 16px text.
+RWD-RES-05 · The category filter scrolls horizontally inside its own
+  container. The page body never scrolls sideways.
+RWD-RES-06 · Dropdown panel: hover-driven on desktop; on touch devices
+  and below lg the accordion pattern is used. Never rely on hover alone.
+RWD-RES-07 · Container: max-w-6xl mx-auto px-4 sm:px-6 lg:px-8. Section
+  padding py-14 sm:py-18 lg:py-24. Buttons w-full on mobile.
+RWD-RES-08 · Images have explicit aspect ratios (aspect-[4/3]) to prevent
+  layout shift.
+
+═══════════════════════════════════════════════════════
+DO NOT CHANGE
+═══════════════════════════════════════════════════════
+
+  - The audit form, /api/book-consultation, the Leads table flow
+  - /api/training-sessions and the Training page
+  - utils/attribution.ts (use it, do not modify it)
+  - The sage colour tokens and the font system
+  - Navbar items other than the Writing → Resources change (About,
+    Services, Book Audit, scroll shadow, sticky behaviour, mobile
+    "Menu/Close" toggle)
+  - Airtable schema and the Loops contact flows for other forms
+  - Any other page's copy or layout
+
+═══════════════════════════════════════════════════════
+VALIDATION CHECKLIST
+═══════════════════════════════════════════════════════
+
+NAV
+□ Desktop: hovering "Resources" opens a panel with Blog and Resources
+□ Moving the pointer from the trigger to the panel does not close it
+□ Click, Enter/Space and Escape work; outside click closes it
+□ "Blog" goes to https://blog.joshuaomole.com; "Resources" to /resources
+□ Mobile: "Resources" row expands to two sub-links; menu closing
+  collapses it
+□ Trigger shows the active state on /resources and /resources/:slug
+□ No "Writing" item remains anywhere
+
+FILES AND SECURITY
+□ No resource file is reachable by URL (test /resources-private/<file>,
+  /<file>, and the built dist/)
+□ GET /api/resources never contains fileName, loopsGroup or emailSubject
+□ Unknown slug and draft slug on /api/resource-request return 404
+□ Path traversal attempt (e.g. fileName "../server.ts") is rejected
+□ The honeypot request returns 200 and sends nothing
+□ The 11th request in 15 minutes from one IP is rate-limited
+
+DELIVERY
+□ Submitting the pop-up sends an email with the file attached, to the
+  address entered, with the established message (or the marked
+  placeholder until Joshua supplies it)
+□ The contact appears in Loops with userGroup exactly equal to the
+  registry's loopsGroup
+□ A returning email address gets the new userGroup applied (409 path works)
+□ If Loops is unreachable, the reader still receives the file
+□ If Resend fails, the reader sees an error and NOT a success screen
+□ UTM and landing page data reach Loops as the source field
+
+LINKS AND SEO
+□ /resources/:slug opens that resource directly, on first load and from
+  a shared link
+□ Pasting the link into a chat preview shows that resource's title,
+  summary and image (server-side meta injected)
+□ /knowledge-hub and /knowledge return a 301 to /resources
+□ "Copy link" copies the canonical URL and shows "Link copied"
+
+DISPLAY
+□ Featured resources appear at the top
+□ Category chips show only when there is more than one category
+□ Cards without a cover show the format placeholder
+□ 'coming-soon' cards are not clickable and have no CTA
+□ No downloads counter appears anywhere
+
+RESPONSIVE
+□ Verified at 375px, 768px and 1280px with no horizontal overflow
+□ Modal works as a bottom sheet at 375px; inputs do not zoom on iOS
+
+BUILD
+□ npm run build completes with zero TypeScript errors
+□ No console errors on /resources, /resources/:slug or on submit
+□ .env.example lists RESEND_API_KEY, RESEND_FROM_EMAIL, RESEND_REPLY_TO,
+  SITE_URL

@@ -5,7 +5,9 @@ import Button from '../components/Button';
 import FadeIn from '../components/FadeIn';
 import { Helmet } from 'react-helmet-async';
 import { useResources } from '../hooks/useResources';
-import ResourceCard from '../components/knowledge-hub/ResourceCard';
+import { ResourcePublic } from '../types/resources';
+import ResourceCard from '../components/resources/ResourceCard';
+import GetCopyModal from '../components/resources/GetCopyModal';
 import { 
   ArrowRight, 
   ArrowUpRight,
@@ -26,6 +28,7 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
   const [expandedTestimonial, setExpandedTestimonial] = React.useState<number | null>(null);
   const [imageIndex, setImageIndex] = React.useState(0);
+  const [selectedResourceModal, setSelectedResourceModal] = React.useState<ResourcePublic | null>(null);
   const imageSources = [
     "/images/joshua-portrait.png",
     "/joshua-portrait.png",
@@ -51,7 +54,7 @@ const Home: React.FC = () => {
 
   const { resources, loading } = useResources();
   const latestResources = resources
-    .filter(r => r.status === 'Published')
+    .filter(r => r.status === 'published')
     .slice(0, 3);
 
   return (
@@ -484,22 +487,22 @@ const Home: React.FC = () => {
           </div>
         </section>
 
-        {/* SECTION 7 — INSIGHTS */}
+        {/* SECTION 7 — RESOURCES */}
         <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-4">
             <div>
               <FadeIn>
                 <h2 className="text-3xl md:text-5xl font-serif text-sage-text mb-4">
-                  Insights
+                  Resources
                 </h2>
                 <p className="text-lg text-sage-sec max-w-xl">
-                  Ideas on business operations, AI, technology, and execution.
+                  Guides, frameworks, and practical resources on business operations, AI, technology, and execution.
                 </p>
               </FadeIn>
             </div>
             <FadeIn>
-              <Button to="/knowledge-hub" variant="outline" size="large">
-                Explore Insights <ArrowRight className="ml-2 w-4 h-4" />
+              <Button to="/resources" variant="outline" size="large">
+                Explore Resources <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </FadeIn>
           </div>
@@ -513,17 +516,17 @@ const Home: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {latestResources.map((resource) => (
-                <FadeIn key={resource.id} className="h-full">
+                <FadeIn key={resource.slug} className="h-full">
                   <ResourceCard 
                     resource={resource} 
-                    onReadMore={() => navigate('/knowledge-hub')} 
+                    onRequest={(res) => setSelectedResourceModal(res)} 
                   />
                 </FadeIn>
               ))}
               {latestResources.length === 0 && (
                 <div className="col-span-3 text-center py-12 bg-sage-surface rounded-xl border border-sage-border">
-                  <AlertCircle className="w-12 h-12 text-sage-primary/50 mx-auto mb-3" />
-                  <p className="text-sage-muted text-sm">No resources published yet. Check back soon!</p>
+                  <AlertCircle className="w-10 h-10 text-sage-primary/50 mx-auto mb-3" />
+                  <p className="text-sage-text font-medium text-sm">Unable to load resources at the moment, Please Check back later</p>
                 </div>
               )}
             </div>
@@ -563,6 +566,15 @@ const Home: React.FC = () => {
             </Button>
           </FadeIn>
         </section>
+
+        {/* Resource download modal */}
+        {selectedResourceModal && (
+          <GetCopyModal
+            key={selectedResourceModal.slug}
+            resource={selectedResourceModal}
+            onClose={() => setSelectedResourceModal(null)}
+          />
+        )}
       </Layout>
     </>
   );

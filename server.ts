@@ -3,32 +3,183 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
 import fs from "fs";
+import { z } from "zod";
+import rateLimit from "express-rate-limit";
 
 dotenv.config();
 
 const app = express();
 const PORT = 3000;
 
+app.set('trust proxy', 1);
 app.use(express.json());
+
+// Resources registry & mailer
+import {
+  RESOURCES_DIR,
+  getResourceBySlug,
+  getPublicResources,
+  validateResourceRegistry
+} from "./server/resources/registry";
+import { sendResourceEmail } from "./server/resources/email";
 
 // API Routes
 import bookConsultationRouter from "./services/api/book-consultation";
 import newsletterSubscribeRouter from "./services/api/newsletter-subscribe";
-import resourceAccessRouter from "./services/api/resource-access";
-import resourcesRouter from "./services/api/resources";
 import trainingSessionsRouter from "./services/api/training-sessions";
 import bookTrainingRouter from "./services/api/book-training";
 
 app.use("/api/book-consultation", bookConsultationRouter);
 app.use("/api/newsletter-subscribe", newsletterSubscribeRouter);
-app.use("/api/resource-access", resourceAccessRouter);
-app.use("/api/resources", resourcesRouter);
 app.use("/api/training-sessions", trainingSessionsRouter);
 app.use("/api/book-training", bookTrainingRouter);
 
-// Permanent redirect from legacy /contact to /audit
+// ── Resources API & Delivery ──
+app.get('/api/resources', (_req, res) => {
+  res.set('Cache-Control', 'public, max-age=300');
+  res.json(getPublicResources());
+});
+
+const resourceRequestSchema = z.object({
+  slug:          z.string().min(1).max(100),
+  firstName:     z.string().trim().min(1).max(80),
+  email:         z.string().trim().toLowerCase().email().max(254),
+  website:       z.string().optional().default(''),   // honeypot
+  leadSource:    z.string().optional().default(''),
+  landingPage:   z.string().optional().default(''),
+  utmParameters: z.string().optional().default(''),
+});
+
+const resourceLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please try again in a few minutes.' },
+});
+
+async function addToLoops(opts: {
+  email: string;
+  firstName: string;
+  userGroup: string;
+  source?: string;
+}) {
+  if (!process.env.LOOPS_API_KEY) {
+    console.warn('[Loops] LOOPS_API_KEY is not set in environment');
+    return;
+  }
+  const payload = {
+    email: opts.email,
+    firstName: opts.firstName || '',
+    userGroup: opts.userGroup,
+    source: opts.source || 'joshuaomole.com',
+  };
+
+  const createRes = await fetch('https://app.loops.so/api/v1/contacts/create', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.LOOPS_API_KEY}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (createRes.status === 409) {
+    // Contact exists; update with the userGroup so existing contacts receive the tag
+    const updateRes = await fetch('https://app.loops.so/api/v1/contacts/update', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.LOOPS_API_KEY}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!updateRes.ok) {
+      const errText = await updateRes.text();
+      throw new Error(`Loops update failed (${updateRes.status}): ${errText}`);
+    }
+    return;
+  }
+
+  if (!createRes.ok) {
+    const errText = await createRes.text();
+    throw new Error(`Loops create failed (${createRes.status}): ${errText}`);
+  }
+}
+
+app.post('/api/resource-request', resourceLimiter, async (req, res) => {
+  // 1. Validate the body with Zod
+  const parseResult = resourceRequestSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    return res.status(400).json({ error: 'Please check your details and try again.' });
+  }
+
+  const { slug, firstName, email, website, leadSource } = parseResult.data;
+
+  // 2. Honeypot check: If non-empty, silently respond 200 { ok: true }
+  if (website && website.trim() !== '') {
+    return res.status(200).json({ ok: true });
+  }
+
+  // 3. Lookup resource by slug
+  const resource = getResourceBySlug(slug);
+  if (!resource || resource.status !== 'published') {
+    return res.status(404).json({ error: 'Resource not found' });
+  }
+
+  // 4. Resolve file path with path traversal guard
+  const filePath = path.resolve(RESOURCES_DIR, resource.fileName);
+  if (!filePath.startsWith(RESOURCES_DIR)) {
+    console.error(`[Security Alert] Traversal attempt rejected: ${resource.fileName}`);
+    return res.status(400).json({ error: 'Invalid file path request' });
+  }
+
+  let fileBuffer: Buffer;
+  try {
+    fileBuffer = await fs.promises.readFile(filePath);
+  } catch (err) {
+    console.error(`Failed to read file for resource "${slug}" at "${filePath}":`, err);
+    return res.status(500).json({ error: "We couldn't prepare your download. Please try again shortly." });
+  }
+
+  // 5. Run both side effects in parallel
+  const [emailResult, loopsResult] = await Promise.allSettled([
+    sendResourceEmail({
+      to: email,
+      firstName,
+      resource,
+      file: fileBuffer,
+    }),
+    addToLoops({
+      email,
+      firstName,
+      userGroup: resource.loopsGroup,
+      source: leadSource || 'Resources page',
+    }),
+  ]);
+
+  // 6. If email send REJECTED: respond 502 with friendly error
+  if (emailResult.status === 'rejected') {
+    console.error(`Resend email delivery failed for ${email} (${slug}):`, emailResult.reason);
+    return res.status(502).json({ error: "We couldn't send your copy. Please try again in a moment." });
+  }
+
+  // 7. If only Loops rejected: log it and still respond { ok: true }
+  if (loopsResult.status === 'rejected') {
+    console.error(`Loops tagging failed for ${email} (${slug}):`, loopsResult.reason);
+  }
+
+  // 8. Otherwise respond { ok: true }
+  return res.status(200).json({ ok: true });
+});
+
+// Permanent redirects
 app.get('/contact', (_req, res) => {
   res.redirect(301, '/audit');
+});
+
+app.get(['/knowledge-hub', '/knowledge'], (_req, res) => {
+  res.redirect(301, '/resources');
 });
 
 // Secure proxy routes matching the Vercel Serverless Functions
@@ -162,14 +313,57 @@ const META_MAP: Record<string, PageMeta> = {
     description: "Join founders and operators receiving weekly systems thinking strategies, actionable AI implementation guides, and operational case studies.",
     url: "https://joshuaomole.com/newsletter"
   },
-  "/knowledge-hub": {
-    title: "Knowledge Hub | Joshua Omole | Business Operations & AI Systems Strategist",
+  "/resources": {
+    title: "Resources | Joshua Omole | Business Operations & AI Systems Strategist",
     description: "Practical resource library. Explore guides, checklists, frameworks, and tools designed to help you build smarter business operations.",
-    url: "https://joshuaomole.com/knowledge-hub"
+    url: "https://joshuaomole.com/resources"
+  },
+  "/knowledge-hub": {
+    title: "Resources | Joshua Omole | Business Operations & AI Systems Strategist",
+    description: "Practical resource library. Explore guides, checklists, frameworks, and tools designed to help you build smarter business operations.",
+    url: "https://joshuaomole.com/resources"
   }
 };
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function resolvePageMeta(cleanPath: string): PageMeta & { image?: string } {
+  if (cleanPath.startsWith('/resources/')) {
+    const slug = cleanPath.slice('/resources/'.length);
+    const resource = getResourceBySlug(slug);
+    if (resource && resource.status === 'published') {
+      const siteUrl = process.env.SITE_URL || 'https://joshuaomole.com';
+      const cover = resource.coverImage
+        ? (resource.coverImage.startsWith('http') ? resource.coverImage : `${siteUrl}${resource.coverImage}`)
+        : `${siteUrl}/og-image.svg`;
+      return {
+        title: `${escapeHtml(resource.title)} | Free ${escapeHtml(resource.format)} from Joshua Omole`,
+        description: escapeHtml(resource.summary),
+        url: `${siteUrl}/resources/${resource.slug}`,
+        image: cover,
+      };
+    }
+  }
+
+  const baseMeta = META_MAP[cleanPath] || META_MAP["/"];
+  const siteUrl = process.env.SITE_URL || 'https://joshuaomole.com';
+  return {
+    ...baseMeta,
+    image: `${siteUrl}/og-image.svg`,
+  };
+}
+
 async function startServer() {
+  // Validate resources registry on boot
+  validateResourceRegistry();
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
@@ -200,7 +394,7 @@ async function startServer() {
         }
         cleanPath = cleanPath.toLowerCase();
 
-        const meta = META_MAP[cleanPath] || META_MAP["/"];
+        const meta = resolvePageMeta(cleanPath);
 
         let customizedHtml = html;
         customizedHtml = customizedHtml.replace(
@@ -239,6 +433,17 @@ async function startServer() {
           /<meta property="twitter:url" content="[^"]*"/gi,
           `<meta property="twitter:url" content="${meta.url}"`
         );
+
+        if (meta.image) {
+          customizedHtml = customizedHtml.replace(
+            /<meta property="og:image" content="[^"]*"/gi,
+            `<meta property="og:image" content="${meta.image}"`
+          );
+          customizedHtml = customizedHtml.replace(
+            /<meta name="twitter:image" content="[^"]*"/gi,
+            `<meta name="twitter:image" content="${meta.image}"`
+          );
+        }
 
         res.send(customizedHtml);
       });

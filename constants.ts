@@ -5,7 +5,7 @@ export const ROUTES: RouteItem[] = [
   { name: 'About', path: '/about' },
   { name: 'Services', path: '/services' },
   { name: 'Training', path: '/training' },
-  { name: 'Knowledge Hub', path: '/knowledge-hub' },
+  { name: 'Resources', path: '/resources' },
   { name: 'Audit', path: '/audit' },
   { name: 'Connect', path: '/connect' },
   { name: 'Newsletter', path: '/newsletter' },

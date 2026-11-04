@@ -172,11 +172,11 @@ const Connect: React.FC = () => {
 
                     <FadeIn delay={700}>
                         <ConnectCard 
-                            title="Knowledge Hub"
-                            description="Guides, frameworks, insights, tools, and practical resources to help you navigate technology and AI."
+                            title="Resources"
+                            description="Guides, frameworks, tools, and practical resources to help you navigate technology and AI."
                             buttonText="Browse Resources"
                             icon={BookOpen}
-                            to="/about"
+                            to="/resources"
                         />
                     </FadeIn>
                 </div>
