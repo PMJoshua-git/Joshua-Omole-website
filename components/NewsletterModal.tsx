@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ShieldCheck, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { getAttributionData } from '../utils/attribution';
 
 interface NewsletterModalProps {
@@ -56,8 +57,25 @@ const NewsletterModal: React.FC<NewsletterModalProps> = ({ isOpen, onClose }) =>
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-sage-bg/80 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="relative w-full max-w-md bg-sage-surface p-8 rounded-2xl border border-sage-border shadow-sm overflow-hidden">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                className="fixed inset-0 bg-sage-bg/80 backdrop-blur-sm"
+                onClick={onClose}
+                aria-hidden="true"
+            />
+            {/* Modal Dialog */}
+            <motion.div
+                initial={{ opacity: 0, scale: 0.98, y: 8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.98, y: 4 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                className="relative z-10 w-full max-w-md bg-sage-surface p-8 rounded-2xl border border-sage-border shadow-lg overflow-hidden"
+            >
                 <button type="button" onClick={onClose} className="absolute top-4 right-4 text-sage-muted hover:text-sage-primary p-2 z-20 transition-colors">✕</button>
                 
                 {isSubmitted ? (
@@ -103,7 +121,7 @@ const NewsletterModal: React.FC<NewsletterModalProps> = ({ isOpen, onClose }) =>
                         </p>
                     </form>
                 )}
-            </div>
+            </motion.div>
         </div>
     );
 };

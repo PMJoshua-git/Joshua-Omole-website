@@ -18,6 +18,7 @@ import {
     BrainCircuit,
     Layers
 } from 'lucide-react';
+import AnimatedCheckmarkList from '../components/animated/AnimatedCheckmarkList';
 
 const Training: React.FC = () => {
   return (
@@ -85,12 +86,18 @@ const Training: React.FC = () => {
                     <p className="text-sage-muted mb-8 flex-grow leading-relaxed">
                         You don't need to understand how AI works at a technical level. You need to know how to govern it, evaluate it, and integrate it into business strategy without being misled. This track gives you exactly that.
                     </p>
-                    <ul className="space-y-4 mb-8 text-sm text-sage-muted">
-                        <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-sage-primary shrink-0" /> <span>AI Strategy & ROI</span></li>
-                        <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-sage-primary shrink-0" /> <span>Decision-Making Frameworks</span></li>
-                        <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-sage-primary shrink-0" /> <span>Governance & Ethics</span></li>
-                        <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-sage-primary shrink-0" /> <span>Digital Transformation Leadership</span></li>
-                    </ul>
+                    <AnimatedCheckmarkList
+                      items={[
+                        "AI Strategy & ROI",
+                        "Decision-Making Frameworks",
+                        "Governance & Ethics",
+                        "Digital Transformation Leadership"
+                      ]}
+                      className="space-y-4 mb-8 text-sm text-sage-muted"
+                      itemClassName="flex items-start gap-3"
+                      variant="circle-icon"
+                      textClassName="flex-grow leading-snug"
+                    />
                     <div className="mt-auto h-24 rounded-xl border border-sage-border bg-sage-surface-2 relative overflow-hidden flex items-center justify-center">
                         <Network className="w-full h-full p-4 text-sage-muted/40" />
                     </div>
@@ -108,12 +115,19 @@ const Training: React.FC = () => {
                     <p className="text-sage-muted mb-8 flex-grow leading-relaxed">
                         Your team doesn't need to become technical. They need to know how to work alongside automation, identify where AI helps, and adopt new systems without losing productivity during the transition.
                     </p>
-                    <ul className="space-y-4 mb-8 text-sm text-sage-muted">
-                        <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-sage-accent shrink-0" /> <span>Workflow Automation</span></li>
-                        <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-sage-accent shrink-0" /> <span>AI in Daily Operations</span></li>
-                        <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-sage-accent shrink-0" /> <span>Productivity Systems</span></li>
-                        <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-sage-accent shrink-0" /> <span>Collaborative Adoption</span></li>
-                    </ul>
+                    <AnimatedCheckmarkList
+                      items={[
+                        "Workflow Automation",
+                        "AI in Daily Operations",
+                        "Productivity Systems",
+                        "Collaborative Adoption"
+                      ]}
+                      className="space-y-4 mb-8 text-sm text-sage-muted"
+                      itemClassName="flex items-start gap-3"
+                      variant="circle-icon"
+                      iconColor="#7C9A82"
+                      textClassName="flex-grow leading-snug"
+                    />
                     <div className="mt-auto h-24 rounded-xl border border-sage-border bg-sage-surface-2 relative overflow-hidden flex items-center justify-center">
                         <Workflow className="w-full h-full p-4 text-sage-muted/40" />
                     </div>
@@ -131,12 +145,18 @@ const Training: React.FC = () => {
                     <p className="text-sage-muted mb-8 flex-grow leading-relaxed">
                         AI is changing what every job requires. This track builds the literacy, the prompting capability, and the operational thinking that makes you the person organizations want to keep.
                     </p>
-                    <ul className="space-y-4 mb-8 text-sm text-sage-muted">
-                        <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-sage-primary shrink-0" /> <span>Core AI Literacy</span></li>
-                        <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-sage-primary shrink-0" /> <span>Advanced Prompting</span></li>
-                        <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-sage-primary shrink-0" /> <span>Digital Workspace Optimization</span></li>
-                        <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-sage-primary shrink-0" /> <span>Career Readiness</span></li>
-                    </ul>
+                    <AnimatedCheckmarkList
+                      items={[
+                        "Core AI Literacy",
+                        "Advanced Prompting",
+                        "Digital Workspace Optimization",
+                        "Career Readiness"
+                      ]}
+                      className="space-y-4 mb-8 text-sm text-sage-muted"
+                      itemClassName="flex items-start gap-3"
+                      variant="circle-icon"
+                      textClassName="flex-grow leading-snug"
+                    />
                     <div className="mt-auto h-24 rounded-xl border border-sage-border bg-sage-surface-2 relative overflow-hidden flex items-center justify-center">
                         <Layers className="w-full h-full p-4 text-sage-muted/40" />
                     </div>

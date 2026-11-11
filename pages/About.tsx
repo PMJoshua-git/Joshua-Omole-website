@@ -16,6 +16,9 @@ import {
   BookOpen,
   Check
 } from 'lucide-react';
+import ScrollTimeline from '../components/animated/ScrollTimeline';
+import AnimatedCheckmarkList from '../components/animated/AnimatedCheckmarkList';
+import AnimatedCrossList from '../components/animated/AnimatedCrossList';
 
 const About: React.FC = () => {
   const [imageIndex, setImageIndex] = useState(0);
@@ -126,8 +129,8 @@ const About: React.FC = () => {
                   </h2>
                 </div>
 
-                <div className="relative border-l border-sage-border ml-4 md:ml-6 space-y-12">
-                  {[
+                <ScrollTimeline
+                  items={[
                     {
                       phase: "Technology & Execution Start",
                       desc: "I started in IT Project Management. Working closely with core technology taught me what was technical and possible—but it also taught me that delivering a technical output doesn't automatically equal a business outcome."
@@ -140,16 +143,8 @@ const About: React.FC = () => {
                       phase: "Designing Clear Systems",
                       desc: "Today, I sit deliberately between business strategy and engineering execution. I solve the foundational operational problems before writing code or suggesting tools, ensuring that whatever technology we integrate serves a clear, predefined workflow."
                     }
-                  ].map((step, idx) => (
-                    <div key={idx} className="relative pl-8 sm:pl-10">
-                      <div className="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full border border-sage-border bg-sage-surface flex items-center justify-center">
-                        <div className="w-2 h-2 rounded-full bg-sage-primary"></div>
-                      </div>
-                      <h3 className="font-heading text-lg font-semibold text-sage-text mb-2">{step.phase}</h3>
-                      <p className="font-body text-sm sm:text-base text-sage-muted leading-relaxed">{step.desc}</p>
-                    </div>
-                  ))}
-                </div>
+                  ]}
+                />
               </FadeIn>
             </div>
           </div>
@@ -231,39 +226,31 @@ const About: React.FC = () => {
               {/* Before Column */}
               <FadeIn className="h-full bg-sage-surface-2 p-8 rounded-2xl border border-sage-border">
                 <span className="text-xs font-bold tracking-wider text-sage-muted uppercase block mb-6">Typical State Before Engagement</span>
-                <ul className="space-y-4">
-                  {[
+                <AnimatedCrossList
+                  items={[
                     "Manual work consuming valuable team hours.",
                     "Unclear process handoffs and task leaks.",
                     "Disconnected tools running in absolute silos.",
                     "Constant operational firefighting by leadership.",
                     "Founder dependency holding back real scale."
-                  ].map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <span className="w-5 h-5 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">&times;</span>
-                      <span className="font-body text-sm text-sage-sec leading-relaxed">{item}</span>
-                    </li>
-                  ))}
-                </ul>
+                  ]}
+                />
               </FadeIn>
 
               {/* After Column */}
               <FadeIn className="h-full bg-sage-soft p-8 rounded-2xl border border-sage-primary/20 shadow-soft">
                 <span className="text-xs font-bold tracking-wider text-sage-primary uppercase block mb-6">Target State After System Design</span>
-                <ul className="space-y-4">
-                  {[
+                <AnimatedCheckmarkList
+                  variant="circle-badge"
+                  textClassName="font-body text-sm text-sage-text font-medium leading-relaxed"
+                  items={[
                     "Clear, designed workflows that require less manual entry.",
                     "Defined ownership where everyone knows their responsibilities.",
                     "Cohesive, connected systems mapping single sources of truth.",
                     "Predictable execution letting your team focus on core delivery.",
                     "Scalable operations that run smoothly without founder hand-holding."
-                  ].map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <span className="w-5 h-5 rounded-full bg-sage-primary/10 text-sage-primary flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold"><Check className="w-3 h-3" /></span>
-                      <span className="font-body text-sm text-sage-text font-medium leading-relaxed">{item}</span>
-                    </li>
-                  ))}
-                </ul>
+                  ]}
+                />
               </FadeIn>
 
             </div>

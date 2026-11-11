@@ -22,7 +22,7 @@ const Button: React.FC<ButtonProps> = ({
   type = 'button',
   glow
 }) => {
-  const baseStyles = "group inline-flex items-center justify-center font-medium transition-[transform,box-shadow,background-color,border-color,color] duration-200 ease-out active:scale-[0.98] md:hover:-translate-y-[1px]";
+  const baseStyles = "group inline-flex items-center justify-center font-medium transition-[transform,box-shadow,background-color,border-color,color] duration-200 ease-out active:scale-[0.98] md:hover:-translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-primary focus-visible:ring-offset-2";
   
   const sizeStyles = {
     small: "px-4 py-2 text-sm rounded-md", 
@@ -34,9 +34,9 @@ const Button: React.FC<ButtonProps> = ({
   const glowClass = isGlowActive ? "cta-ambient-glow" : "";
 
   const variants = {
-    primary: "border-transparent text-white bg-sage-primary hover:bg-sage-primary-hover shadow-sm hover:shadow",
-    secondary: "border border-sage-primary text-sage-primary bg-transparent hover:bg-sage-surface-2 hover:shadow-xs active:scale-[0.98]",
-    outline: "border border-sage-border text-sage-text bg-transparent hover:border-sage-primary hover:bg-sage-surface-2 active:scale-[0.98]",
+    primary: "border border-transparent text-white bg-sage-primary hover:bg-sage-primary-hover shadow-sm hover:shadow active:bg-sage-dark",
+    secondary: "border border-sage-primary text-sage-primary bg-transparent hover:bg-sage-surface-2 hover:shadow-xs active:bg-sage-soft",
+    outline: "border border-sage-border text-sage-text bg-transparent hover:border-sage-primary hover:bg-sage-surface-2 active:bg-sage-surface-2",
     text: "border-transparent text-sage-primary hover:text-sage-primary-hover px-0 rounded-none underline-offset-4 hover:underline md:hover:translate-y-0"
   };
 

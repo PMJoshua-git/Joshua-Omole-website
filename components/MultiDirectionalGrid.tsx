@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
+import { useAssembleCards } from '../hooks/useAssembleCards';
 
 interface MultiDirectionalGridProps {
   children: React.ReactNode[];
@@ -11,50 +12,10 @@ export const MultiDirectionalGrid: React.FC<MultiDirectionalGridProps> = ({
   className = '',
   gridClassName = 'grid grid-cols-1 lg:grid-cols-3 gap-8 items-start',
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isInView, setIsInView] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.matchMedia) {
-      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-      setPrefersReducedMotion(mediaQuery.matches);
-      const listener = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-      mediaQuery.addEventListener('change', listener);
-      return () => mediaQuery.removeEventListener('change', listener);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      setIsInView(true);
-      return;
-    }
-
-    const currentEl = containerRef.current;
-    if (!currentEl) return;
-
-    // 10% threshold as per specification
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsInView(true);
-          } else {
-            // Re-trigger animation every time section leaves/enters viewport
-            setIsInView(false);
-          }
-        });
-      },
-      {
-        threshold: 0.1,
-        rootMargin: '0px 0px -5% 0px',
-      }
-    );
-
-    observer.observe(currentEl);
-    return () => observer.disconnect();
-  }, [prefersReducedMotion]);
+  const { containerRef, isInView, prefersReducedMotion } = useAssembleCards({
+    threshold: 0.1,
+    rootMargin: '0px 0px -5% 0px',
+  });
 
   // Positions: 0 -> Left, 1 -> Center, 2 -> Right (cycles if > 3)
   const getDirectionClass = (index: number) => {

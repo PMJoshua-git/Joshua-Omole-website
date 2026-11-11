@@ -4,6 +4,7 @@ import Button from '../components/Button';
 import FadeIn from '../components/FadeIn';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import AnimatedCheckmarkList from '../components/animated/AnimatedCheckmarkList';
 
 const Services: React.FC = () => {
   return (
@@ -135,21 +136,17 @@ const Services: React.FC = () => {
               
               <div className="bg-sage-surface border border-sage-border p-8 md:p-10 rounded-xl shadow-soft hover:border-sage-primary/30 transition-all">
                 <h3 className="text-xl font-serif text-sage-text mb-8 border-b border-sage-border pb-4">What you get</h3>
-                <ul className="space-y-4">
-                  {[
+                <AnimatedCheckmarkList
+                  items={[
                     "Bottlenecks + root causes",
                     "What to fix, improve or remove",
                     "Required tools, resources + specialists",
                     "Cost implications",
                     "ROI / before-and-after view",
                     "Implementation roadmap"
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start">
-                      <CheckCircle2 className="w-5 h-5 text-sage-primary mr-3 flex-shrink-0 mt-0.5" />
-                      <span className="text-sage-muted font-medium">{item}</span>
-                    </li>
-                  ))}
-                </ul>
+                  ]}
+                  variant="circle-icon"
+                />
               </div>
             </div>
           </FadeIn>
@@ -161,21 +158,18 @@ const Services: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start bg-sage-surface-2 py-12 -mx-4 px-4 sm:mx-0 sm:px-12 rounded-2xl border border-sage-border">
               <div className="order-2 lg:order-1 bg-sage-surface border border-sage-border p-8 md:p-10 rounded-xl shadow-soft hover:border-sage-primary/30 transition-all">
                 <h3 className="text-xl font-serif text-sage-text mb-8 border-b border-sage-border pb-4">What you get</h3>
-                <ul className="space-y-4">
-                  {[
+                <AnimatedCheckmarkList
+                  items={[
                     "Project planning + execution",
                     "Specialist/vendor coordination",
                     "Internal workflow transition",
                     "Customer-facing workflow transition",
                     "Progress reporting",
                     "Outcome validation"
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start">
-                      <CheckCircle2 className="w-5 h-5 text-sage-accent mr-3 flex-shrink-0 mt-0.5" />
-                      <span className="text-sage-muted font-medium">{item}</span>
-                    </li>
-                  ))}
-                </ul>
+                  ]}
+                  variant="circle-icon"
+                  iconColor="#7C9A82"
+                />
               </div>
               
               <div className="order-1 lg:order-2">
@@ -221,20 +215,16 @@ const Services: React.FC = () => {
               
               <div className="bg-sage-surface border border-sage-border p-8 md:p-10 rounded-xl shadow-soft hover:border-sage-primary/30 transition-all">
                 <h3 className="text-xl font-serif text-sage-text mb-8 border-b border-sage-border pb-4">What's included</h3>
-                <ul className="space-y-4">
-                  {[
+                <AnimatedCheckmarkList
+                  items={[
                     "Process mapping + root cause analysis",
                     "Automation architecture",
                     "Build + implementation",
                     "Error handling + alerts",
                     "SOPs + team handoff"
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start">
-                      <CheckCircle2 className="w-5 h-5 text-sage-primary mr-3 flex-shrink-0 mt-0.5" />
-                      <span className="text-sage-muted font-medium">{item}</span>
-                    </li>
-                  ))}
-                </ul>
+                  ]}
+                  variant="circle-icon"
+                />
               </div>
             </div>
           </FadeIn>

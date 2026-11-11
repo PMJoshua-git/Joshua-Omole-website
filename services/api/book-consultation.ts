@@ -131,7 +131,7 @@ router.post('/', async (req, res) => {
     });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return res.status(400).json({ success: false, message: 'Validation error', errors: err.errors });
+      return res.status(400).json({ success: false, message: 'Validation error', errors: (err as any).issues || (err as any).errors });
     }
     console.error('Book Consultation Handler Error:', err);
     return res.status(500).json({ success: false, message: 'Internal server error' });

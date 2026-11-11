@@ -40,7 +40,7 @@ router.post('/', async (req, res) => {
     return res.status(200).json({ success: true, message: 'Training booking logged successfully' });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return res.status(400).json({ success: false, message: 'Validation error', errors: err.errors });
+      return res.status(400).json({ success: false, message: 'Validation error', errors: (err as any).issues || (err as any).errors });
     }
     console.error('Training Booking Handler Error:', err);
     return res.status(500).json({ success: false, message: 'Internal server error' });

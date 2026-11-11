@@ -11,6 +11,7 @@ export interface RevealOnScrollProps {
   className?: string;
   fullWidth?: boolean;
   as?: React.ElementType;
+  id?: string;
 }
 
 export const RevealOnScroll: React.FC<RevealOnScrollProps> = ({
@@ -24,6 +25,7 @@ export const RevealOnScroll: React.FC<RevealOnScrollProps> = ({
   className = '',
   fullWidth = false,
   as: Component = 'div',
+  id,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const domRef = useRef<HTMLDivElement>(null);
@@ -113,6 +115,7 @@ export const RevealOnScroll: React.FC<RevealOnScrollProps> = ({
   return (
     <Component
       ref={domRef}
+      id={id}
       style={dynamicStyle}
       className={`${fullWidth ? 'w-full' : ''} ${className}`}
     >

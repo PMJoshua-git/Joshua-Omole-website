@@ -9,6 +9,7 @@ import { useResources } from '../hooks/useResources';
 import { ResourcePublic } from '../types/resources';
 import ResourceCard from '../components/resources/ResourceCard';
 import GetCopyModal from '../components/resources/GetCopyModal';
+import AnimatedCheckmarkList from '../components/animated/AnimatedCheckmarkList';
 
 export const ResourceDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -205,18 +206,13 @@ export const ResourceDetail: React.FC = () => {
                     <h2 className="font-heading text-xl font-bold text-sage-text mb-4">
                       What's inside
                     </h2>
-                    <ul className="space-y-3">
-                      {resource.includes.map((item, idx) => (
-                        <li key={idx} className="flex items-start">
-                          <span className="w-5 h-5 rounded-full bg-sage-primary/10 text-sage-primary flex items-center justify-center shrink-0 mt-0.5 mr-3">
-                            <Check className="w-3.5 h-3.5" />
-                          </span>
-                          <span className="font-body text-sm sm:text-base text-sage-text/90 leading-relaxed">
-                            {item}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+                    <AnimatedCheckmarkList
+                      items={resource.includes}
+                      className="space-y-3"
+                      itemClassName="flex items-start"
+                      variant="circle-badge"
+                      textClassName="font-body text-sm sm:text-base text-sage-text/90 leading-relaxed"
+                    />
                   </div>
                 )}
 

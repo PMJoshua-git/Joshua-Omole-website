@@ -1,13 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronDown, ArrowUpRight } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Button from './Button';
+import { 
+  mobileMenuVariants, 
+  mobileMenuItemVariants, 
+  MOTION_EASINGS, 
+  MOTION_DURATIONS 
+} from '../utils/motion';
 
 const Navigation: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
   const [isResourcesMobileOpen, setIsResourcesMobileOpen] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
   
   const closeTimer = useRef<number | null>(null);
   const resourcesRef = useRef<HTMLDivElement>(null);
@@ -96,9 +104,12 @@ const Navigation: React.FC = () => {
       <header
         className={`
           sticky top-0 z-50 w-full
-          bg-sage-bg border-b border-sage-border
-          transition-shadow duration-200
-          ${isScrolled ? 'shadow-[0_1px_8px_rgba(0,0,0,0.06)]' : ''}
+          bg-sage-bg/95 backdrop-blur-md border-b
+          transition-[box-shadow,border-color,background-color] duration-200 ease-out
+          ${isScrolled 
+            ? 'shadow-[0_2px_12px_rgba(32,42,36,0.06)] border-sage-border bg-sage-bg/98' 
+            : 'border-sage-border/80'
+          }
         `}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -124,36 +135,50 @@ const Navigation: React.FC = () => {
               className="hidden lg:flex items-center gap-1"
               aria-label="Primary navigation"
             >
-              {primaryNavLinks.map(({ label, href }) => (
-                <Link
-                  key={href}
-                  to={href}
-                  className={`
-                    relative font-body text-sm px-3 py-1.5
-                    transition-colors duration-150 rounded-md
-                    active:scale-[0.98]
-                    focus-visible:outline-none
-                    focus-visible:ring-2
-                    focus-visible:ring-sage-primary
-                    focus-visible:ring-offset-1
-                    ${isActive(href)
-                      ? 'text-sage-primary font-medium'
-                      : 'text-sage-text hover:text-sage-primary'
-                    }
-                  `}
-                >
-                  {label}
-                  {/* Active underline indicator */}
-                  {isActive(href) && (
-                    <span
-                      className="absolute bottom-0 left-3 right-3
-                                 h-[2px] bg-sage-primary rounded-full
-                                 transition-all duration-200"
-                      aria-hidden="true"
-                    />
-                  )}
-                </Link>
-              ))}
+              {primaryNavLinks.map(({ label, href }) => {
+                const active = isActive(href);
+                return (
+                  <Link
+                    key={href}
+                    to={href}
+                    className={`
+                      relative font-body text-sm px-3 py-1.5
+                      transition-colors duration-150 rounded-md
+                      active:scale-[0.98]
+                      focus-visible:outline-none
+                      focus-visible:ring-2
+                      focus-visible:ring-sage-primary
+                      focus-visible:ring-offset-1
+                      ${active
+                        ? 'text-sage-primary font-medium'
+                        : 'text-sage-text hover:text-sage-primary'
+                      }
+                    `}
+                  >
+                    {label}
+                    {/* Active underline indicator with smooth layout animation */}
+                    {active && (
+                      shouldReduceMotion ? (
+                        <span
+                          className="absolute bottom-0 left-3 right-3 h-[2px] bg-sage-primary rounded-full"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <motion.span
+                          layoutId="activeNavIndicator"
+                          className="absolute bottom-0 left-3 right-3 h-[2px] bg-sage-primary rounded-full"
+                          transition={{
+                            type: 'spring',
+                            stiffness: 450,
+                            damping: 35,
+                          }}
+                          aria-hidden="true"
+                        />
+                      )
+                    )}
+                  </Link>
+                );
+              })}
 
               {/* ── Resources Dropdown (Desktop) ── */}
               <div
@@ -197,61 +222,78 @@ const Navigation: React.FC = () => {
                   />
                   {/* Active underline indicator */}
                   {isResourcesActive && (
-                    <span
-                      className="absolute bottom-0 left-3 right-3
-                                 h-[2px] bg-sage-primary rounded-full
-                                 transition-all duration-200"
-                      aria-hidden="true"
-                    />
+                    shouldReduceMotion ? (
+                      <span
+                        className="absolute bottom-0 left-3 right-3 h-[2px] bg-sage-primary rounded-full"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <motion.span
+                        layoutId="activeNavIndicator"
+                        className="absolute bottom-0 left-3 right-3 h-[2px] bg-sage-primary rounded-full"
+                        transition={{
+                          type: 'spring',
+                          stiffness: 450,
+                          damping: 35,
+                        }}
+                        aria-hidden="true"
+                      />
+                    )
                   )}
                 </button>
 
-                {/* Dropdown panel */}
-                {isResourcesOpen && (
-                  <div
-                    className="absolute left-0 top-full pt-2 z-50"
-                    onMouseEnter={openResources}
-                    onMouseLeave={scheduleClose}
-                  >
-                    <div
-                      role="menu"
-                      aria-label="Resources menu"
-                      className="w-72 bg-sage-surface border border-sage-border rounded-xl shadow-md p-2 animate-fade-in"
+                {/* Dropdown panel with AnimatePresence */}
+                <AnimatePresence>
+                  {isResourcesOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                      transition={{ duration: MOTION_DURATIONS.MICRO, ease: MOTION_EASINGS.easeOut }}
+                      className="absolute left-0 top-full pt-2 z-50"
+                      onMouseEnter={openResources}
+                      onMouseLeave={scheduleClose}
                     >
-                      {/* Item 1: Blog */}
-                      <a
-                        href="https://blog.joshuaomole.com"
-                        role="menuitem"
-                        className="block rounded-lg px-3 py-2.5 transition-colors hover:bg-sage-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-primary group"
+                      <div
+                        role="menu"
+                        aria-label="Resources menu"
+                        className="w-72 bg-sage-surface border border-sage-border rounded-xl shadow-md p-2"
                       >
-                        <div className="flex items-center justify-between">
-                          <span className="font-body text-sm font-medium text-sage-text group-hover:text-sage-primary transition-colors">
-                            Blog
-                          </span>
-                          <ArrowUpRight className="w-3.5 h-3.5 text-sage-muted group-hover:text-sage-primary transition-colors" />
-                        </div>
-                        <p className="font-body text-xs text-sage-muted mt-0.5">
-                          Articles on operations and systems
-                        </p>
-                      </a>
+                        {/* Item 1: Blog */}
+                        <a
+                          href="https://blog.joshuaomole.com"
+                          role="menuitem"
+                          className="block rounded-lg px-3 py-2.5 transition-colors hover:bg-sage-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-primary group"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-body text-sm font-medium text-sage-text group-hover:text-sage-primary transition-colors">
+                              Blog
+                            </span>
+                            <ArrowUpRight className="w-3.5 h-3.5 text-sage-muted group-hover:text-sage-primary transition-colors group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                          </div>
+                          <p className="font-body text-xs text-sage-muted mt-0.5">
+                            Articles on operations and systems
+                          </p>
+                        </a>
 
-                      {/* Item 2: Resources */}
-                      <Link
-                        to="/resources"
-                        role="menuitem"
-                        onClick={() => setIsResourcesOpen(false)}
-                        className="block rounded-lg px-3 py-2.5 transition-colors hover:bg-sage-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-primary group"
-                      >
-                        <div className="font-body text-sm font-medium text-sage-text group-hover:text-sage-primary transition-colors">
-                          Resources
-                        </div>
-                        <p className="font-body text-xs text-sage-muted mt-0.5">
-                          Free templates, guides and frameworks
-                        </p>
-                      </Link>
-                    </div>
-                  </div>
-                )}
+                        {/* Item 2: Resources */}
+                        <Link
+                          to="/resources"
+                          role="menuitem"
+                          onClick={() => setIsResourcesOpen(false)}
+                          className="block rounded-lg px-3 py-2.5 transition-colors hover:bg-sage-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-primary group"
+                        >
+                          <div className="font-body text-sm font-medium text-sage-text group-hover:text-sage-primary transition-colors">
+                            Resources
+                          </div>
+                          <p className="font-body text-xs text-sage-muted mt-0.5">
+                            Free templates, guides and frameworks
+                          </p>
+                        </Link>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Static Book Audit CTA button */}
@@ -277,7 +319,7 @@ const Navigation: React.FC = () => {
                          p-2 -mr-2 rounded-md
                          focus-visible:outline-none
                          focus-visible:ring-2
-                         focus-visible:ring-sage-primary"
+                         focus-visible:ring-sage-primary active:scale-[0.98]"
               aria-expanded={isMenuOpen}
               aria-controls="mobile-menu"
               aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
@@ -317,135 +359,154 @@ const Navigation: React.FC = () => {
           </div>
         </div>
 
-        {/* ─── Mobile drop panel ─── */}
-        {isMenuOpen && (
-          <div
-            id="mobile-menu"
-            className="lg:hidden border-t border-sage-border
-                       bg-sage-bg animate-fade-in"
-            role="navigation"
-            aria-label="Mobile navigation menu"
-          >
-            <div className="max-w-6xl mx-auto">
-              {primaryNavLinks.map(({ label, href }) => (
-                <Link
-                  key={href}
-                  to={href}
-                  className={`
-                    flex items-center min-h-[52px] px-5
-                    font-body text-sm
-                    border-b border-sage-border
-                    transition-colors duration-150
-                    focus-visible:outline-none
-                    focus-visible:ring-2
-                    focus-visible:ring-inset
-                    focus-visible:ring-sage-primary
-                    ${isActive(href)
-                      ? 'text-sage-primary font-medium bg-sage-surface-2'
-                      : 'text-sage-text hover:bg-sage-surface-2'
-                    }
-                  `}
-                >
-                  {/* Active left border indicator */}
-                  <span
-                    className={`
-                      w-[3px] h-[18px] rounded-full mr-4 flex-shrink-0
-                      transition-colors
-                      ${isActive(href) ? 'bg-sage-primary' : 'bg-transparent'}
-                    `}
-                    aria-hidden="true"
-                  />
-                  {label}
-                </Link>
-              ))}
+        {/* ─── Mobile drop panel with AnimatePresence ─── */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              id="mobile-menu"
+              initial={shouldReduceMotion ? { opacity: 0 } : "closed"}
+              animate={shouldReduceMotion ? { opacity: 1 } : "open"}
+              exit={shouldReduceMotion ? { opacity: 0 } : "closed"}
+              variants={mobileMenuVariants}
+              className="lg:hidden border-t border-sage-border bg-sage-bg overflow-hidden shadow-lg"
+              role="navigation"
+              aria-label="Mobile navigation menu"
+            >
+              <div className="max-w-6xl mx-auto py-1">
+                {primaryNavLinks.map(({ label, href }) => {
+                  const active = isActive(href);
+                  return (
+                    <motion.div key={href} variants={mobileMenuItemVariants}>
+                      <Link
+                        to={href}
+                        onClick={() => setIsMenuOpen(false)}
+                        className={`
+                          flex items-center min-h-[52px] px-5
+                          font-body text-sm
+                          border-b border-sage-border/60
+                          transition-colors duration-150
+                          focus-visible:outline-none
+                          focus-visible:ring-2
+                          focus-visible:ring-inset
+                          focus-visible:ring-sage-primary
+                          ${active
+                            ? 'text-sage-primary font-medium bg-sage-surface-2'
+                            : 'text-sage-text hover:bg-sage-surface-2'
+                          }
+                        `}
+                      >
+                        {/* Active left border indicator */}
+                        <span
+                          className={`
+                            w-[3px] h-[18px] rounded-full mr-4 flex-shrink-0
+                            transition-colors
+                            ${active ? 'bg-sage-primary' : 'bg-transparent'}
+                          `}
+                          aria-hidden="true"
+                        />
+                        {label}
+                      </Link>
+                    </motion.div>
+                  );
+                })}
 
-              {/* ── Mobile Resources Accordion ── */}
-              <div className="border-b border-sage-border">
-                <button
-                  type="button"
-                  onClick={() => setIsResourcesMobileOpen((prev) => !prev)}
-                  aria-expanded={isResourcesMobileOpen}
-                  aria-controls="mobile-resources-accordion"
-                  className={`
-                    w-full flex items-center justify-between min-h-[52px] px-5
-                    font-body text-sm text-left
-                    transition-colors duration-150
-                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sage-primary
-                    ${isResourcesActive
-                      ? 'text-sage-primary font-medium bg-sage-surface-2'
-                      : 'text-sage-text hover:bg-sage-surface-2'
-                    }
-                  `}
-                >
-                  <div className="flex items-center">
-                    {/* Active left border indicator */}
-                    <span
-                      className={`
-                        w-[3px] h-[18px] rounded-full mr-4 flex-shrink-0
-                        transition-colors
-                        ${isResourcesActive ? 'bg-sage-primary' : 'bg-transparent'}
-                      `}
+                {/* ── Mobile Resources Accordion ── */}
+                <motion.div variants={mobileMenuItemVariants} className="border-b border-sage-border/60">
+                  <button
+                    type="button"
+                    onClick={() => setIsResourcesMobileOpen((prev) => !prev)}
+                    aria-expanded={isResourcesMobileOpen}
+                    aria-controls="mobile-resources-accordion"
+                    className={`
+                      w-full flex items-center justify-between min-h-[52px] px-5
+                      font-body text-sm text-left
+                      transition-colors duration-150 cursor-pointer
+                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sage-primary
+                      ${isResourcesActive
+                        ? 'text-sage-primary font-medium bg-sage-surface-2'
+                        : 'text-sage-text hover:bg-sage-surface-2'
+                      }
+                    `}
+                  >
+                    <div className="flex items-center">
+                      {/* Active left border indicator */}
+                      <span
+                        className={`
+                          w-[3px] h-[18px] rounded-full mr-4 flex-shrink-0
+                          transition-colors
+                          ${isResourcesActive ? 'bg-sage-primary' : 'bg-transparent'}
+                        `}
+                        aria-hidden="true"
+                      />
+                      <span>Resources</span>
+                    </div>
+                    <ChevronDown
+                      className={`w-4 h-4 text-sage-muted transition-transform duration-200 ${
+                        isResourcesMobileOpen ? 'rotate-180' : 'rotate-0'
+                      }`}
                       aria-hidden="true"
                     />
-                    <span>Resources</span>
-                  </div>
-                  <ChevronDown
-                    className={`w-4 h-4 text-sage-muted transition-transform duration-200 ${
-                      isResourcesMobileOpen ? 'rotate-180' : 'rotate-0'
-                    }`}
-                    aria-hidden="true"
-                  />
-                </button>
+                  </button>
 
-                {/* Sub-links */}
-                {isResourcesMobileOpen && (
-                  <div id="mobile-resources-accordion" className="bg-sage-surface-2/40 border-t border-sage-border/50">
-                    {/* Blog link */}
-                    <a
-                      href="https://blog.joshuaomole.com"
-                      className="flex flex-col justify-center min-h-[48px] pl-12 pr-5 py-2.5 border-b border-sage-border/40 hover:bg-sage-surface-2 transition-colors"
-                    >
-                      <div className="flex items-center gap-1 font-body text-sm font-medium text-sage-text">
-                        <span>Blog</span>
-                        <ArrowUpRight className="w-3.5 h-3.5 text-sage-muted" />
-                      </div>
-                      <span className="font-body text-xs text-sage-muted">
-                        Articles on operations and systems
-                      </span>
-                    </a>
+                  {/* Sub-links with AnimatePresence */}
+                  <AnimatePresence>
+                    {isResourcesMobileOpen && (
+                      <motion.div
+                        id="mobile-resources-accordion"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: MOTION_DURATIONS.STANDARD, ease: MOTION_EASINGS.easeOut }}
+                        className="bg-sage-surface-2/50 border-t border-sage-border/50 overflow-hidden"
+                      >
+                        {/* Blog link */}
+                        <a
+                          href="https://blog.joshuaomole.com"
+                          className="flex flex-col justify-center min-h-[48px] pl-12 pr-5 py-2.5 border-b border-sage-border/40 hover:bg-sage-surface-2 transition-colors"
+                        >
+                          <div className="flex items-center gap-1 font-body text-sm font-medium text-sage-text">
+                            <span>Blog</span>
+                            <ArrowUpRight className="w-3.5 h-3.5 text-sage-muted" />
+                          </div>
+                          <span className="font-body text-xs text-sage-muted">
+                            Articles on operations and systems
+                          </span>
+                        </a>
 
-                    {/* Resources link */}
-                    <Link
-                      to="/resources"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="flex flex-col justify-center min-h-[48px] pl-12 pr-5 py-2.5 hover:bg-sage-surface-2 transition-colors"
-                    >
-                      <span className="font-body text-sm font-medium text-sage-text">
-                        Resources
-                      </span>
-                      <span className="font-body text-xs text-sage-muted">
-                        Free templates, guides and frameworks
-                      </span>
-                    </Link>
-                  </div>
-                )}
+                        {/* Resources link */}
+                        <Link
+                          to="/resources"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="flex flex-col justify-center min-h-[48px] pl-12 pr-5 py-2.5 hover:bg-sage-surface-2 transition-colors"
+                        >
+                          <span className="font-body text-sm font-medium text-sage-text">
+                            Resources
+                          </span>
+                          <span className="font-body text-xs text-sage-muted">
+                            Free templates, guides and frameworks
+                          </span>
+                        </Link>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+
+                {/* Mobile CTA */}
+                <motion.div variants={mobileMenuItemVariants} className="p-4">
+                  <Button
+                    to="/audit"
+                    variant="primary"
+                    size="default"
+                    className="w-full justify-center font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Book Audit
+                  </Button>
+                </motion.div>
               </div>
-
-              {/* Mobile CTA */}
-              <div className="p-4">
-                <Button
-                  to="/audit"
-                  variant="primary"
-                  size="default"
-                  className="w-full justify-center font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Book Audit
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
     </>
   );

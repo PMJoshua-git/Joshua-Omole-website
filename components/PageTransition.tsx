@@ -1,4 +1,6 @@
 import React from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { pageVariants } from '../utils/motion';
 
 interface PageTransitionProps {
   children: React.ReactNode;
@@ -6,10 +8,22 @@ interface PageTransitionProps {
 }
 
 export const PageTransition: React.FC<PageTransitionProps> = ({ children, className = '' }) => {
+  const shouldReduceMotion = useReducedMotion();
+
+  if (shouldReduceMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
-    <div className={`animate-page-fade ${className}`}>
+    <motion.div
+      variants={pageVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      className={className}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 };
 

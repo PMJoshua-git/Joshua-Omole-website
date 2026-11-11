@@ -21,12 +21,23 @@ import {
   Mail,
   ShieldCheck,
   CheckCircle2,
-  ChevronDown
+  ChevronDown,
+  Truck,
+  Factory,
+  Building2,
+  ShoppingBag,
+  Store,
+  Briefcase,
+  Activity,
+  Landmark,
+  Users,
+  Megaphone
 } from 'lucide-react';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const [expandedTestimonial, setExpandedTestimonial] = React.useState<number | null>(null);
+  const [activeBridgeStep, setActiveBridgeStep] = React.useState<number | null>(null);
   const [imageIndex, setImageIndex] = React.useState(0);
   const [selectedResourceModal, setSelectedResourceModal] = React.useState<ResourcePublic | null>(null);
   const imageSources = [
@@ -56,6 +67,20 @@ const Home: React.FC = () => {
   const latestResources = resources
     .filter(r => r.status === 'published')
     .slice(0, 3);
+
+  const industriesMarquee = [
+    { name: "SaaS & Tech", icon: <Cpu className="w-3.5 h-3.5" /> },
+    { name: "E-Commerce", icon: <ShoppingBag className="w-3.5 h-3.5" /> },
+    { name: "Retail", icon: <Store className="w-3.5 h-3.5" /> },
+    { name: "Professional Services", icon: <Briefcase className="w-3.5 h-3.5" /> },
+    { name: "Healthcare Clinics", icon: <Activity className="w-3.5 h-3.5" /> },
+    { name: "Logistics & Supply Chain", icon: <Truck className="w-3.5 h-3.5" /> },
+    { name: "Financial Services", icon: <Landmark className="w-3.5 h-3.5" /> },
+    { name: "Digital Agencies & Studios", icon: <Layers className="w-3.5 h-3.5" /> },
+    { name: "Real Estate", icon: <Building2 className="w-3.5 h-3.5" /> },
+    { name: "B2B Agencies", icon: <Users className="w-3.5 h-3.5" /> },
+    { name: "B2C Agencies", icon: <Megaphone className="w-3.5 h-3.5" /> }
+  ];
 
   return (
     <>
@@ -95,8 +120,8 @@ const Home: React.FC = () => {
                   <Button to="/audit" variant="primary" size="large" className="group justify-center">
                     Book a Free Clarity Audit <ArrowUpRight className="ml-2 w-5 h-5 group-hover:rotate-45 transition-transform" />
                   </Button>
-                  <Button to="/services" variant="secondary" size="large" className="justify-center">
-                    See My Work
+                  <Button to="/business-workflow-fixes" variant="secondary" size="large" className="justify-center">
+                    Fix a workflow
                   </Button>
                 </div>
               </FadeIn>
@@ -122,6 +147,63 @@ const Home: React.FC = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-sage-bg/10 via-transparent to-transparent pointer-events-none"></div>
                 </div>
               </FadeIn>
+            </div>
+          </div>
+        </section>
+
+        {/* SLEEK INFINITE MARQUEE TICKER — INDUSTRIES SERVED */}
+        <section className="border-y border-sage-border/60 bg-sage-surface/40 backdrop-blur-xs py-7 sm:py-8 relative z-10 overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4 sm:mb-5 text-center">
+            <p className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.18em] text-sage-muted font-medium">
+              Industries Served · Systems Thinking &amp; Operational Architecture
+            </p>
+          </div>
+
+          {/* Marquee Wrapper with left/right linear gradient fade mask */}
+          <div
+            className="relative w-full overflow-hidden"
+            style={{
+              maskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)'
+            }}
+          >
+            {/* Left Edge Fade Overlay */}
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-28 z-20 bg-gradient-to-r from-sage-bg via-sage-bg/80 to-transparent" />
+            
+            {/* Right Edge Fade Overlay */}
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-28 z-20 bg-gradient-to-l from-sage-bg via-sage-bg/80 to-transparent" />
+
+            {/* Continuous Seamless Scrolling Track */}
+            <div className="animate-marquee-infinite py-1 flex items-center gap-3 sm:gap-4 select-none">
+              {/* Primary Loop */}
+              <div className="flex shrink-0 items-center gap-3 sm:gap-4">
+                {industriesMarquee.map((item, idx) => (
+                  <div
+                    key={`industry-a-${idx}`}
+                    className="group/pill inline-flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full bg-sage-surface border border-sage-border text-sage-text hover:border-sage-primary hover:text-sage-primary hover:bg-sage-surface-2 transition-all duration-200 cursor-default shadow-2xs text-xs sm:text-sm font-medium whitespace-nowrap"
+                  >
+                    <span className="text-sage-primary group-hover/pill:scale-110 transition-transform duration-200">
+                      {item.icon}
+                    </span>
+                    <span>{item.name}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Duplicate Loop for Gap-free Infinite Reset */}
+              <div className="flex shrink-0 items-center gap-3 sm:gap-4" aria-hidden="true">
+                {industriesMarquee.map((item, idx) => (
+                  <div
+                    key={`industry-b-${idx}`}
+                    className="group/pill inline-flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full bg-sage-surface border border-sage-border text-sage-text hover:border-sage-primary hover:text-sage-primary hover:bg-sage-surface-2 transition-all duration-200 cursor-default shadow-2xs text-xs sm:text-sm font-medium whitespace-nowrap"
+                  >
+                    <span className="text-sage-primary group-hover/pill:scale-110 transition-transform duration-200">
+                      {item.icon}
+                    </span>
+                    <span>{item.name}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -394,7 +476,53 @@ const Home: React.FC = () => {
             </FadeIn>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          {/* Interactive BRIDGE Stage Tracker */}
+          <div className="relative mb-8 hidden lg:block">
+            <div className="max-w-4xl mx-auto relative px-8">
+              {/* Connecting Background Rail */}
+              <div className="absolute top-1/2 left-10 right-10 -translate-y-1/2 h-[2px] bg-sage-border/80 z-0" />
+              {/* Active Connecting Scrub Line */}
+              <div 
+                className="absolute top-1/2 left-10 -translate-y-1/2 h-[2px] bg-sage-primary transition-all duration-300 ease-out z-0"
+                style={{
+                  width: activeBridgeStep !== null 
+                    ? `calc(${(activeBridgeStep / 4) * 100}% * 0.9 + 2%)` 
+                    : '100%',
+                  opacity: activeBridgeStep !== null ? 1 : 0.35
+                }}
+              />
+              {/* Stepper Dots */}
+              <div className="relative z-10 flex justify-between items-center">
+                {['B', 'R', 'I', 'D', 'G'].map((letter, idx) => {
+                  const isActive = activeBridgeStep === idx;
+                  const isPassed = activeBridgeStep !== null && activeBridgeStep >= idx;
+                  return (
+                    <button
+                      key={letter}
+                      type="button"
+                      onClick={() => setActiveBridgeStep(idx)}
+                      onMouseEnter={() => setActiveBridgeStep(idx)}
+                      className={`group flex items-center justify-center w-8 h-8 rounded-full text-xs font-mono font-bold transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-primary ${
+                        isActive
+                          ? 'bg-sage-primary text-white scale-110 shadow-sm ring-4 ring-sage-primary/15'
+                          : isPassed
+                            ? 'bg-sage-soft text-sage-primary border border-sage-primary/40'
+                            : 'bg-sage-surface text-sage-muted border border-sage-border hover:border-sage-primary hover:text-sage-primary'
+                      }`}
+                      aria-label={`Focus BRIDGE stage ${letter}`}
+                    >
+                      {letter}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6"
+            onMouseLeave={() => setActiveBridgeStep(null)}
+          >
             {[
               {
                 letter: "B",
@@ -421,17 +549,43 @@ const Home: React.FC = () => {
                 name: "Governance",
                 desc: "Make sure the system keeps working. Define protocols to prevent operational drift as you scale."
               }
-            ].map((step, idx) => (
-              <FadeIn key={idx} delay={idx * 100} className="h-full">
-                <div className="bg-sage-surface p-8 rounded-xl border border-sage-border shadow-soft h-full flex flex-col hover:border-sage-primary/30 transition-all duration-300">
-                  <div className="text-4xl font-bold font-serif text-sage-primary mb-3">
-                    {step.letter}
+            ].map((step, idx) => {
+              const isActive = activeBridgeStep === idx;
+              return (
+                <FadeIn key={idx} delay={idx * 80} className="h-full">
+                  <div 
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setActiveBridgeStep(idx)}
+                    onMouseEnter={() => setActiveBridgeStep(idx)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setActiveBridgeStep(idx);
+                      }
+                    }}
+                    className={`p-8 rounded-xl border shadow-soft h-full flex flex-col transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-primary select-none ${
+                      isActive
+                        ? 'bg-sage-surface border-sage-primary ring-1 ring-sage-primary/30 -translate-y-1 shadow-md'
+                        : 'bg-sage-surface border-sage-border hover:border-sage-primary/40 hover:-translate-y-0.5'
+                    }`}
+                  >
+                    <div className={`text-4xl font-bold font-serif mb-3 transition-colors duration-200 ${
+                      isActive ? 'text-sage-primary' : 'text-sage-primary/80'
+                    }`}>
+                      {step.letter}
+                    </div>
+                    <h3 className="text-lg font-serif font-bold text-sage-text mb-2 flex items-center justify-between">
+                      <span>{step.name}</span>
+                      {isActive && (
+                        <span className="w-2 h-2 rounded-full bg-sage-primary" aria-hidden="true" />
+                      )}
+                    </h3>
+                    <p className="text-sage-sec text-xs leading-relaxed">{step.desc}</p>
                   </div>
-                  <h3 className="text-lg font-serif font-bold text-sage-text mb-2">{step.name}</h3>
-                  <p className="text-sage-sec text-xs leading-relaxed">{step.desc}</p>
-                </div>
-              </FadeIn>
-            ))}
+                </FadeIn>
+              );
+            })}
           </div>
         </section>
 

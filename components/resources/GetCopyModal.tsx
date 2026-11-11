@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { ResourcePublic } from '../../types/resources';
 import { getAttributionData } from '../../utils/attribution';
 
@@ -173,15 +174,23 @@ export const GetCopyModal: React.FC<GetCopyModalProps> = ({ resource, onClose })
       aria-labelledby="get-copy-modal-title"
     >
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-sage-text/40 transition-opacity"
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed inset-0 bg-sage-text/40 backdrop-blur-[2px]"
         onClick={handleClose}
         aria-hidden="true"
       />
 
       {/* Modal Dialog (Bottom sheet on mobile, centered card on sm+) */}
-      <div
+      <motion.div
         ref={modalRef}
+        initial={{ opacity: 0, scale: 0.98, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.98, y: 4 }}
+        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
         className="relative z-10 w-full sm:max-w-md bg-sage-surface border border-sage-border shadow-lg rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8"
       >
         {/* Close Button */}
@@ -329,7 +338,7 @@ export const GetCopyModal: React.FC<GetCopyModalProps> = ({ resource, onClose })
             </form>
           </div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 };
