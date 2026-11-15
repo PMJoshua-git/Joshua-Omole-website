@@ -1,7 +1,10 @@
 {
   "functions": {
+    "api/**/*.ts": {
+      "includeFiles": "server/**"
+    },
     "api/ssr-meta.ts": {
-      "includeFiles": "dist/index.html"
+      "includeFiles": ["dist/index.html", "server/**"]
     }
   },
   "rewrites": [

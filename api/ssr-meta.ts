@@ -52,13 +52,25 @@ export default async function handler(req: any, res: any) {
         : req.url || '/';
 
     const template = await loadIndexHtmlTemplate(req);
-    const html = injectPageMetaIntoHtml(template, rawPath);
+    let html = template;
+    try {
+      html = injectPageMetaIntoHtml(template, rawPath);
+    } catch (metaErr: any) {
+      console.error('[SSR Meta] Meta tag injection failed; falling back to clean template:', metaErr?.message || metaErr);
+    }
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
     return res.status(200).send(html);
   } catch (err: any) {
-    console.error('[SSR Meta] Failed to inject meta tags:', err?.message || err);
-    return res.status(500).send('Unable to render page');
+    console.error('[SSR Meta] Critical error rendering page, falling back to static index.html:', err?.message || err);
+    try {
+      const fallbackTemplate = await loadIndexHtmlTemplate(req);
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(fallbackTemplate);
+    } catch (fallbackErr: any) {
+      console.error('[SSR Meta] Fallback index.html loading failed:', fallbackErr?.message || fallbackErr);
+      return res.status(200).send('<!DOCTYPE html><html><head><title>Clarity Map</title></head><body><div id="root"></div></body></html>');
+    }
   }
 }
