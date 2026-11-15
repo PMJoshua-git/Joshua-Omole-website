@@ -4,7 +4,7 @@
       "includeFiles": "server/**"
     },
     "api/ssr-meta.ts": {
-      "includeFiles": ["dist/index.html", "server/**"]
+      "includeFiles": "{dist/index.html,server/**}"
     }
   },
   "rewrites": [
