@@ -449,6 +449,13 @@ const BusinessWorkflowFixes: React.FC = () => {
       <Helmet>
         <title>Business Workflow Fixes | Joshua Omole</title>
         <meta name="description" content="Fix the small operational leaks that cost your business leads, sales, and time with custom, lightweight automations." />
+        <meta property="og:title" content="Business Workflow Fixes | Joshua Omole" />
+        <meta property="og:description" content="Fix the small operational leaks that cost your business leads, sales, and time with custom, lightweight automations." />
+        <meta property="og:url" content="https://joshuaomole.com/business-workflow-fixes" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="Business Workflow Fixes | Joshua Omole" />
+        <meta name="twitter:description" content="Fix the small operational leaks that cost your business leads, sales, and time with custom, lightweight automations." />
+        <link rel="canonical" href="https://joshuaomole.com/business-workflow-fixes" />
       </Helmet>
 
       <Layout>

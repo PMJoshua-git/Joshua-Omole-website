@@ -13,6 +13,7 @@ import FadeIn from '../components/FadeIn';
 import Layout from '../components/Layout';
 import QuoteBlock from '../components/QuoteBlock';
 import Button from '../components/Button';
+import { Helmet } from 'react-helmet-async';
 
 interface ConnectCardProps {
     title: string;
@@ -89,6 +90,17 @@ const Connect: React.FC = () => {
     }, []);
 
     return (
+        <>
+        <Helmet>
+            <title>Connect &amp; Resources | Joshua Omole</title>
+            <meta name="description" content="Book consultation calls, access operational training, register for live workshops, and sign up for the weekly newsletter with Joshua Omole." />
+            <meta property="og:title" content="Connect & Resources | Joshua Omole" />
+            <meta property="og:description" content="Book consultation calls, access operational training, register for live workshops, and sign up for the weekly newsletter with Joshua Omole." />
+            <meta property="og:url" content="https://joshuaomole.com/connect" />
+            <meta name="twitter:title" content="Connect & Resources | Joshua Omole" />
+            <meta name="twitter:description" content="Book consultation calls, access operational training, register for live workshops, and sign up for the weekly newsletter with Joshua Omole." />
+            <link rel="canonical" href="https://joshuaomole.com/connect" />
+        </Helmet>
         <Layout>
             <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 pt-12 pb-24 relative">
                 
@@ -212,6 +224,7 @@ const Connect: React.FC = () => {
 
             </div>
         </Layout>
+        </>
     );
 };
 

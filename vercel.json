@@ -1,12 +1,21 @@
 {
+  "functions": {
+    "api/ssr-meta.ts": {
+      "includeFiles": "dist/index.html"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/api/$1"
     },
     {
-      "source": "/((?!api).*)",
-      "destination": "/index.html"
+      "source": "/",
+      "destination": "/api/ssr-meta?path=/"
+    },
+    {
+      "source": "/((?!api/|assets/|images/|favicon\\.svg|og-image\\.svg|.*\\.[a-zA-Z0-9]{1,8}$).*)",
+      "destination": "/api/ssr-meta?path=/$1"
     }
   ]
 }

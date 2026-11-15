@@ -11,7 +11,9 @@ import Newsletter from './pages/Newsletter';
 import KnowledgeHub from './pages/KnowledgeHub';
 import ResourceDetail from './pages/ResourceDetail';
 import BusinessWorkflowFixes from './pages/BusinessWorkflowFixes';
+import ClarityMap from './pages/ClarityMap';
 import FloatingAssistant from './components/FloatingAssistant';
+import ClarityMapPopup from './components/ClarityMapPopup';
 import { captureAttributionData } from './utils/attribution';
 
 const TITLE_MAP: Record<string, string> = {
@@ -27,6 +29,7 @@ const TITLE_MAP: Record<string, string> = {
   "/knowledge-hub": "Resources | Joshua Omole",
   "/knowledge": "Resources | Joshua Omole",
   "/business-workflow-fixes": "Business Workflow Fixes | Joshua Omole",
+  "/clarity-map": "Clarity Map | Interactive Business Workflow Diagnostic | Joshua Omole",
 };
 
 const PageTitleUpdater = () => {
@@ -81,7 +84,9 @@ const App: React.FC = () => {
         <Route path="/knowledge-hub" element={<Navigate to="/resources" replace />} />
         <Route path="/knowledge" element={<Navigate to="/resources" replace />} />
         <Route path="/business-workflow-fixes" element={<BusinessWorkflowFixes />} />
+        <Route path="/clarity-map" element={<ClarityMap />} />
       </Routes>
+      <ClarityMapPopup />
     </Router>
   );
 };

@@ -1,0 +1,430 @@
+[
+  {
+    "process_code": "EC-01",
+    "process_name": "Order processing to fulfilment",
+    "industry_id": "ecommerce",
+    "industry_name": "E-Commerce",
+    "work_area": "Fulfilment Operations",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Validate paid orders, allocate stock, pick and pack items, dispatch parcels, and send tracking updates.",
+    "typical_lifecycle": [
+      "Receive paid order",
+      "Validate",
+      "Allocate stock",
+      "Pick and pack",
+      "Dispatch",
+      "Notify customer",
+      "Track delivery"
+    ],
+    "questions": [
+      {
+        "qid": "EC01_Q1",
+        "stage": "Order Intake & Validation",
+        "question": "Which channels create orders and where do new orders first appear?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Online storefront (Shopify / WooCommerce / custom)",
+          "Marketplaces (Amazon / Etsy / eBay)",
+          "Social DM / WhatsApp / Instagram",
+          "Phone or manual invoice orders",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC01_Q2",
+        "stage": "Order Intake & Validation",
+        "question": "What checks happen before an order is released for fulfilment?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Payment clearance check",
+          "Shipping address validation",
+          "Fraud risk flag check",
+          "Stock availability verification",
+          "None — paid orders print straight into packing",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC01_Q3",
+        "stage": "Picking & Packing",
+        "question": "How do staff know which location or warehouse should fulfil the order?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Single warehouse / stock room",
+          "System routing rule by stock or postcode",
+          "Manager checks stock spreadsheets and assigns manually",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC01_Q4",
+        "stage": "Picking & Packing",
+        "question": "How are picking lists created and how are picked items checked against the order?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Barcode scan verification against order system",
+          "Printed packing slips checked visually by packer",
+          "Staff read orders straight from screen/phone with no formal double-check",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC01_Q5",
+        "stage": "Dispatch & Tracking",
+        "question": "Who packs, labels and hands the parcel to the carrier?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Fulfilment assistant packs, prints shipping label manually, and hands to courier..."
+      },
+      {
+        "qid": "EC01_Q6",
+        "stage": "Dispatch & Tracking",
+        "question": "How is dispatch confirmation and tracking information sent to the customer?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Triggered automatically when label is generated or scanned",
+          "Staff copy tracking numbers manually into storefront or emails",
+          "Only sent if the customer asks",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC01_Q7",
+        "stage": "Dispatch & Tracking",
+        "question": "What happens when stock is unavailable, an address is wrong, payment is held or dispatch fails?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Order sits aside in an exception tray while customer support emails the buyer..."
+      }
+    ]
+  },
+  {
+    "process_code": "EC-02",
+    "process_name": "Inventory replenishment",
+    "industry_id": "ecommerce",
+    "industry_name": "E-Commerce",
+    "work_area": "Supply & Stock Control",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Monitor stock levels, calculate reorder quantities, issue supplier POs, inspect goods, and update inventory.",
+    "typical_lifecycle": [
+      "Monitor stock",
+      "Set reorder trigger",
+      "Confirm demand",
+      "Raise purchase order",
+      "Receive and inspect goods",
+      "Update inventory"
+    ],
+    "questions": [
+      {
+        "qid": "EC02_Q1",
+        "stage": "Monitoring & Demand",
+        "question": "How do you currently know which items need replenishment?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Automated low-stock alerts from inventory system",
+          "Weekly manual review of sales vs stock spreadsheet",
+          "Warehouse staff notice shelves running low or items go out of stock",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC02_Q2",
+        "stage": "Monitoring & Demand",
+        "question": "Are reorder points or minimum stock levels defined, and who maintains them?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Yes — defined per SKU and reviewed regularly by ops/buyer",
+          "Rough mental rules or outdated minimums in a spreadsheet",
+          "No minimum stock levels defined",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC02_Q3",
+        "stage": "Ordering & Approval",
+        "question": "How do you check demand, lead time and available cash before ordering?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Operations lead checks 30-day sales history and asks finance/owner if budget is available..."
+      },
+      {
+        "qid": "EC02_Q4",
+        "stage": "Ordering & Approval",
+        "question": "Who selects or approves suppliers and purchase quantities?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Buyer raises PO; owner/finance approves before sending",
+          "Owner handles both selection and ordering directly",
+          "Inventory coordinator reorders approved SKUs up to a threshold",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC02_Q5",
+        "stage": "Goods Receipt",
+        "question": "How are deliveries checked against the order and discrepancies recorded?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Counted against purchase order with discrepancy log sent to supplier",
+          "Quick visual check against packing slip; variances noted casually",
+          "Boxes put straight on shelves without formal count",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC02_Q6",
+        "stage": "Goods Receipt",
+        "question": "When is received stock made available for sale, and who updates the stock record?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Warehouse assistant updates stock count in storefront the same day or next morning..."
+      },
+      {
+        "qid": "EC02_Q7",
+        "stage": "Goods Receipt",
+        "question": "How do you handle damaged, short, excess or slow-moving stock?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Damaged units quarantined and emailed to supplier; slow movers discounted ad hoc..."
+      }
+    ]
+  },
+  {
+    "process_code": "EC-03",
+    "process_name": "Returns, refunds and exchanges",
+    "industry_id": "ecommerce",
+    "industry_name": "E-Commerce",
+    "work_area": "Post-Purchase Care",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Approve return requests, inspect inbound parcels, decide disposition, and reconcile refunds and inventory.",
+    "typical_lifecycle": [
+      "Receive request",
+      "Check policy",
+      "Approve",
+      "Receive item",
+      "Inspect",
+      "Decide disposition",
+      "Refund or exchange",
+      "Update stock and customer"
+    ],
+    "questions": [
+      {
+        "qid": "EC03_Q1",
+        "stage": "Request & Eligibility",
+        "question": "How does a customer request a return and what information is captured?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Self-service returns portal collecting order ID, item, reason, and photos",
+          "Customer emails or messages support with order details",
+          "Items simply arrive back in the post with a paper note",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC03_Q2",
+        "stage": "Request & Eligibility",
+        "question": "Who checks eligibility against the returns policy?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Automated rules in returns portal",
+          "Customer service agent checks order date & policy manually",
+          "Manager reviews each request",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC03_Q3",
+        "stage": "Request & Eligibility",
+        "question": "What exceptions require a manager's decision?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Late returns past 30 days, high-value claims, damaged without photos..."
+      },
+      {
+        "qid": "EC03_Q4",
+        "stage": "Receipt & Inspection",
+        "question": "How is the returned item received and inspected, and who records its condition?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Warehouse packer opens parcel, inspects condition, and messages support on Slack..."
+      },
+      {
+        "qid": "EC03_Q5",
+        "stage": "Receipt & Inspection",
+        "question": "Who decides whether it is restocked, repaired, written off or exchanged?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Warehouse staff using written grading rules",
+          "Warehouse asks manager or founder case by case",
+          "No fixed grading — usually put back on shelf if unopened",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC03_Q6",
+        "stage": "Resolution & Reconciliation",
+        "question": "Who authorises and processes the refund or replacement?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Support agent after warehouse confirmation",
+          "Finance / manager must approve all refunds",
+          "Triggered automatically on carrier scan",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC03_Q7",
+        "stage": "Resolution & Reconciliation",
+        "question": "How are inventory, payment records and customer updates reconciled after resolution?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Storefront restocks SKU on refund, though damaged stock adjustments happen manually later..."
+      }
+    ]
+  },
+  {
+    "process_code": "EC-04",
+    "process_name": "Customer enquiry and complaint resolution",
+    "industry_id": "ecommerce",
+    "industry_name": "E-Commerce",
+    "work_area": "Customer Support",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Consolidate customer tickets across channels, investigate order issues, resolve complaints, and log recurring themes.",
+    "typical_lifecycle": [
+      "Capture query",
+      "Identify order/customer",
+      "Classify",
+      "Assign",
+      "Investigate",
+      "Resolve",
+      "Communicate",
+      "Learn"
+    ],
+    "questions": [
+      {
+        "qid": "EC04_Q1",
+        "stage": "Intake & Triage",
+        "question": "Which channels receive customer questions and complaints?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Helpdesk / support email",
+          "Live chat",
+          "Instagram / Facebook DMs & comments",
+          "WhatsApp / SMS",
+          "Phone",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC04_Q2",
+        "stage": "Intake & Triage",
+        "question": "What details are needed to identify the order and understand the issue?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Order number",
+          "Email address used at checkout",
+          "Photos of damaged/wrong item",
+          "Delivery postcode",
+          "Often missing — support has to ask back and forth",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC04_Q3",
+        "stage": "Intake & Triage",
+        "question": "How are enquiries prioritised and assigned to the right person?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Tagged and routed automatically in helpdesk",
+          "Team lead triages inbox manually each morning",
+          "Whoever logs in picks up messages from each separate app",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC04_Q4",
+        "stage": "Investigation & Approval",
+        "question": "What response-time expectations exist for different types of enquiry?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Clear response targets by urgency (e.g. same-day for missing orders)",
+          "General aim to reply within 24 hours, no formal tiers",
+          "No defined response targets",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC04_Q5",
+        "stage": "Investigation & Approval",
+        "question": "Which issues can frontline staff resolve and which require approval?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Staff can resend small orders under £30; full refunds or carrier disputes need manager sign-off..."
+      },
+      {
+        "qid": "EC04_Q6",
+        "stage": "Resolution & Learning",
+        "question": "How is the resolution and customer communication recorded?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Central ticket thread linked to order profile",
+          "Notes spread across email, social DMs, and warehouse chats",
+          "Not consistently recorded",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "EC04_Q7",
+        "stage": "Resolution & Learning",
+        "question": "How do you identify repeat complaints or recurring product/delivery issues?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Monthly review of ticket tags and defect reasons",
+          "Team notices patterns informally when several complaints hit",
+          "Not tracked systematically",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      }
+    ]
+  }
+]

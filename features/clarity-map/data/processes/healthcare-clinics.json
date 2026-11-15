@@ -1,0 +1,394 @@
+[
+  {
+    "process_code": "HC-01",
+    "process_name": "Appointment request to confirmed booking",
+    "industry_id": "healthcare-clinics",
+    "industry_name": "Healthcare Clinics",
+    "work_area": "Patient Access & Scheduling",
+    "questionnaire_version": "1.0.0",
+    "regulated": true,
+    "regulated_notice": "Operational diagnostic only — not a clinical or compliance determination. Clinical triage and scheduling escalation rules must remain under authorised clinical supervision. Do not include patient names or health details.",
+    "short_description": "Manage appointment requests, visit-type triage rules, pre-visit forms, confirmations, and rescheduling.",
+    "typical_lifecycle": [
+      "Receive request",
+      "Identify visit type",
+      "Check scheduling rules",
+      "Book",
+      "Confirm",
+      "Prepare record",
+      "Remind"
+    ],
+    "questions": [
+      {
+        "qid": "HC01_Q1",
+        "stage": "Request Intake",
+        "question": "Which channels are used for appointment requests?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Phone call to reception",
+          "Online patient booking portal",
+          "Website enquiry form",
+          "Email",
+          "Walk-in at front desk",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "HC01_Q2",
+        "stage": "Request Intake",
+        "question": "What minimum information is collected to identify the patient and appointment type?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Visit reason category, new vs returning status, preferred practitioner, coverage type...",
+        "privacyNote": "Describe categories only — never enter real patient details."
+      },
+      {
+        "qid": "HC01_Q3",
+        "stage": "Scheduling & Clinical Triage",
+        "question": "Who determines the appropriate appointment slot or clinician, and what rules guide that decision?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Reception follows written clinic visit-type & clinician matching rules",
+          "Reception asks clinician or practice nurse when unsure",
+          "Receptionist uses personal experience without written guide",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "HC01_Q4",
+        "stage": "Scheduling & Clinical Triage",
+        "question": "How are urgency or special scheduling needs escalated to qualified staff?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Red-flag symptoms flagged to triage nurse immediately per clinic protocol..."
+      },
+      {
+        "qid": "HC01_Q5",
+        "stage": "Confirmation & Reminders",
+        "question": "How is the booking recorded and confirmed to the patient?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Booked in clinic EHR/practice system with automated SMS/email confirmation",
+          "Entered in calendar and confirmed manually by reception",
+          "Verbal confirmation on phone only",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "HC01_Q6",
+        "stage": "Confirmation & Reminders",
+        "question": "What preparation, forms or records are needed before arrival?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Intake/consent form, prior referral summary, fasting/prep instructions..."
+      },
+      {
+        "qid": "HC01_Q7",
+        "stage": "Confirmation & Reminders",
+        "question": "How are cancellations, rescheduling and no-shows handled and tracked?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Waitlist checked manually if someone cancels; no-shows noted in EHR..."
+      }
+    ]
+  },
+  {
+    "process_code": "HC-02",
+    "process_name": "Patient arrival, check-in and rooming",
+    "industry_id": "healthcare-clinics",
+    "industry_name": "Healthcare Clinics",
+    "work_area": "Front Desk & Clinical Flow",
+    "questionnaire_version": "1.0.0",
+    "regulated": true,
+    "regulated_notice": "Operational diagnostic only — not a clinical or compliance determination. Clinical assessment and identity verification policies remain under authorised clinic leadership. Do not enter patient data.",
+    "short_description": "Verify arriving patients, collect consent/intake updates, notify clinical staff, and record rooming status.",
+    "typical_lifecycle": [
+      "Confirm identity",
+      "Verify details",
+      "Collect required forms",
+      "Notify clinical team",
+      "Room patient",
+      "Hand over"
+    ],
+    "questions": [
+      {
+        "qid": "HC02_Q1",
+        "stage": "Arrival & Verification",
+        "question": "What steps happen when a patient arrives?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Checks in at desk or kiosk, confirms appointment, waits in reception..."
+      },
+      {
+        "qid": "HC02_Q2",
+        "stage": "Arrival & Verification",
+        "question": "How is identity confirmed using the clinic's approved procedure?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Two-identifier check by receptionist per clinic policy",
+          "Digital kiosk check-in + staff verification",
+          "Informal name check only",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "HC02_Q3",
+        "stage": "Forms & Details",
+        "question": "What demographic, consent, coverage or administrative information is checked or updated?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Contact & address verification",
+          "Insurance / billing coverage check",
+          "Signed consent / privacy forms",
+          "Clinical intake / medication history update",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "HC02_Q4",
+        "stage": "Clinical Handoff",
+        "question": "How does reception notify clinical staff that the patient is ready?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Status changed in clinic system visible in clinical room",
+          "Internal chat message or intercom/walk down hallway",
+          "Paper chart placed in physical tray",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "HC02_Q5",
+        "stage": "Clinical Handoff",
+        "question": "What information is handed to the clinical team and through which approved channel?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Completed intake packet scanned into EHR before medical assistant rooms patient..."
+      },
+      {
+        "qid": "HC02_Q6",
+        "stage": "Exceptions & Status",
+        "question": "How are late arrivals, missing records or urgent concerns handled?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Reception checks with clinician whether to squeeze in or reschedule..."
+      },
+      {
+        "qid": "HC02_Q7",
+        "stage": "Exceptions & Status",
+        "question": "Where is check-in completion recorded and who can see patient status?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Live status board inside EHR visible to front desk and clinical team",
+          "Reception knows; clinicians have to ask or check waiting room",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      }
+    ]
+  },
+  {
+    "process_code": "HC-03",
+    "process_name": "Referral receipt to appointment completion",
+    "industry_id": "healthcare-clinics",
+    "industry_name": "Healthcare Clinics",
+    "work_area": "Referral Coordination",
+    "questionnaire_version": "1.0.0",
+    "regulated": true,
+    "regulated_notice": "Operational diagnostic only — clinical triage and referral urgency must remain with qualified clinicians. Do not include patient health information.",
+    "short_description": "Log inbound referrals, check completeness, support clinician triage, book visits, and close the loop with referrers.",
+    "typical_lifecycle": [
+      "Receive referral",
+      "Check completeness",
+      "Clinical review",
+      "Prioritise",
+      "Contact patient",
+      "Schedule",
+      "Track completion",
+      "Return information"
+    ],
+    "questions": [
+      {
+        "qid": "HC03_Q1",
+        "stage": "Referral Intake",
+        "question": "How are referrals received and logged?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Electronic referral network / EHR inbox",
+          "Fax / e-fax",
+          "Encrypted email",
+          "Paper letter brought by patient",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "HC03_Q2",
+        "stage": "Referral Intake",
+        "question": "What information must accompany a referral before it can be reviewed?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Referring clinician details, clinical history summary, recent imaging/labs..."
+      },
+      {
+        "qid": "HC03_Q3",
+        "stage": "Triage & Clarification",
+        "question": "Who performs clinical triage or determines urgency?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Designated triage clinician / specialist reviews every referral",
+          "Nurse screens using written clinical criteria",
+          "Admin guesses urgency unless marked Urgent on cover",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "HC03_Q4",
+        "stage": "Triage & Clarification",
+        "question": "How are incomplete referrals returned or clarified?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Coordinator faxes/emails referrer office and puts referral in pending folder..."
+      },
+      {
+        "qid": "HC03_Q5",
+        "stage": "Scheduling & Loop Closure",
+        "question": "Who owns contacting the patient and arranging the appointment?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Referral coordinator calls patient up to 3 times..."
+      },
+      {
+        "qid": "HC03_Q6",
+        "stage": "Scheduling & Loop Closure",
+        "question": "How do you track referrals that are not booked, declined or not attended?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Central referral queue with overdue alerts",
+          "Spreadsheet updated manually",
+          "No reliable tracking once message is left",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "HC03_Q7",
+        "stage": "Scheduling & Loop Closure",
+        "question": "How is the outcome communicated to the referring clinician through approved channels?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Consultation letter faxed or sent via secure EHR message after visit..."
+      }
+    ]
+  },
+  {
+    "process_code": "HC-04",
+    "process_name": "Test result follow-up and communication",
+    "industry_id": "healthcare-clinics",
+    "industry_name": "Healthcare Clinics",
+    "work_area": "Clinical Follow-Up",
+    "questionnaire_version": "1.0.0",
+    "regulated": true,
+    "regulated_notice": "Operational diagnostic only — interpretation of test results and clinical communication decisions must always be made by authorised clinicians.",
+    "short_description": "Match inbound lab/imaging results, ensure clinician review, handle urgent escalations, and verify loop closure.",
+    "typical_lifecycle": [
+      "Receive result",
+      "Route to responsible clinician",
+      "Review",
+      "Determine action",
+      "Communicate",
+      "Document",
+      "Close loop"
+    ],
+    "questions": [
+      {
+        "qid": "HC04_Q1",
+        "stage": "Receipt & Routing",
+        "question": "How are results received and matched to the correct patient record?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Electronic lab interface matches into EHR automatically",
+          "Admin downloads PDFs/faxes and attaches manually to patient chart",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "HC04_Q2",
+        "stage": "Receipt & Routing",
+        "question": "Who is responsible for ensuring each result is reviewed?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Ordering clinician signs off in inbox; practice nurse monitors overdue queue if clinician is away..."
+      },
+      {
+        "qid": "HC04_Q3",
+        "stage": "Clinical Review & Escalation",
+        "question": "How are urgent or abnormal results escalated under clinic policy?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Lab phones clinic directly for critical values; handed immediately to duty doctor..."
+      },
+      {
+        "qid": "HC04_Q4",
+        "stage": "Clinical Review & Escalation",
+        "question": "Who decides what clinical action or communication is appropriate?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Ordering or covering clinician makes all clinical decisions",
+          "Clinician sets action note for nurse/admin to deliver approved message",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "HC04_Q5",
+        "stage": "Patient Contact & Loop Closure",
+        "question": "How is the patient contacted and how is successful communication confirmed?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Secure portal message, phone call, or follow-up booking logged in chart..."
+      },
+      {
+        "qid": "HC04_Q6",
+        "stage": "Patient Contact & Loop Closure",
+        "question": "How are failed contact attempts and outstanding actions tracked?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Tracked task list with escalation rule after X missed attempts",
+          "Notes in patient chart without an active follow-up queue",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "HC04_Q7",
+        "stage": "Patient Contact & Loop Closure",
+        "question": "How does the clinic verify that no result remains unreviewed or uncommunicated?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Weekly reconciliation of ordered tests vs received & signed-off results..."
+      }
+    ]
+  }
+]

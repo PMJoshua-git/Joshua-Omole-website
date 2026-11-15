@@ -1,0 +1,347 @@
+[
+  {
+    "process_code": "BA-01",
+    "process_name": "Target account to sales-qualified opportunity",
+    "industry_id": "b2b-agencies",
+    "industry_name": "B2B Agencies",
+    "work_area": "Outbound & Pipeline",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Define target accounts, prevent duplicate outreach, qualify buying roles, and capture SQL evidence cleanly.",
+    "typical_lifecycle": [
+      "Define target",
+      "Research account",
+      "Identify stakeholders",
+      "Outreach",
+      "Respond",
+      "Qualify",
+      "Create opportunity"
+    ],
+    "questions": [
+      {
+        "qid": "BA01_Q1",
+        "stage": "Targeting & Research",
+        "question": "How are target accounts selected and what makes an account suitable?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. ICP criteria (headcount, sector, tech stack) built by sales lead..."
+      },
+      {
+        "qid": "BA01_Q2",
+        "stage": "Targeting & Research",
+        "question": "Where is account research stored and how do you prevent duplicate outreach?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Central CRM deduplication checked before adding sequences",
+          "Shared spreadsheets — sometimes two reps message same company",
+          "Kept in individual SDR lists",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "BA01_Q3",
+        "stage": "Targeting & Research",
+        "question": "How are buying roles and decision-makers identified?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. LinkedIn Sales Navigator mapping VP/Director + procurement contact..."
+      },
+      {
+        "qid": "BA01_Q4",
+        "stage": "Outreach & Qualification",
+        "question": "Who approves outreach messaging and cadence?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Sales lead / founder approves playbook templates",
+          "Each rep writes and adjusts their own outreach",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "BA01_Q5",
+        "stage": "Outreach & Qualification",
+        "question": "How are responses, objections and next steps recorded?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Logged in CRM activity notes with scheduled follow-up task..."
+      },
+      {
+        "qid": "BA01_Q6",
+        "stage": "Qualification Gate",
+        "question": "What evidence is required before an account becomes sales-qualified?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Confirmed need, budget ballpark, decision stakeholder, target timeline..."
+      },
+      {
+        "qid": "BA01_Q7",
+        "stage": "Qualification Gate",
+        "question": "How are dormant, disqualified or reactivated accounts handled?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Marked with reason code in CRM and queued for 90-day revisit..."
+      }
+    ]
+  },
+  {
+    "process_code": "BA-02",
+    "process_name": "Discovery to proposal and commercial approval",
+    "industry_id": "b2b-agencies",
+    "industry_name": "B2B Agencies",
+    "work_area": "Enterprise Sales",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Structure discovery insights, map procurement stakeholders, review delivery risk & margin, and track proposal approvals.",
+    "typical_lifecycle": [
+      "Prepare discovery",
+      "Understand need",
+      "Confirm stakeholders",
+      "Scope solution",
+      "Estimate",
+      "Approve",
+      "Issue proposal",
+      "Follow up"
+    ],
+    "questions": [
+      {
+        "qid": "BA02_Q1",
+        "stage": "Discovery",
+        "question": "What information is collected before and during discovery?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Current workflows, KPIs, tech environment, blockers, buying timeline..."
+      },
+      {
+        "qid": "BA02_Q2",
+        "stage": "Discovery",
+        "question": "How do you document the client's problem, desired outcome and buying criteria?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Standardised discovery summary in CRM",
+          "Personal call notes or slide deck drafted fresh",
+          "Mostly remembered by salesperson",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "BA02_Q3",
+        "stage": "Scoping & Commercial Review",
+        "question": "Who confirms decision-makers, procurement steps and approval path?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Account executive maps economic buyer, legal review, and security questionnaire..."
+      },
+      {
+        "qid": "BA02_Q4",
+        "stage": "Scoping & Commercial Review",
+        "question": "How is scope, resourcing, timeline and delivery risk estimated?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Delivery lead co-scopes effort & capacity before proposal goes out",
+          "Sales estimates using rough past deals without checking delivery calendar",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "BA02_Q5",
+        "stage": "Scoping & Commercial Review",
+        "question": "Who reviews pricing, margin, commitments and non-standard terms?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Managing director / finance approves discounts or custom SLAs..."
+      },
+      {
+        "qid": "BA02_Q6",
+        "stage": "Proposal & Closing",
+        "question": "How is proposal version, approval and client feedback tracked?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Proposal tool tracks opens/versions, or v1/v2 PDFs emailed..."
+      },
+      {
+        "qid": "BA02_Q7",
+        "stage": "Proposal & Closing",
+        "question": "What must happen before a verbal agreement becomes a signed engagement?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. MSA + SOW executed, PO number received, and first invoice raised..."
+      }
+    ]
+  },
+  {
+    "process_code": "BA-03",
+    "process_name": "Sales-to-delivery handoff and onboarding",
+    "industry_id": "b2b-agencies",
+    "industry_name": "B2B Agencies",
+    "work_area": "Revenue-to-Delivery",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Transfer commercial commitments cleanly to delivery teams, verify capacity & scope boundaries, and launch kickoff.",
+    "typical_lifecycle": [
+      "Confirm contract",
+      "Capture commitments",
+      "Transfer context",
+      "Kickoff",
+      "Assign team",
+      "Gather inputs",
+      "Establish governance"
+    ],
+    "questions": [
+      {
+        "qid": "BA03_Q1",
+        "stage": "Handoff Trigger",
+        "question": "What exact event triggers the handoff from sales to delivery?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Signed contract + deposit invoice cleared",
+          "Deal moved to Closed-Won in CRM",
+          "Sales rep pings delivery channel when client verbally agrees",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "BA03_Q2",
+        "stage": "Context Transfer",
+        "question": "What client goals, promised outcomes, scope boundaries and risks must be transferred?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Signed SOW, discovery recordings, stakeholder politics, custom deadlines..."
+      },
+      {
+        "qid": "BA03_Q3",
+        "stage": "Context Transfer",
+        "question": "Who checks handoff completeness and accepts delivery ownership?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Delivery lead formally accepts handoff checklist before kickoff",
+          "Whoever is assigned reads whatever docs are in CRM",
+          "No formal acceptance — work begins after quick chat",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "BA03_Q4",
+        "stage": "Kickoff & Governance",
+        "question": "How are stakeholders, approvers, communication rules and escalation paths confirmed?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Covered in kickoff deck and documented in project charter..."
+      },
+      {
+        "qid": "BA03_Q5",
+        "stage": "Kickoff & Governance",
+        "question": "What inputs, access or data are needed before delivery starts?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. System permissions, data exports, SME interview calendar..."
+      },
+      {
+        "qid": "BA03_Q6",
+        "stage": "Kickoff & Governance",
+        "question": "How are milestones and success measures agreed at kickoff?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Mutual 30/60/90-day milestone plan signed off in kickoff recap..."
+      },
+      {
+        "qid": "BA03_Q7",
+        "stage": "Kickoff & Governance",
+        "question": "What happens when sales commitments conflict with delivery capacity or the signed scope?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Escalated to leadership/account director to renegotiate timeline or add contractor..."
+      }
+    ]
+  },
+  {
+    "process_code": "BA-04",
+    "process_name": "Account renewal and expansion",
+    "industry_id": "b2b-agencies",
+    "industry_name": "B2B Agencies",
+    "work_area": "Account Management",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Start renewal preparation early, assess account outcomes & risk, justify scope expansion, and govern commercial terms.",
+    "typical_lifecycle": [
+      "Review outcomes",
+      "Identify risk/opportunity",
+      "Prepare account plan",
+      "Engage stakeholders",
+      "Propose change",
+      "Approve",
+      "Renew"
+    ],
+    "questions": [
+      {
+        "qid": "BA04_Q1",
+        "stage": "Renewal Horizon & Review",
+        "question": "How early before contract end does the renewal process begin?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "60–90 days prior with automated CRM reminder",
+          "30 days prior",
+          "In the final couple of weeks or when contract lapses",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "BA04_Q2",
+        "stage": "Renewal Horizon & Review",
+        "question": "What delivery, relationship, usage or outcome information is reviewed?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Results vs KPIs, hours/margin health, stakeholder turnover, NPS..."
+      },
+      {
+        "qid": "BA04_Q3",
+        "stage": "Account Planning",
+        "question": "Who identifies renewal risk and who owns the account plan?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Account director flags risk in monthly review and owns renewal plan..."
+      },
+      {
+        "qid": "BA04_Q4",
+        "stage": "Account Planning",
+        "question": "How are client stakeholders and decision-makers engaged?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Quarterly Executive Business Review presenting ROI and next-phase roadmap..."
+      },
+      {
+        "qid": "BA04_Q5",
+        "stage": "Commercial Approval",
+        "question": "What evidence is required before recommending expansion or a scope change?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Proven baseline results + identified bottleneck or unmet client goal..."
+      },
+      {
+        "qid": "BA04_Q6",
+        "stage": "Commercial Approval",
+        "question": "Who approves commercial terms and contract changes?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Finance + managing partner approve fee adjustments or multi-year discounts..."
+      },
+      {
+        "qid": "BA04_Q7",
+        "stage": "Commercial Approval",
+        "question": "How are renewal decisions, risks and next actions recorded?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Logged in CRM renewal pipeline with signed addendum archived..."
+      }
+    ]
+  }
+]

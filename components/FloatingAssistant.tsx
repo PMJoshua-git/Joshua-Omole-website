@@ -4,6 +4,18 @@ import { X, Bot } from 'lucide-react';
 const FloatingAssistant: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showTeaser, setShowTeaser] = useState(false);
+  const [clarityPopupVisible, setClarityPopupVisible] = useState(false);
+
+  useEffect(() => {
+    const handlePopupVisibility = (e: Event) => {
+      const detail = (e as CustomEvent<{ visible?: boolean }>).detail;
+      setClarityPopupVisible(Boolean(detail?.visible));
+    };
+    window.addEventListener('clarity-popup:visibility', handlePopupVisibility);
+    return () => {
+      window.removeEventListener('clarity-popup:visibility', handlePopupVisibility);
+    };
+  }, []);
 
   // Teaser Logic
   useEffect(() => {
@@ -64,7 +76,11 @@ const FloatingAssistant: React.FC = () => {
       {/* Floating Toggle Button */}
       <button 
         onClick={toggleOpen}
-        className={`fixed bottom-6 right-6 z-[60] bg-sage-primary text-white hover:bg-sage-primary-hover rounded-full w-12 h-12 shadow-md transition-colors flex items-center justify-center ${isOpen ? 'rotate-90' : 'rotate-0'}`}
+        data-testid="floating-assistant-toggle"
+        data-floating-assistant-open={isOpen ? 'true' : 'false'}
+        className={`fixed right-6 z-[60] bg-sage-primary text-white hover:bg-sage-primary-hover rounded-full w-12 h-12 shadow-md transition-all flex items-center justify-center ${
+          clarityPopupVisible ? 'max-md:bottom-[28vh] md:bottom-6' : 'bottom-6'
+        } ${isOpen ? 'rotate-90' : 'rotate-0'}`}
         aria-label={isOpen ? "Close Chat" : "Open Chat"}
       >
         {isOpen ? <X className="w-6 h-6" /> : <Bot className="w-7 h-7" />}
@@ -99,10 +115,11 @@ const FloatingAssistant: React.FC = () => {
         </div>
       </div>
 
-      {/* AI Teaser Popup - Positioned to point at the button */}
+      {/* AI Teaser Popup - Positioned to point at the button (suppressed while Clarity Map pop-up is visible to prevent collision) */}
       <div 
+        data-testid="floating-assistant-teaser"
         className={`fixed bottom-24 right-6 z-[59] flex flex-col items-end pointer-events-none transition-all duration-500 transform ${
-          showTeaser && !isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          showTeaser && !isOpen && !clarityPopupVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}
       >
         <div className="pointer-events-auto bg-sage-surface border border-sage-border p-4 rounded-2xl shadow-sm relative max-w-xs mb-2">

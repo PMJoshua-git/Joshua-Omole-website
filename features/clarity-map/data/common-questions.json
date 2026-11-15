@@ -1,0 +1,229 @@
+[
+  {
+    "qid": "C1",
+    "stage": "Frequency & Roles",
+    "question": "How often does this process happen?",
+    "helpText": "Helps anchor volume and weekly workload estimates accurately.",
+    "type": "single_select",
+    "required": true,
+    "options": [
+      "Daily",
+      "A few times a week",
+      "Weekly",
+      "Monthly",
+      "Per project or case",
+      "Seasonally",
+      "Not sure"
+    ],
+    "allowOther": true,
+    "allowNotSure": true
+  },
+  {
+    "qid": "C1b",
+    "stage": "Frequency & Roles",
+    "question": "Roughly how many times does it happen in that period?",
+    "helpText": "Choose the closest band. Use active counts rather than guessing exact numbers.",
+    "type": "numeric_range",
+    "required": true,
+    "options": [
+      "1–3 times",
+      "4–10 times",
+      "11–25 times",
+      "26–50 times",
+      "50+ times",
+      "Not sure"
+    ],
+    "unitLabelByC1": {
+      "Daily": "per week",
+      "A few times a week": "per week",
+      "Weekly": "per week",
+      "Monthly": "per month",
+      "Per project or case": "per project or case",
+      "Seasonally": "per season",
+      "Not sure": "per typical cycle"
+    },
+    "allowNotSure": true
+  },
+  {
+    "qid": "C2",
+    "stage": "Frequency & Roles",
+    "question": "Which roles are involved from start to finish, and what does each do?",
+    "helpText": "Use role titles only (e.g. Owner, Coordinator, Specialist, Manager). Never enter personal names.",
+    "type": "long_text",
+    "required": true,
+    "placeholder": "e.g. Coordinator receives request and checks details; Owner approves; Ops assistant updates tracker...",
+    "privacyNote": "Describe roles only — do not include real names, phone numbers, or emails."
+  },
+  {
+    "qid": "C3",
+    "stage": "Tools & Information",
+    "question": "Where is the information for this process currently kept or exchanged?",
+    "helpText": "Select every place information passes through or lives during a typical run.",
+    "type": "multi_select",
+    "required": true,
+    "options": [
+      "Business system / CRM / ERP",
+      "Spreadsheet",
+      "Shared document",
+      "Email",
+      "Messaging app (WhatsApp / Slack / Teams)",
+      "Paper notes or forms",
+      "Individual device or inbox",
+      "Someone's memory",
+      "Not sure"
+    ],
+    "allowOther": true,
+    "allowNotSure": true
+  },
+  {
+    "qid": "C3_master",
+    "stage": "Tools & Information",
+    "question": "When information sits in more than one place, which record is treated as the main source of truth?",
+    "helpText": "If your team disagrees or checks multiple places, select that honestly.",
+    "type": "single_select",
+    "required": false,
+    "options": [
+      "Business system / CRM / ERP",
+      "Shared spreadsheet",
+      "Shared document or folder",
+      "Email thread",
+      "No single main record — people check several places",
+      "Not sure"
+    ],
+    "allowOther": true,
+    "allowNotSure": true,
+    "condition": {
+      "questionId": "C3",
+      "operator": "min_selected",
+      "value": 2
+    }
+  },
+  {
+    "qid": "C4",
+    "stage": "Friction & Time",
+    "question": "What usually goes wrong, gets delayed, or has to be repeated?",
+    "helpText": "Select all recurring symptoms you notice in practice.",
+    "type": "multi_select",
+    "required": true,
+    "options": [
+      "Waiting for information",
+      "Unclear owner",
+      "Duplicate data entry",
+      "Missing or incomplete information",
+      "Approval delay",
+      "Rework or mistakes",
+      "Customer or client chasing for updates",
+      "No clear status visibility",
+      "Disconnected tools",
+      "Unhandled exceptions",
+      "Not sure"
+    ],
+    "allowOther": true,
+    "allowNotSure": true
+  },
+  {
+    "qid": "C_approval_who",
+    "stage": "Friction & Time",
+    "question": "When approval is needed, who approves it and what triggers that approval?",
+    "helpText": "Use role titles and describe what signals the approver to act.",
+    "type": "short_text",
+    "required": false,
+    "placeholder": "e.g. Owner approves via email or WhatsApp when spend exceeds £250 or before dispatch.",
+    "condition": {
+      "questionId": "C4",
+      "operator": "includes",
+      "value": "Approval delay"
+    },
+    "privacyNote": "Use role names only."
+  },
+  {
+    "qid": "C5",
+    "stage": "Friction & Time",
+    "question": "What is the single most frustrating part of this process for you or your team?",
+    "helpText": "Optional plain-English note. Do not include client names or sensitive details.",
+    "type": "long_text",
+    "required": false,
+    "placeholder": "Describe what causes the most chasing, stress, or wasted effort...",
+    "privacyNote": "Never include customer, patient, or employee names or sensitive numbers."
+  },
+  {
+    "qid": "C6",
+    "stage": "Friction & Time",
+    "question": "How much active, hands-on staff time does one run usually take from start to finish?",
+    "helpText": "Count only active working minutes — exclude time spent waiting for replies or approvals.",
+    "type": "time_range",
+    "isTimeQuestion": true,
+    "required": true,
+    "options": [
+      "Under 15 minutes",
+      "15–60 minutes",
+      "1–3 hours",
+      "Half day or more (4+ hours)",
+      "Not sure"
+    ],
+    "allowNotSure": true
+  },
+  {
+    "qid": "C7",
+    "stage": "Friction & Time",
+    "question": "Where do you lose the most elapsed time waiting?",
+    "type": "single_select",
+    "required": true,
+    "options": [
+      "Little to no waiting",
+      "Waiting on customer / client / patient",
+      "Waiting on manager or owner approval",
+      "Waiting on supplier or external provider",
+      "Waiting on another internal team",
+      "Not sure"
+    ],
+    "allowOther": true,
+    "allowNotSure": true
+  },
+  {
+    "qid": "C8",
+    "stage": "Consistency & Review",
+    "question": "How consistent is the process across different people or cases?",
+    "type": "single_select",
+    "required": true,
+    "options": [
+      "Same documented steps every time",
+      "Mostly consistent with minor shortcuts",
+      "Varies depending on who handles it",
+      "Varies widely by customer or case",
+      "Not sure"
+    ],
+    "allowNotSure": true
+  },
+  {
+    "qid": "C9",
+    "stage": "Consistency & Review",
+    "question": "How does your team know for certain that a process run is complete?",
+    "type": "single_select",
+    "required": true,
+    "options": [
+      "Clear completion checklist or criteria",
+      "A team member or manager confirms it",
+      "The customer confirms receipt or completion",
+      "Record status changes in our main system",
+      "Informally — when nobody asks about it anymore",
+      "Not sure"
+    ],
+    "allowNotSure": true
+  },
+  {
+    "qid": "C10",
+    "stage": "Consistency & Review",
+    "question": "How do you review whether this process is working well over time?",
+    "type": "single_select",
+    "required": true,
+    "options": [
+      "Named metrics reviewed on a regular schedule",
+      "Occasional informal check-ins",
+      "Only looked at when a problem or complaint happens",
+      "Not measured or reviewed currently",
+      "Not sure"
+    ],
+    "allowNotSure": true
+  }
+]

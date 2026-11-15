@@ -1,0 +1,100 @@
+[
+  {
+    "id": "real-estate",
+    "name": "Real Estate",
+    "shortDescription": "Enquiries to viewings, tenant onboarding, maintenance dispatch, and rent reconciliation.",
+    "iconName": "Building2",
+    "regulated": false,
+    "processCount": 4
+  },
+  {
+    "id": "ecommerce",
+    "name": "E-Commerce",
+    "shortDescription": "Order fulfilment, stock replenishment, returns processing, and customer resolution.",
+    "iconName": "ShoppingBag",
+    "regulated": false,
+    "processCount": 4
+  },
+  {
+    "id": "retail",
+    "name": "Retail",
+    "shortDescription": "Goods receiving, shelf replenishment, till cash-up reconciliation, and store returns.",
+    "iconName": "Store",
+    "regulated": false,
+    "processCount": 4
+  },
+  {
+    "id": "professional-coaching",
+    "name": "Professional Coach",
+    "shortDescription": "Discovery call qualification, client onboarding, session delivery, and offboarding.",
+    "iconName": "Compass",
+    "regulated": false,
+    "processCount": 4
+  },
+  {
+    "id": "saas-tech",
+    "name": "SaaS & Tech",
+    "shortDescription": "Customer activation, support ticket triage, release management, and billing changes.",
+    "iconName": "Layers",
+    "regulated": false,
+    "processCount": 4
+  },
+  {
+    "id": "professional-services",
+    "name": "Professional Services",
+    "shortDescription": "Enquiry to engagement, matter delivery, time capture to invoice, and document chase.",
+    "iconName": "Briefcase",
+    "regulated": false,
+    "processCount": 4
+  },
+  {
+    "id": "healthcare-clinics",
+    "name": "Healthcare Clinics",
+    "shortDescription": "Appointment scheduling, patient check-in, referral tracking, and test result follow-up.",
+    "iconName": "Stethoscope",
+    "regulated": true,
+    "regulatedNotice": "Operational workflow diagnostic only — not a compliance determination. Clinical triage, diagnosis, and patient decisions must remain with authorised clinicians. Do not enter patient names or health identifiers.",
+    "processCount": 4
+  },
+  {
+    "id": "logistics-supply-chain",
+    "name": "Logistics & Supply Chain",
+    "shortDescription": "Order-to-dispatch, transport route planning, proof of delivery, and supplier receipts.",
+    "iconName": "Truck",
+    "regulated": false,
+    "processCount": 4
+  },
+  {
+    "id": "financial-services",
+    "name": "Financial Services",
+    "shortDescription": "Client KYC onboarding, credit applications, payment reconciliation, and account requests.",
+    "iconName": "Landmark",
+    "regulated": true,
+    "regulatedNotice": "Operational workflow diagnostic only — not a regulatory or compliance certification. Credit, KYC, risk, and legal approvals must remain with authorised personnel. Do not enter client names or account numbers.",
+    "processCount": 4
+  },
+  {
+    "id": "digital-agencies",
+    "name": "Digital Agencies & Studios",
+    "shortDescription": "Lead qualification, project setup, creative production approvals, and client reporting.",
+    "iconName": "PenTool",
+    "regulated": false,
+    "processCount": 4
+  },
+  {
+    "id": "b2b-agencies",
+    "name": "B2B Agencies",
+    "shortDescription": "Account outreach, discovery to commercial proposal, sales-to-delivery handoff, and renewals.",
+    "iconName": "Handshake",
+    "regulated": false,
+    "processCount": 4
+  },
+  {
+    "id": "b2c-agencies",
+    "name": "B2C Agencies",
+    "shortDescription": "Consumer bookings, service delivery dispatch, complaint recovery, and repeat retention.",
+    "iconName": "Users",
+    "regulated": false,
+    "processCount": 4
+  }
+]

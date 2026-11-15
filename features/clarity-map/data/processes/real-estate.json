@@ -1,0 +1,448 @@
+[
+  {
+    "process_code": "RE-01",
+    "process_name": "Property enquiry to viewing",
+    "industry_id": "real-estate",
+    "industry_name": "Real Estate",
+    "work_area": "Sales & Leasing",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Capture property interest, confirm availability, assign an agent, and manage viewings and follow-up.",
+    "typical_lifecycle": [
+      "Capture source and property interest",
+      "Qualify availability and requirements",
+      "Assign agent",
+      "Arrange viewing",
+      "Confirm outcome and follow-up"
+    ],
+    "questions": [
+      {
+        "qid": "RE01_Q1",
+        "stage": "Intake & Qualification",
+        "question": "Where do property enquiries arrive?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Property portal (Rightmove, Zillow, PropertyPro, etc.)",
+          "Website enquiry form",
+          "Phone call",
+          "WhatsApp / messaging",
+          "Referral",
+          "Walk-in",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE01_Q2",
+        "stage": "Intake & Qualification",
+        "question": "What details do you collect before assigning an agent?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Specific property of interest",
+          "Budget range",
+          "Preferred location",
+          "Move-in or purchase timing",
+          "Buyer or tenant readiness / status",
+          "None — assigned immediately with just contact details",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE01_Q3",
+        "stage": "Availability & Assignment",
+        "question": "How do you check whether the property is still available and who confirms that information?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Live status in our CRM / property listing software checked by coordinator",
+          "Shared spreadsheet checked manually",
+          "Asking the listing agent or landlord via WhatsApp / phone",
+          "Assumed available unless someone remembers otherwise",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE01_Q4",
+        "stage": "Availability & Assignment",
+        "question": "How is the enquiry assigned, and how does the agent know a response is due?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Assigned automatically in CRM with SLA alert",
+          "Manually forwarded by admin / reception via email or WhatsApp",
+          "Posted to a shared group chat — whoever responds first takes it",
+          "Owner / senior agent assigns verbally or in meetings",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE01_Q5",
+        "stage": "Viewing Coordination",
+        "question": "How are viewing slots agreed, confirmed and changed?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Shared calendar booking link sent to prospect",
+          "Back-and-forth phone calls or WhatsApp between prospect, agent, and current occupant",
+          "Coordinator checks agent calendar and emails confirmation",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE01_Q6",
+        "stage": "Post-Viewing & Exceptions",
+        "question": "After the viewing, who records the outcome and decides the next follow-up?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Showing agent logs notes in CRM and sets follow-up task",
+          "Agent sends a quick message or tells coordinator verbally",
+          "No formal log — agent follows up if the prospect seems keen",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE01_Q7",
+        "stage": "Post-Viewing & Exceptions",
+        "question": "What happens when the property is unavailable, the prospect does not attend, or the agent is unavailable?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Prospect is offered similar listings manually, or no-shows aren't logged systematically...",
+        "privacyNote": "Describe your process without personal names."
+      }
+    ]
+  },
+  {
+    "process_code": "RE-02",
+    "process_name": "Rental application to tenancy",
+    "industry_id": "real-estate",
+    "industry_name": "Real Estate",
+    "work_area": "Leasing & Tenancy",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Receive rental applications, verify documents, obtain landlord approval, and coordinate move-in.",
+    "typical_lifecycle": [
+      "Receive application",
+      "Check completeness",
+      "Conduct permitted screening",
+      "Obtain decision",
+      "Prepare agreement",
+      "Collect required payments",
+      "Prepare move-in"
+    ],
+    "questions": [
+      {
+        "qid": "RE02_Q1",
+        "stage": "Application Intake",
+        "question": "How does an applicant submit an application and supporting documents?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Online portal / digital form with file uploads",
+          "PDF / Word form emailed back with attachments",
+          "Documents sent over WhatsApp photos or email threads",
+          "Paper application handed in at the office",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE02_Q2",
+        "stage": "Application Intake",
+        "question": "Who checks whether the application is complete, and how are missing items requested?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Leasing coordinator reviews files manually and emails or WhatsApps applicant for missing payslips..."
+      },
+      {
+        "qid": "RE02_Q3",
+        "stage": "Screening & Decision",
+        "question": "What checks are performed, who performs them and what evidence is retained?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Coordinator runs reference/employment/ID checks via screening provider and saves PDFs to property folder..."
+      },
+      {
+        "qid": "RE02_Q4",
+        "stage": "Screening & Decision",
+        "question": "Who makes the approval or decline decision, and what criteria or authority do they use?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Property owner / landlord gives final approval after staff summary",
+          "Lettings manager approves against documented agency criteria",
+          "Agency director reviews each case ad hoc",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE02_Q5",
+        "stage": "Agreement & Move-In",
+        "question": "How are the agreement, required payments and move-in conditions coordinated?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "E-signature platform + invoice link tracked in one system",
+          "Agreement emailed separately while finance tracks deposit bank transfers manually",
+          "Handled ad hoc across email, phone, and spreadsheets",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE02_Q6",
+        "stage": "Agreement & Move-In",
+        "question": "How do you confirm that all required items are complete before keys or possession are handed over?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Mandatory pre-handover checklist signed off by manager",
+          "Property manager checks emails and bank account manually",
+          "Whoever is handing over keys checks verbally",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE02_Q7",
+        "stage": "Agreement & Move-In",
+        "question": "What happens when an application is incomplete, disputed or requires an exception?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Sits on hold until applicant replies or landlord agrees to a guarantor..."
+      }
+    ]
+  },
+  {
+    "process_code": "RE-03",
+    "process_name": "Property maintenance request",
+    "industry_id": "real-estate",
+    "industry_name": "Real Estate",
+    "work_area": "Property Management",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Log maintenance issues, triage urgency, obtain owner spend approval, dispatch contractors, and close requests.",
+    "typical_lifecycle": [
+      "Receive tenant/owner request",
+      "Classify urgency",
+      "Inspect or obtain details",
+      "Approve spend",
+      "Assign contractor",
+      "Verify completion",
+      "Close request"
+    ],
+    "questions": [
+      {
+        "qid": "RE03_Q1",
+        "stage": "Request & Triage",
+        "question": "How can a tenant or owner report a maintenance issue, and what information is collected?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Dedicated maintenance portal / form with photos",
+          "Email",
+          "WhatsApp / SMS",
+          "Phone call",
+          "Walk-in",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE03_Q2",
+        "stage": "Request & Triage",
+        "question": "How do you distinguish emergency, urgent and routine requests?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Written urgency matrix / rules followed by staff",
+          "Property manager decides case by case",
+          "No formal rules — handled in the order received unless tenant calls repeatedly",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE03_Q3",
+        "stage": "Approval & Dispatch",
+        "question": "Who decides whether an inspection or contractor visit is needed?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Property manager / coordinator",
+          "Property owner must review first",
+          "Maintenance lead",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE03_Q4",
+        "stage": "Approval & Dispatch",
+        "question": "What spending limit or approval is required from the property owner?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Pre-agreed float / threshold (only quotes above limit need owner sign-off)",
+          "Every non-emergency spend needs owner approval first",
+          "No fixed rule — we message owners inconsistently",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE03_Q5",
+        "stage": "Approval & Dispatch",
+        "question": "How are contractors selected, briefed, scheduled and given access?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Manager messages preferred plumber on WhatsApp and asks tenant directly to arrange entry..."
+      },
+      {
+        "qid": "RE03_Q6",
+        "stage": "Verification & Closure",
+        "question": "Who confirms the work is complete and acceptable before the request is closed?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Tenant confirmation + photo/invoice from contractor checked by coordinator",
+          "Contractor invoice alone is treated as completion",
+          "Physical inspection by property manager",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE03_Q7",
+        "stage": "Verification & Closure",
+        "question": "How are updates, costs, photos, invoices and repeat faults recorded?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "All logged on a central property maintenance record",
+          "Invoices go to accounting while photos/updates remain in emails or chats",
+          "Spreadsheets updated manually at month-end",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      }
+    ]
+  },
+  {
+    "process_code": "RE-04",
+    "process_name": "Rent collection and arrears follow-up",
+    "industry_id": "real-estate",
+    "industry_name": "Real Estate",
+    "work_area": "Property Accounting",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Track due rent, reconcile bank receipts, chase arrears, and prepare accurate owner statements.",
+    "typical_lifecycle": [
+      "Track due rent",
+      "Reconcile receipts",
+      "Identify arrears",
+      "Contact tenant",
+      "Escalate",
+      "Update owner and ledger"
+    ],
+    "questions": [
+      {
+        "qid": "RE04_Q1",
+        "stage": "Billing & Receipt Matching",
+        "question": "How are rent due dates and expected amounts recorded?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Property accounting software schedule",
+          "Spreadsheet tracker",
+          "Manual calendar reminders",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE04_Q2",
+        "stage": "Billing & Receipt Matching",
+        "question": "How do you identify payments received and match them to the correct tenancy?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Bank feed reconciled automatically or semi-automatically in accounting software",
+          "Admin downloads bank statements and matches references manually in a spreadsheet",
+          "Checked manually in online banking when someone has time",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE04_Q3",
+        "stage": "Arrears Follow-Up",
+        "question": "Who checks unmatched, partial or late payments?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Accounts assistant or property manager checks every Monday..."
+      },
+      {
+        "qid": "RE04_Q4",
+        "stage": "Arrears Follow-Up",
+        "question": "What reminder sequence is used, and who decides when to escalate?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Defined reminder schedule (Day 1, 3, 7, 14) with clear escalation rule",
+          "Property manager chases manually when they notice a gap",
+          "Ad hoc calls/messages; manager or owner decides when to escalate",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE04_Q5",
+        "stage": "Arrears Follow-Up",
+        "question": "How are payment promises, disputes or payment plans recorded?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Logged directly against the tenant ledger",
+          "Kept in emails or WhatsApp messages",
+          "Not systematically recorded",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RE04_Q6",
+        "stage": "Reporting & Exceptions",
+        "question": "How are owner statements and arrears reports prepared and checked?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Exported from software or compiled manually in Excel before month-end review..."
+      },
+      {
+        "qid": "RE04_Q7",
+        "stage": "Reporting & Exceptions",
+        "question": "What happens when the payment record and bank receipt do not agree?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Flagged to finance lead to contact tenant for proof of payment..."
+      }
+    ]
+  }
+]

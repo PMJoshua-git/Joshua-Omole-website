@@ -10,6 +10,7 @@ export const ROUTES: RouteItem[] = [
   { name: 'Connect', path: '/connect' },
   { name: 'Newsletter', path: '/newsletter' },
   { name: 'Workflow Fixes', path: '/business-workflow-fixes' },
+  { name: 'Clarity Map', path: '/clarity-map' },
   { name: 'Contact', path: '/contact' },
 ];
 

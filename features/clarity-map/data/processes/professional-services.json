@@ -1,0 +1,380 @@
+[
+  {
+    "process_code": "PS-01",
+    "process_name": "Client enquiry to engagement",
+    "industry_id": "professional-services",
+    "industry_name": "Professional Services",
+    "work_area": "Business Development & Intake",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Acknowledge enquiries, run conflict/eligibility checks, scope proposals, secure sign-off, and hand off to delivery.",
+    "typical_lifecycle": [
+      "Receive enquiry",
+      "Conflict/fit checks",
+      "Discovery",
+      "Scope",
+      "Proposal",
+      "Approval",
+      "Engagement letter",
+      "Open matter/project"
+    ],
+    "questions": [
+      {
+        "qid": "PS01_Q1",
+        "stage": "Intake & Checks",
+        "question": "Where do enquiries arrive and who acknowledges them?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Website contact form, partner referrals, or email; practice manager acknowledges..."
+      },
+      {
+        "qid": "PS01_Q2",
+        "stage": "Intake & Checks",
+        "question": "What information is required to assess fit, scope and urgency?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Client sector, scope summary, key deadlines, budget indication..."
+      },
+      {
+        "qid": "PS01_Q3",
+        "stage": "Intake & Checks",
+        "question": "Are conflict, independence, eligibility or other checks required before proceeding?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Yes — formal conflict / independence check logged before scoping",
+          "Informal partner check during meetings",
+          "No conflict checks required",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PS01_Q4",
+        "stage": "Scoping & Approval",
+        "question": "Who defines scope, estimates effort and approves commercial terms?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Lead consultant drafts scope; managing partner approves fee and terms..."
+      },
+      {
+        "qid": "PS01_Q5",
+        "stage": "Scoping & Approval",
+        "question": "How are proposal changes and client approvals recorded?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Tracked in proposal / e-signature system with version history",
+          "Multiple emailed PDFs and email reply confirmations",
+          "Verbal yes followed by later paperwork",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PS01_Q6",
+        "stage": "Engagement & Handoff",
+        "question": "What must be signed or paid before work begins?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Signed engagement letter AND initial retainer/deposit",
+          "Signed engagement letter only",
+          "Sometimes work begins on email approval while paperwork catches up",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PS01_Q7",
+        "stage": "Engagement & Handoff",
+        "question": "How is the accepted engagement handed to the delivery team with all commitments intact?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Partner briefs delivery lead verbally, or posts proposal summary in project tool..."
+      }
+    ]
+  },
+  {
+    "process_code": "PS-02",
+    "process_name": "Client matter or project delivery",
+    "industry_id": "professional-services",
+    "industry_name": "Professional Services",
+    "work_area": "Client Delivery",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Open client matters, manage milestones and client inputs, control scope changes, review quality, and close cleanly.",
+    "typical_lifecycle": [
+      "Open matter",
+      "Plan",
+      "Assign",
+      "Collect inputs",
+      "Perform work",
+      "Review",
+      "Update client",
+      "Deliver",
+      "Close"
+    ],
+    "questions": [
+      {
+        "qid": "PS02_Q1",
+        "stage": "Matter Setup",
+        "question": "What triggers the formal start of a matter or project?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Signed engagement + deposit cleared + matter ID opened",
+          "Partner sends email telling team to start",
+          "Kickoff call scheduled",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PS02_Q2",
+        "stage": "Matter Setup",
+        "question": "What information and documents must be available before work starts?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Client intake packet, prior filings/reports, stakeholder contacts..."
+      },
+      {
+        "qid": "PS02_Q3",
+        "stage": "Execution & Tracking",
+        "question": "Who owns the matter, each workstream and quality review?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Accountable manager owns timeline; analysts draft deliverables; senior partner reviews..."
+      },
+      {
+        "qid": "PS02_Q4",
+        "stage": "Execution & Tracking",
+        "question": "How are milestones, deadlines, dependencies and client inputs tracked?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Central practice/project management board with due dates",
+          "Shared spreadsheet updated in weekly meetings",
+          "Each consultant manages their own tasks and emails",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PS02_Q5",
+        "stage": "Scope & Quality Review",
+        "question": "How are scope changes or additional work assessed and approved?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Formal change request approved in writing before extra work starts",
+          "Extra work often absorbed or discussed later at invoicing",
+          "Partner approves ad hoc over calls",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PS02_Q6",
+        "stage": "Scope & Quality Review",
+        "question": "How are client updates and work products reviewed before release?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Peer/partner sign-off checklist required before sending client deliverables..."
+      },
+      {
+        "qid": "PS02_Q7",
+        "stage": "Scope & Quality Review",
+        "question": "What is required to close the matter and capture lessons or outstanding obligations?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Final invoice issued, files archived, debrief notes logged..."
+      }
+    ]
+  },
+  {
+    "process_code": "PS-03",
+    "process_name": "Time capture to invoice",
+    "industry_id": "professional-services",
+    "industry_name": "Professional Services",
+    "work_area": "Billing & Finance",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Capture billable time and expenses, validate entries, approve write-offs, issue invoices, and follow up arrears.",
+    "typical_lifecycle": [
+      "Record time/expenses",
+      "Review",
+      "Approve",
+      "Prepare invoice",
+      "Issue",
+      "Follow up",
+      "Reconcile"
+    ],
+    "questions": [
+      {
+        "qid": "PS03_Q1",
+        "stage": "Time & Expense Capture",
+        "question": "When and where do staff record time and expenses?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Daily in practice time-tracking software",
+          "End of week or end of month from calendar/email memory",
+          "Spreadsheets emailed to finance",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PS03_Q2",
+        "stage": "Time & Expense Capture",
+        "question": "What information is required for each entry to be billable and traceable?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Matter code, task category, clear client-facing narrative, receipt for expenses..."
+      },
+      {
+        "qid": "PS03_Q3",
+        "stage": "Review & Approval",
+        "question": "Who checks entries for completeness, accuracy and client terms?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Billing partner or project manager reviews draft pre-bill each month..."
+      },
+      {
+        "qid": "PS03_Q4",
+        "stage": "Review & Approval",
+        "question": "How are write-offs, fixed fees, disbursements or exceptions approved?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Documented partner approval thresholds for adjustments",
+          "Partners adjust pre-bills manually without formal log",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PS03_Q5",
+        "stage": "Invoicing & Follow-Up",
+        "question": "How is approved work transferred into an invoice?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Direct sync from time system to accounting software",
+          "Finance re-types approved hours/amounts into accounting tool",
+          "Manual Word/PDF invoice creation",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PS03_Q6",
+        "stage": "Invoicing & Follow-Up",
+        "question": "Who checks and sends the invoice, and how are errors corrected?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Finance prepares draft, manager approves, finance emails PDF..."
+      },
+      {
+        "qid": "PS03_Q7",
+        "stage": "Invoicing & Follow-Up",
+        "question": "How are overdue invoices and disputed items assigned and followed up?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Finance sends automated reminders; partner steps in past 30 days..."
+      }
+    ]
+  },
+  {
+    "process_code": "PS-04",
+    "process_name": "Document request and collection",
+    "industry_id": "professional-services",
+    "industry_name": "Professional Services",
+    "work_area": "Client Operations",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Request required client documents, track missing items, verify quality/versions, and keep delivery teams synced.",
+    "typical_lifecycle": [
+      "Identify required documents",
+      "Request",
+      "Track receipt",
+      "Review completeness",
+      "Chase",
+      "Store",
+      "Make available"
+    ],
+    "questions": [
+      {
+        "qid": "PS04_Q1",
+        "stage": "Request Preparation",
+        "question": "Who identifies the documents needed and how is the list created?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Standardised checklist per service type tailored by lead",
+          "Written fresh in an email each time by the consultant",
+          "Requested piecemeal as work progresses",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PS04_Q2",
+        "stage": "Request Preparation",
+        "question": "How are requests sent and how does the client know what is required?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Client upload portal showing checklist items and due dates",
+          "Emailed bulleted list or attached spreadsheet",
+          "Messages across email and WhatsApp",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PS04_Q3",
+        "stage": "Receipt & Review",
+        "question": "Where are incoming documents received and stored?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Clients email attachments which staff rename and save into SharePoint/Drive..."
+      },
+      {
+        "qid": "PS04_Q4",
+        "stage": "Receipt & Review",
+        "question": "Who checks completeness, legibility, version and relevance?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Admin coordinator checks files upon arrival, or specialist discovers gaps later..."
+      },
+      {
+        "qid": "PS04_Q5",
+        "stage": "Tracking & Control",
+        "question": "How are missing items and deadlines tracked?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Portal/tracker highlights overdue items automatically",
+          "Manual checklist spreadsheet reviewed weekly",
+          "No central tracker — staff check inbox threads before meetings",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PS04_Q6",
+        "stage": "Tracking & Control",
+        "question": "What access or confidentiality controls apply?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Matter-level folder permissions; encrypted link instead of plain email..."
+      },
+      {
+        "qid": "PS04_Q7",
+        "stage": "Tracking & Control",
+        "question": "How does the delivery team know the document set is complete and current?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Status changed to 'Ready for delivery' and team notified..."
+      }
+    ]
+  }
+]

@@ -24,7 +24,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 
 // Resources registry & mailer
 import {
@@ -34,17 +34,20 @@ import {
   validateResourceRegistry
 } from "./server/resources/registry";
 import { sendResourceEmail } from "./server/resources/email";
+import { injectPageMetaIntoHtml } from "./server/seo/pageMeta";
 
 // API Routes
 import bookConsultationRouter from "./services/api/book-consultation";
 import newsletterSubscribeRouter from "./services/api/newsletter-subscribe";
 import trainingSessionsRouter from "./services/api/training-sessions";
 import bookTrainingRouter from "./services/api/book-training";
+import clarityMapRouter from "./server/clarity-map/routes";
 
 app.use("/api/book-consultation", bookConsultationRouter);
 app.use("/api/newsletter-subscribe", newsletterSubscribeRouter);
 app.use("/api/training-sessions", trainingSessionsRouter);
 app.use("/api/book-training", bookTrainingRouter);
+app.use("/api/clarity-map", clarityMapRouter);
 
 // ── Resources API & Delivery ──
 app.get('/api/resources', (_req, res) => {
@@ -355,100 +358,6 @@ app.post("/api/save-contact", async (req, res) => {
   }
 });
 
-interface PageMeta {
-  title: string;
-  description: string;
-  url: string;
-}
-
-const META_MAP: Record<string, PageMeta> = {
-  "/": {
-    title: "Joshua Omole | Business Operations & AI Systems Strategist",
-    description: "I help businesses design smarter operations using technical tools, AI, systems thinking and practical execution",
-    url: "https://joshuaomole.com/"
-  },
-  "/about": {
-    title: "About | Joshua Omole | Business Operations & AI Systems Strategist",
-    description: "I build the operational architecture that makes a business run without the founder holding everything together manually.",
-    url: "https://joshuaomole.com/about"
-  },
-  "/services": {
-    title: "Services | Joshua Omole | Business Operations & AI Systems Strategist",
-    description: "Clear engagements. Defined outcomes. Smarter operations designed to scale your business using systems thinking, automation, and AI.",
-    url: "https://joshuaomole.com/services"
-  },
-  "/training": {
-    title: "Training | Joshua Omole | Business Operations & AI Systems Strategist",
-    description: "Operational training built for how business actually works. Explore our targeted curriculums for leaders, executives, and team members.",
-    url: "https://joshuaomole.com/training"
-  },
-  "/audit": {
-    title: "Free Systems Clarity Audit | Joshua Omole",
-    description: "Find out what your operation is actually costing you right now. A focused 30-minute session to pinpoint bottlenecks and walk away with 3 actionable findings.",
-    url: "https://joshuaomole.com/audit"
-  },
-  "/contact": {
-    title: "Book a Call | Joshua Omole | Business Operations & AI Systems Strategist",
-    description: "Let's discuss how to optimize, automate, and integrate intelligent systems into your business operations. Book a direct strategy call.",
-    url: "https://joshuaomole.com/contact"
-  },
-  "/connect": {
-    title: "Connect & Resources | Joshua Omole",
-    description: "Book consultation calls, access operational training, register for live workshops, and sign up for the weekly newsletter with Joshua Omole.",
-    url: "https://joshuaomole.com/connect"
-  },
-  "/newsletter": {
-    title: "Newsletter | Joshua Omole | Business Operations & AI Systems Strategist",
-    description: "Join founders and operators receiving weekly systems thinking strategies, actionable AI implementation guides, and operational case studies.",
-    url: "https://joshuaomole.com/newsletter"
-  },
-  "/resources": {
-    title: "Resources | Joshua Omole | Business Operations & AI Systems Strategist",
-    description: "Practical resource library. Explore guides, checklists, frameworks, and tools designed to help you build smarter business operations.",
-    url: "https://joshuaomole.com/resources"
-  },
-  "/knowledge-hub": {
-    title: "Resources | Joshua Omole | Business Operations & AI Systems Strategist",
-    description: "Practical resource library. Explore guides, checklists, frameworks, and tools designed to help you build smarter business operations.",
-    url: "https://joshuaomole.com/resources"
-  }
-};
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-function resolvePageMeta(cleanPath: string): PageMeta & { image?: string } {
-  if (cleanPath.startsWith('/resources/')) {
-    const slug = cleanPath.slice('/resources/'.length);
-    const resource = getResourceBySlug(slug);
-    if (resource && resource.status === 'published') {
-      const siteUrl = process.env.SITE_URL || 'https://joshuaomole.com';
-      const cover = resource.coverImage
-        ? (resource.coverImage.startsWith('http') ? resource.coverImage : `${siteUrl}${resource.coverImage}`)
-        : `${siteUrl}/og-image.svg`;
-      return {
-        title: `${escapeHtml(resource.title)} | Free ${escapeHtml(resource.format)} from Joshua Omole`,
-        description: escapeHtml(resource.summary),
-        url: `${siteUrl}/resources/${resource.slug}`,
-        image: cover,
-      };
-    }
-  }
-
-  const baseMeta = META_MAP[cleanPath] || META_MAP["/"];
-  const siteUrl = process.env.SITE_URL || 'https://joshuaomole.com';
-  return {
-    ...baseMeta,
-    image: `${siteUrl}/og-image.svg`,
-  };
-}
-
 async function startServer() {
   // Validate resources registry on boot
   validateResourceRegistry();
@@ -477,63 +386,7 @@ async function startServer() {
           return res.sendFile(filePath);
         }
 
-        let cleanPath = req.path;
-        if (cleanPath.length > 1 && cleanPath.endsWith('/')) {
-          cleanPath = cleanPath.slice(0, -1);
-        }
-        cleanPath = cleanPath.toLowerCase();
-
-        const meta = resolvePageMeta(cleanPath);
-
-        let customizedHtml = html;
-        customizedHtml = customizedHtml.replace(
-          /<title>[^<]*<\/title>/gi,
-          `<title>${meta.title}</title>`
-        );
-        customizedHtml = customizedHtml.replace(
-          /<meta name="title" content="[^"]*"/gi,
-          `<meta name="title" content="${meta.title}"`
-        );
-        customizedHtml = customizedHtml.replace(
-          /<meta name="description" content="[^"]*"/gi,
-          `<meta name="description" content="${meta.description}"`
-        );
-        customizedHtml = customizedHtml.replace(
-          /<meta property="og:title" content="[^"]*"/gi,
-          `<meta property="og:title" content="${meta.title}"`
-        );
-        customizedHtml = customizedHtml.replace(
-          /<meta property="og:description" content="[^"]*"/gi,
-          `<meta property="og:description" content="${meta.description}"`
-        );
-        customizedHtml = customizedHtml.replace(
-          /<meta property="og:url" content="[^"]*"/gi,
-          `<meta property="og:url" content="${meta.url}"`
-        );
-        customizedHtml = customizedHtml.replace(
-          /<meta property="twitter:title" content="[^"]*"/gi,
-          `<meta property="twitter:title" content="${meta.title}"`
-        );
-        customizedHtml = customizedHtml.replace(
-          /<meta property="twitter:description" content="[^"]*"/gi,
-          `<meta property="twitter:description" content="${meta.description}"`
-        );
-        customizedHtml = customizedHtml.replace(
-          /<meta property="twitter:url" content="[^"]*"/gi,
-          `<meta property="twitter:url" content="${meta.url}"`
-        );
-
-        if (meta.image) {
-          customizedHtml = customizedHtml.replace(
-            /<meta property="og:image" content="[^"]*"/gi,
-            `<meta property="og:image" content="${meta.image}"`
-          );
-          customizedHtml = customizedHtml.replace(
-            /<meta name="twitter:image" content="[^"]*"/gi,
-            `<meta name="twitter:image" content="${meta.image}"`
-          );
-        }
-
+        const customizedHtml = injectPageMetaIntoHtml(html, req.path);
         res.send(customizedHtml);
       });
     });

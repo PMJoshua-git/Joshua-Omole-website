@@ -1,0 +1,343 @@
+[
+  {
+    "process_code": "FS-01",
+    "process_name": "Client onboarding and account opening",
+    "industry_id": "financial-services",
+    "industry_name": "Financial Services",
+    "work_area": "Client Onboarding & Controls",
+    "questionnaire_version": "1.0.0",
+    "regulated": true,
+    "regulated_notice": "Operational workflow diagnostic only — not a regulatory or compliance determination. All KYC, AML, risk-rating, and account opening approvals must remain with authorised personnel. Do not enter client names or account identifiers.",
+    "short_description": "Collect onboarding documents, coordinate verification checks, manage senior approvals, and activate accounts.",
+    "typical_lifecycle": [
+      "Capture application",
+      "Verify identity and documents",
+      "Screen",
+      "Assess risk",
+      "Approve",
+      "Open account",
+      "Activate",
+      "Monitor"
+    ],
+    "questions": [
+      {
+        "qid": "FS01_Q1",
+        "stage": "Application Intake",
+        "question": "What event starts the onboarding process and what client type/product is involved?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Client accepts advisory proposal or submits online account application...",
+        "privacyNote": "Describe the client segment/product type only — no personal or account details."
+      },
+      {
+        "qid": "FS01_Q2",
+        "stage": "Document Collection",
+        "question": "What identity, ownership, purpose and supporting information must be collected under your approved policy?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Certified ID, proof of address, beneficial ownership structure, source of funds declaration..."
+      },
+      {
+        "qid": "FS01_Q3",
+        "stage": "Document Collection",
+        "question": "Who checks document completeness and authenticity, and how are gaps returned to the client?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Onboarding analyst checks files and emails advisor/client for missing items..."
+      },
+      {
+        "qid": "FS01_Q4",
+        "stage": "Screening & Risk Review",
+        "question": "Which verification, screening and risk-review steps apply, and who is authorised to perform them?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Sanctions/PEP screening run by compliance analyst; risk rating reviewed by MLRO/senior officer..."
+      },
+      {
+        "qid": "FS01_Q5",
+        "stage": "Screening & Risk Review",
+        "question": "What cases require enhanced review or senior/compliance approval?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Complex corporate structures, high-risk jurisdictions, non-standard mandates..."
+      },
+      {
+        "qid": "FS01_Q6",
+        "stage": "Approval & Retention",
+        "question": "Who authorises account opening and confirms required controls are complete?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Authorised compliance/operations approver signs off checklist before activation",
+          "Relationship manager requests sign-off via email",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "FS01_Q7",
+        "stage": "Approval & Retention",
+        "question": "How are records, decisions, exceptions and ongoing review dates retained?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Saved in compliance archive with periodic review date logged in CRM..."
+      }
+    ]
+  },
+  {
+    "process_code": "FS-02",
+    "process_name": "Loan or credit application processing",
+    "industry_id": "financial-services",
+    "industry_name": "Financial Services",
+    "work_area": "Credit & Underwriting",
+    "questionnaire_version": "1.0.0",
+    "regulated": true,
+    "regulated_notice": "Operational workflow diagnostic only — credit, lending, and underwriting decisions must always remain with authorised human decision-makers under your approved policy.",
+    "short_description": "Validate credit files, track underwriting & approval limits, resolve evidence conflicts, and release funds.",
+    "typical_lifecycle": [
+      "Receive application",
+      "Collect evidence",
+      "Verify",
+      "Assess",
+      "Review",
+      "Approve/decline",
+      "Issue offer",
+      "Complete",
+      "Monitor"
+    ],
+    "questions": [
+      {
+        "qid": "FS02_Q1",
+        "stage": "Application Intake",
+        "question": "What information and documents are collected at application?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Application form, financial statements, bank statements, collateral details..."
+      },
+      {
+        "qid": "FS02_Q2",
+        "stage": "Verification & Assessment",
+        "question": "Who checks completeness and validates submitted information?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Credit analyst reviews pack before forwarding to underwriting officer..."
+      },
+      {
+        "qid": "FS02_Q3",
+        "stage": "Verification & Assessment",
+        "question": "Which assessment steps are performed, and who is authorised to make credit decisions?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Cash-flow/affordability assessment by underwriter; credit committee approves above threshold..."
+      },
+      {
+        "qid": "FS02_Q4",
+        "stage": "Verification & Assessment",
+        "question": "How are missing information, exceptions and conflicting evidence handled?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Application placed in pending status while relationship officer requests clarification..."
+      },
+      {
+        "qid": "FS02_Q5",
+        "stage": "Approvals & Release",
+        "question": "What approval limits or independent reviews apply?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Tiered mandate limits with second-pair-of-eyes sign-off on exceptions..."
+      },
+      {
+        "qid": "FS02_Q6",
+        "stage": "Approvals & Release",
+        "question": "How are offer terms communicated, accepted and documented?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Formal offer letter sent for signature with expiry deadline..."
+      },
+      {
+        "qid": "FS02_Q7",
+        "stage": "Approvals & Release",
+        "question": "What must be completed before funds or credit are released, and who confirms it?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Signed facility docs + conditions precedent checklist verified by settlement ops..."
+      }
+    ]
+  },
+  {
+    "process_code": "FS-03",
+    "process_name": "Payment exception and reconciliation",
+    "industry_id": "financial-services",
+    "industry_name": "Financial Services",
+    "work_area": "Treasury & Reconciliation",
+    "questionnaire_version": "1.0.0",
+    "regulated": true,
+    "regulated_notice": "Operational workflow diagnostic only — financial adjustments, reversals, and reconciliation sign-offs must follow dual-control and authorised finance governance.",
+    "short_description": "Match transaction feeds, investigate unallocated or reversed payments, govern adjustments, and close breaks.",
+    "typical_lifecycle": [
+      "Receive transaction",
+      "Match records",
+      "Identify exception",
+      "Investigate",
+      "Approve adjustment",
+      "Resolve",
+      "Report"
+    ],
+    "questions": [
+      {
+        "qid": "FS03_Q1",
+        "stage": "Matching",
+        "question": "Which transaction records are compared and how often?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Daily bank statements vs payment gateway vs client ledger..."
+      },
+      {
+        "qid": "FS03_Q2",
+        "stage": "Matching",
+        "question": "What identifiers are used to match payments to customers, invoices or accounts?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Payment reference code, invoice ID, exact amount, sender account..."
+      },
+      {
+        "qid": "FS03_Q3",
+        "stage": "Exception Investigation",
+        "question": "How are unmatched, duplicate, delayed or reversed transactions identified?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Automated matching rules flag breaks daily",
+          "Finance team compares CSV exports in Excel",
+          "Discovered at month-end close or when client queries",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "FS03_Q4",
+        "stage": "Exception Investigation",
+        "question": "Who investigates each exception and what evidence is required?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Reconciliation analyst checks remittance advice and gateway logs..."
+      },
+      {
+        "qid": "FS03_Q5",
+        "stage": "Approval & Resolution",
+        "question": "What adjustments or reversals require independent approval?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Write-offs, manual reallocations, and refunds require second finance manager approval..."
+      },
+      {
+        "qid": "FS03_Q6",
+        "stage": "Approval & Resolution",
+        "question": "How are unresolved items aged, escalated and reported?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Items over 5 business days escalated on weekly exception report..."
+      },
+      {
+        "qid": "FS03_Q7",
+        "stage": "Approval & Resolution",
+        "question": "How is final resolution recorded and checked against the source records?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Break closed with audit note and journal reference verified next cycle..."
+      }
+    ]
+  },
+  {
+    "process_code": "FS-04",
+    "process_name": "Customer service request and account change",
+    "industry_id": "financial-services",
+    "industry_name": "Financial Services",
+    "work_area": "Client Servicing",
+    "questionnaire_version": "1.0.0",
+    "regulated": true,
+    "regulated_notice": "Operational workflow diagnostic only — authentication, mandate verification, and regulated account changes remain strictly governed by your firm's authorised controls.",
+    "short_description": "Authenticate client change requests, verify authority, enforce dual checks, and maintain an audit trail.",
+    "typical_lifecycle": [
+      "Receive request",
+      "Authenticate",
+      "Classify",
+      "Verify authority",
+      "Assess rules",
+      "Approve",
+      "Execute",
+      "Confirm",
+      "Retain evidence"
+    ],
+    "questions": [
+      {
+        "qid": "FS04_Q1",
+        "stage": "Intake & Authentication",
+        "question": "Which channels receive service requests and how are they logged?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Secure client portal",
+          "Service email / ticketing system",
+          "Telephone",
+          "Direct message to advisor / relationship manager",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "FS04_Q2",
+        "stage": "Intake & Authentication",
+        "question": "How is the customer's identity authenticated before account information is disclosed or changed?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Logged-in MFA session, callback to registered number, or security verification questions..."
+      },
+      {
+        "qid": "FS04_Q3",
+        "stage": "Authority & Approval",
+        "question": "What authority or supporting evidence is required for the requested change?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Signed instruction letter, board mandate check for business accounts..."
+      },
+      {
+        "qid": "FS04_Q4",
+        "stage": "Authority & Approval",
+        "question": "Which requests can frontline staff complete and which require specialist approval?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Address updates by frontline; beneficiary or bank detail changes need dual approval..."
+      },
+      {
+        "qid": "FS04_Q5",
+        "stage": "Execution & Audit Trail",
+        "question": "How is the change checked before it is applied?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Maker-checker four-eyes verification before execution",
+          "Agent checks own work against form",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "FS04_Q6",
+        "stage": "Execution & Audit Trail",
+        "question": "How is the customer notified and the audit trail retained?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Confirmation letter sent via secure message and evidence attached to CRM ticket..."
+      },
+      {
+        "qid": "FS04_Q7",
+        "stage": "Execution & Audit Trail",
+        "question": "What happens when the request is disputed, suspicious or incomplete?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Frozen immediately and escalated to fraud/compliance team..."
+      }
+    ]
+  }
+]

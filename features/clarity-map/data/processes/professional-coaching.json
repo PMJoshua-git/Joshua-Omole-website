@@ -1,0 +1,395 @@
+[
+  {
+    "process_code": "PC-01",
+    "process_name": "Enquiry to discovery call",
+    "industry_id": "professional-coaching",
+    "industry_name": "Professional Coach",
+    "work_area": "Client Acquisition",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Capture coaching enquiries, qualify fit, schedule discovery calls, prepare context, and follow up on outcomes.",
+    "typical_lifecycle": [
+      "Capture prospect",
+      "Respond",
+      "Assess fit",
+      "Schedule call",
+      "Prepare",
+      "Conduct call",
+      "Record outcome",
+      "Follow up"
+    ],
+    "questions": [
+      {
+        "qid": "PC01_Q1",
+        "stage": "Enquiry & Fit",
+        "question": "Where do prospective clients first contact you?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Website enquiry or booking form",
+          "LinkedIn / social DMs",
+          "Direct email",
+          "Referral introduction",
+          "Speaking / workshop leads",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "PC01_Q2",
+        "stage": "Enquiry & Fit",
+        "question": "What information do you collect before deciding whether to offer a discovery call?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Current goals / challenge",
+          "Role or career context",
+          "Budget / programme readiness",
+          "Preferred timeline",
+          "None — anyone can book a call directly",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PC01_Q3",
+        "stage": "Enquiry & Fit",
+        "question": "How do you decide whether a prospect is a fit, and what remains your personal judgement?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Check basic readiness/timeline, then coach personally judges rapport and coachability during call..."
+      },
+      {
+        "qid": "PC01_Q4",
+        "stage": "Scheduling & Prep",
+        "question": "How are available times shared and confirmed?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Online scheduling link with automatic calendar invite",
+          "Back-and-forth email or WhatsApp proposing times",
+          "Assistant coordinates times manually",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PC01_Q5",
+        "stage": "Scheduling & Prep",
+        "question": "What preparation do you do before the call and where do you store it?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Review LinkedIn + intake notes in Google Doc or Notion 15 mins prior..."
+      },
+      {
+        "qid": "PC01_Q6",
+        "stage": "Call Outcome & Follow-Up",
+        "question": "How do you record the outcome and agreed next step?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Logged in CRM / coaching tool immediately after call",
+          "Notes written in notebook or separate doc; follow-up drafted later",
+          "Kept in head / inbox thread",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PC01_Q7",
+        "stage": "Call Outcome & Follow-Up",
+        "question": "What happens when a prospect does not book, misses the call or needs a later follow-up?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Send one manual check-in email; often forgotten if busy..."
+      }
+    ]
+  },
+  {
+    "process_code": "PC-02",
+    "process_name": "Client onboarding",
+    "industry_id": "professional-coaching",
+    "industry_name": "Professional Coach",
+    "work_area": "Client Delivery",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Transition new coaching clients from agreement and payment through intake, scheduling, and session readiness.",
+    "typical_lifecycle": [
+      "Confirm acceptance",
+      "Agreement",
+      "Payment",
+      "Welcome",
+      "Intake",
+      "Scheduling",
+      "Access",
+      "First-session preparation"
+    ],
+    "questions": [
+      {
+        "qid": "PC02_Q1",
+        "stage": "Agreement & Payment",
+        "question": "What event officially starts onboarding?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Signed coaching agreement AND first payment received",
+          "Signed agreement alone",
+          "Payment received alone",
+          "Verbal yes / email confirmation",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "PC02_Q2",
+        "stage": "Agreement & Payment",
+        "question": "How do you prepare, send and track the agreement?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Template sent via e-signature tool with automatic status tracking",
+          "Word/PDF edited manually and emailed for signature",
+          "Informal email terms without separate contract",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PC02_Q3",
+        "stage": "Agreement & Payment",
+        "question": "How do you confirm payment or an agreed payment plan?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Automated checkout / recurring invoice status",
+          "Manually checking bank transfers / Stripe dashboard before emailing welcome",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PC02_Q4",
+        "stage": "Intake & Scheduling",
+        "question": "What information do you collect about goals, expectations and working preferences?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Pre-coaching questionnaire covering 90-day outcomes, communication norms, and reflections..."
+      },
+      {
+        "qid": "PC02_Q5",
+        "stage": "Intake & Scheduling",
+        "question": "How do you schedule sessions and share joining details?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Client books recurring slots via calendar link with video link attached",
+          "Agreed over email and invites created manually",
+          "Booked one session at a time after each call",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PC02_Q6",
+        "stage": "Readiness Check",
+        "question": "What materials, access or preparation must be completed before session one?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Intake form submitted 48 hours before session one, shared folder access..."
+      },
+      {
+        "qid": "PC02_Q7",
+        "stage": "Readiness Check",
+        "question": "Who checks readiness and what happens when a client has not completed a required step?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Coach notices morning of session and sends quick reminder..."
+      }
+    ]
+  },
+  {
+    "process_code": "PC-03",
+    "process_name": "Session delivery and follow-up",
+    "industry_id": "professional-coaching",
+    "industry_name": "Professional Coach",
+    "work_area": "Client Delivery",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Prepare session context, capture confidential notes and actions, send recaps, and track accountability.",
+    "typical_lifecycle": [
+      "Prepare",
+      "Conduct session",
+      "Capture notes/actions",
+      "Send recap",
+      "Track commitments",
+      "Prepare next session"
+    ],
+    "questions": [
+      {
+        "qid": "PC03_Q1",
+        "stage": "Session Preparation",
+        "question": "How do you prepare for each session and find the client's previous notes or actions?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Single client workspace / coaching platform checked before call",
+          "Searching Google Docs / Notion / email threads for last recap",
+          "Reviewing handwritten notebook",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PC03_Q2",
+        "stage": "Notes & Confidentiality",
+        "question": "Where are session notes stored and who can access them?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Private coaching notes in Notion/notebook; shared action summary in client Google Doc..."
+      },
+      {
+        "qid": "PC03_Q3",
+        "stage": "Notes & Confidentiality",
+        "question": "How are client commitments and coach actions captured?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Captured in shared action tracker during or right after session",
+          "Typed into recap email from rough notes",
+          "Left to the client to remember unless they ask",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PC03_Q4",
+        "stage": "Recap & Between-Session Tracking",
+        "question": "How do you send a recap and agree the next actions?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Coach writes personalised recap email within 24 hours..."
+      },
+      {
+        "qid": "PC03_Q5",
+        "stage": "Recap & Between-Session Tracking",
+        "question": "How do you track overdue actions or clients who need support between sessions?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Mid-cycle check-in prompt or tracker review",
+          "Only reviewed when preparing for the next scheduled call",
+          "Client messages on WhatsApp/Slack if stuck",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PC03_Q6",
+        "stage": "Recap & Between-Session Tracking",
+        "question": "What information is reviewed before the next session?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Previous session commitments, client pre-session check-in form..."
+      },
+      {
+        "qid": "PC03_Q7",
+        "stage": "Notes & Confidentiality",
+        "question": "What should remain personal and confidential rather than being sent through automated messages?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Sensitive leadership dynamics, emotional reflections, confidential executive feedback..."
+      }
+    ]
+  },
+  {
+    "process_code": "PC-04",
+    "process_name": "Renewal, completion and offboarding",
+    "industry_id": "professional-coaching",
+    "industry_name": "Professional Coach",
+    "work_area": "Client Retention",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Track engagement end dates, review progress, manage renewal conversations, and wrap up offboarding cleanly.",
+    "typical_lifecycle": [
+      "Review progress",
+      "Discuss continuation",
+      "Agree next phase or close",
+      "Settle billing",
+      "Provide resources",
+      "Retain records"
+    ],
+    "questions": [
+      {
+        "qid": "PC04_Q1",
+        "stage": "Engagement Review",
+        "question": "How do you know when a coaching engagement is approaching its end?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Session counter / end-date alert in tracker",
+          "Manual calendar check",
+          "Often realised at the final session",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PC04_Q2",
+        "stage": "Engagement Review",
+        "question": "What evidence or progress measures are reviewed with the client?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Original 90-day goals vs outcomes achieved, qualitative reflection..."
+      },
+      {
+        "qid": "PC04_Q3",
+        "stage": "Renewal Decision",
+        "question": "Who initiates the renewal or completion conversation?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Coach raises it 2–3 sessions before end",
+          "Wait for client to ask about continuing",
+          "Assistant sends a check-in email",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "PC04_Q4",
+        "stage": "Renewal Decision",
+        "question": "How are new scope, duration and payment terms agreed?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Discussed on review call, then new agreement & invoice sent manually..."
+      },
+      {
+        "qid": "PC04_Q5",
+        "stage": "Completion & Offboarding",
+        "question": "What steps happen when a client completes or chooses not to continue?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Final wrap-up session, feedback request, cancel recurring billing..."
+      },
+      {
+        "qid": "PC04_Q6",
+        "stage": "Completion & Offboarding",
+        "question": "How are final resources, feedback and outstanding actions handled?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Send summary packet and testimonial link manually..."
+      },
+      {
+        "qid": "PC04_Q7",
+        "stage": "Completion & Offboarding",
+        "question": "How are records retained or access removed after the engagement ends?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Checklist to archive notes and revoke shared workspace access",
+          "Records stay wherever they are; access isn't systematically closed",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      }
+    ]
+  }
+]

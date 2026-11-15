@@ -1,0 +1,418 @@
+[
+  {
+    "process_code": "RT-01",
+    "process_name": "Goods receiving and stock put-away",
+    "industry_id": "retail",
+    "industry_name": "Retail",
+    "work_area": "Back-of-House Inventory",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Verify incoming store deliveries against purchase orders, inspect quality, record discrepancies, and release stock.",
+    "typical_lifecycle": [
+      "Prepare for delivery",
+      "Verify against purchase order",
+      "Inspect",
+      "Record discrepancies",
+      "Label",
+      "Store",
+      "Release for sale"
+    ],
+    "questions": [
+      {
+        "qid": "RT01_Q1",
+        "stage": "Delivery Preparation",
+        "question": "How does the store know a supplier delivery is expected?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Delivery calendar / POS purchase order schedule",
+          "Email notice forwarded by buyer or owner",
+          "Carrier simply turns up at the back door",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT01_Q2",
+        "stage": "Inspection & Discrepancies",
+        "question": "Who checks quantities and items against the purchase order or delivery note?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Designated receiving clerk / supervisor",
+          "Whoever is nearest the back door when delivery arrives",
+          "Store manager reviews paperwork later",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT01_Q3",
+        "stage": "Inspection & Discrepancies",
+        "question": "What inspection is performed for damage, expiry, quality or wrong items?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Box count & outer condition check",
+          "Individual item & barcode verification",
+          "Expiry / batch date check",
+          "Quality / defect spot check",
+          "No formal check — just sign delivery slip",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT01_Q4",
+        "stage": "Inspection & Discrepancies",
+        "question": "How are discrepancies documented and communicated to the supplier?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Annotated on paper delivery note, photographed, and emailed to supplier or head office..."
+      },
+      {
+        "qid": "RT01_Q5",
+        "stage": "Put-Away & Release",
+        "question": "Who labels and decides where stock is stored?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Stockroom assistant prints price tags and puts stock in numbered aisles or available shelf space..."
+      },
+      {
+        "qid": "RT01_Q6",
+        "stage": "Put-Away & Release",
+        "question": "When and how is the stock record updated?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Scanned directly into POS upon receipt",
+          "Entered manually into POS/spreadsheet by manager later that day or week",
+          "Stock goes on floor first; paperwork entered later",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT01_Q7",
+        "stage": "Put-Away & Release",
+        "question": "What happens when the delivery is partial, damaged or does not match the order?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Quarantined in backroom while manager chases supplier for credit note..."
+      }
+    ]
+  },
+  {
+    "process_code": "RT-02",
+    "process_name": "Shelf replenishment",
+    "industry_id": "retail",
+    "industry_name": "Retail",
+    "work_area": "Store Floor Operations",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Identify empty shelves, locate backroom stock, replenish floor displays, and log out-of-stock issues.",
+    "typical_lifecycle": [
+      "Identify shelf gaps",
+      "Check backroom stock",
+      "Prioritise",
+      "Replenish",
+      "Verify",
+      "Record out-of-stock issues"
+    ],
+    "questions": [
+      {
+        "qid": "RT02_Q1",
+        "stage": "Gap Identification",
+        "question": "How are shelf gaps identified?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Scheduled floor walk / gap scan",
+          "Staff observation during shift",
+          "Daily POS sales / low-on-floor report",
+          "Customer asking for an item",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT02_Q2",
+        "stage": "Stock Retrieval",
+        "question": "How do staff locate the required stock in the backroom?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Labelled bays/bins tracked in system",
+          "Rough category zones in stockroom",
+          "Searching shelves manually or asking supervisor",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT02_Q3",
+        "stage": "Stock Retrieval",
+        "question": "Who decides replenishment priorities during busy periods?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Shift supervisor assigns priority aisles/bestsellers",
+          "Written opening/midday replenishment list",
+          "Staff pick whatever gap they see first",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT02_Q4",
+        "stage": "Replenishment & Verification",
+        "question": "How is shelf quantity or product placement checked after replenishment?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Supervisor walk-through / planogram spot check",
+          "Staff self-check FIFO/facing as they restock",
+          "No formal check after restocking",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT02_Q5",
+        "stage": "Replenishment & Verification",
+        "question": "How are out-of-stock items and unavailable backroom stock recorded?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Logged in POS/handheld out-of-stock report",
+          "Written on a clipboard or whiteboard",
+          "Mentioned verbally to manager",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT02_Q6",
+        "stage": "Replenishment & Verification",
+        "question": "Who follows up on repeated stock gaps or supplier delays?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Store manager checks out-of-stock list every Tuesday and emails buyer..."
+      },
+      {
+        "qid": "RT02_Q7",
+        "stage": "Replenishment & Verification",
+        "question": "What interruptions or duplicate checks slow replenishment?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Staff pulled to tills mid-restock, or searching multiple backroom piles for items showing in POS..."
+      }
+    ]
+  },
+  {
+    "process_code": "RT-03",
+    "process_name": "Point-of-sale cash-up and reconciliation",
+    "industry_id": "retail",
+    "industry_name": "Retail",
+    "work_area": "Financial Control",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Close tills, count cash and tender totals, investigate variances, approve adjustments, and file close reports.",
+    "typical_lifecycle": [
+      "Close tills",
+      "Count cash",
+      "Compare sales/tender totals",
+      "Investigate variances",
+      "Approve",
+      "Deposit or report"
+    ],
+    "questions": [
+      {
+        "qid": "RT03_Q1",
+        "stage": "Till Close & Count",
+        "question": "Who closes each till and at what point in the shift?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Cashier closes own till at shift end with supervisor present",
+          "Duty manager closes all tills at store closing",
+          "Rotating staff close tills without a fixed handover rule",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT03_Q2",
+        "stage": "Till Close & Count",
+        "question": "What sales, cash, card and other tender records are compared?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "POS Z-report totals",
+          "Physical cash count",
+          "Card terminal end-of-day batch settlement",
+          "Vouchers / gift cards / store credit",
+          "Mobile / transfer receipts",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT03_Q3",
+        "stage": "Verification & Variances",
+        "question": "Who independently checks the cash count or reconciliation?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Second person (supervisor or manager) performs blind count / review",
+          "Only checked if the total looks noticeably wrong",
+          "Same person who operated till counts and signs off alone",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT03_Q4",
+        "stage": "Verification & Variances",
+        "question": "What happens when a variance is found?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Recount cash, review voids/refund slips, log variance reason on sheet..."
+      },
+      {
+        "qid": "RT03_Q5",
+        "stage": "Approval & Reporting",
+        "question": "Who can approve adjustments, refunds or voids?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Manager PIN / sign-off required for all voids and adjustments",
+          "Threshold rule — minor variances logged by supervisor, larger by manager",
+          "Cashiers can process without prior approval",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT03_Q6",
+        "stage": "Approval & Reporting",
+        "question": "Where are close reports and supporting evidence stored?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Digital close record in POS/accounting + scanned slips",
+          "Paper binder / safe folder + spreadsheet summary",
+          "Receipts kept in envelopes or desk drawer",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT03_Q7",
+        "stage": "Approval & Reporting",
+        "question": "How are unresolved variances tracked until closure?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Tracked on variance log until finance reconciles bank deposit..."
+      }
+    ]
+  },
+  {
+    "process_code": "RT-04",
+    "process_name": "In-store return or exchange",
+    "industry_id": "retail",
+    "industry_name": "Retail",
+    "work_area": "Customer Service & Stock",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Locate original transactions at counter, apply policy & inspection checks, approve refunds, and route stock.",
+    "typical_lifecycle": [
+      "Receive request",
+      "Locate transaction",
+      "Check policy",
+      "Inspect item",
+      "Approve",
+      "Refund/exchange",
+      "Update stock"
+    ],
+    "questions": [
+      {
+        "qid": "RT04_Q1",
+        "stage": "Return Intake",
+        "question": "How does the customer present a return and how do staff find the original sale?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Receipt barcode scanned / looked up in POS by customer email or card",
+          "Manual date/item search in POS when receipt is missing",
+          "Paper receipt book or handwritten lookup",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT04_Q2",
+        "stage": "Policy & Inspection",
+        "question": "What policy checks are required before accepting the return?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Return window days check",
+          "Proof of purchase verification",
+          "Tags / packaging intact check",
+          "Non-returnable category check",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT04_Q3",
+        "stage": "Policy & Inspection",
+        "question": "How is the item's condition assessed and recorded?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Associate visually inspects item at till and selects return reason code in POS..."
+      },
+      {
+        "qid": "RT04_Q4",
+        "stage": "Approval & Stock Routing",
+        "question": "When is manager approval required?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "No receipt, outside return window, or cash refund above threshold",
+          "Manager must approve every return on the till",
+          "Staff handle all returns without approval",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT04_Q5",
+        "stage": "Approval & Stock Routing",
+        "question": "How is the refund or exchange processed and checked?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Refunded to original payment card via POS and signed slip placed in till..."
+      },
+      {
+        "qid": "RT04_Q6",
+        "stage": "Approval & Stock Routing",
+        "question": "How is returned stock routed to resale, repair, supplier return or write-off?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Separate labelled bins behind till with reason tags",
+          "Left behind counter until manager sorts it at end of day",
+          "Put straight back on the shop floor unless visibly broken",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "RT04_Q7",
+        "stage": "Approval & Stock Routing",
+        "question": "How are unusual patterns or disputed returns escalated?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Store manager reviews CCTV/receipt history and logs repeated policy exceptions..."
+      }
+    ]
+  }
+]

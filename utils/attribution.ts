@@ -8,7 +8,31 @@ export interface AttributionData {
   lead_source: string;
 }
 
+export interface UtmClickParams {
+  utm_source: string;
+  utm_medium: string;
+  utm_campaign: string;
+  utm_content?: string;
+}
+
 const STORAGE_KEY = 'joshua_attribution_data';
+
+/**
+ * Appends click-level UTM query parameters to an internal path
+ * without modifying stored first-touch attribution in localStorage.
+ */
+export const appendUtmParams = (path: string, params: UtmClickParams): string => {
+  const [basePath, existingQuery = ''] = path.split('?');
+  const search = new URLSearchParams(existingQuery);
+  search.set('utm_source', params.utm_source);
+  search.set('utm_medium', params.utm_medium);
+  search.set('utm_campaign', params.utm_campaign);
+  if (params.utm_content) {
+    search.set('utm_content', params.utm_content);
+  }
+  const qs = search.toString();
+  return qs ? `${basePath}?${qs}` : basePath;
+};
 
 export const captureAttributionData = (searchString?: string) => {
   if (typeof window === 'undefined') return;
@@ -27,11 +51,37 @@ export const captureAttributionData = (searchString?: string) => {
     }
   }
 
-  // Capture UTM parameters (only overwrite if they exist in current URL to persist first touch)
-  const utm_source = urlParams.get('utm_source') || currentData.utm_source || null;
-  const utm_medium = urlParams.get('utm_medium') || currentData.utm_medium || null;
-  const utm_campaign = urlParams.get('utm_campaign') || currentData.utm_campaign || null;
-  const utm_content = urlParams.get('utm_content') || currentData.utm_content || null;
+  // First-touch preservation: keep stored attribution if already captured;
+  // internal click UTMs (e.g. from Clarity Map pop-up) never overwrite existing first-touch data.
+  const hasStoredFirstTouch = Boolean(
+    currentData.utm_source || currentData.utm_medium || currentData.utm_campaign
+  );
+  const incomingSource = urlParams.get('utm_source');
+  const incomingMedium = urlParams.get('utm_medium');
+  const incomingCampaign = urlParams.get('utm_campaign');
+  const incomingContent = urlParams.get('utm_content');
+
+  const isInternalPopupClick =
+    incomingSource === 'site' &&
+    incomingMedium === 'popup' &&
+    incomingCampaign === 'clarity_map_popup';
+
+  const utm_source =
+    hasStoredFirstTouch || isInternalPopupClick
+      ? currentData.utm_source || (hasStoredFirstTouch ? null : incomingSource)
+      : incomingSource || currentData.utm_source || null;
+  const utm_medium =
+    hasStoredFirstTouch || isInternalPopupClick
+      ? currentData.utm_medium || (hasStoredFirstTouch ? null : incomingMedium)
+      : incomingMedium || currentData.utm_medium || null;
+  const utm_campaign =
+    hasStoredFirstTouch || isInternalPopupClick
+      ? currentData.utm_campaign || (hasStoredFirstTouch ? null : incomingCampaign)
+      : incomingCampaign || currentData.utm_campaign || null;
+  const utm_content =
+    hasStoredFirstTouch || isInternalPopupClick
+      ? currentData.utm_content || (hasStoredFirstTouch ? null : incomingContent)
+      : incomingContent || currentData.utm_content || null;
 
   // Capture landing page (only first touch)
   const landing_page = currentData.landing_page || window.location.pathname;
@@ -51,7 +101,7 @@ export const captureAttributionData = (searchString?: string) => {
   }
 
   // Priority Logic for Lead Source
-  let lead_source = 'direct';
+  let lead_source = currentData.lead_source || 'direct';
   if (utm_source) {
     lead_source = utm_source;
   } else if (referrer) {

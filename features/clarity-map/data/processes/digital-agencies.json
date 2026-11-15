@@ -1,0 +1,372 @@
+[
+  {
+    "process_code": "DA-01",
+    "process_name": "Lead to qualified opportunity",
+    "industry_id": "digital-agencies",
+    "industry_name": "Digital Agencies & Studios",
+    "work_area": "New Business",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Consolidate inbound studio enquiries, qualify budget & fit, schedule discovery calls, and handle non-fit leads.",
+    "typical_lifecycle": [
+      "Capture lead",
+      "Acknowledge",
+      "Assess fit",
+      "Discover need",
+      "Qualify",
+      "Assign",
+      "Schedule next step"
+    ],
+    "questions": [
+      {
+        "qid": "DA01_Q1",
+        "stage": "Capture & Consolidation",
+        "question": "Which channels generate enquiries and where are they consolidated?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Agency website form",
+          "Referrals / partner introductions",
+          "LinkedIn / social DMs",
+          "Direct founder email",
+          "Directory listings (Clutch / Dribbble / Google)",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "DA01_Q2",
+        "stage": "Capture & Consolidation",
+        "question": "What information is needed to assess service fit, budget, timing and decision authority?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Project scope, target launch window, indicative budget range, key stakeholder..."
+      },
+      {
+        "qid": "DA01_Q3",
+        "stage": "Qualification & Scheduling",
+        "question": "Who reviews new leads and how quickly?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Founder / new-business lead reviews same business day",
+          "Account manager reviews when checking inbox",
+          "No fixed SLA — depends on busyness",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "DA01_Q4",
+        "stage": "Qualification & Scheduling",
+        "question": "What qualification criteria are used and where are exceptions recorded?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Minimum project budget and core service match; exceptions noted in CRM..."
+      },
+      {
+        "qid": "DA01_Q5",
+        "stage": "Qualification & Scheduling",
+        "question": "How are discovery calls scheduled and prepared?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Calendar link sent after brief form; team reviews brand website before call..."
+      },
+      {
+        "qid": "DA01_Q6",
+        "stage": "Outcome & Nurture",
+        "question": "How is the lead outcome and next action recorded?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "CRM stage updated with clear next task & date",
+          "Notes in Slack / Google Doc; proposals drafted manually",
+          "Mostly tracked in email inbox",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "DA01_Q7",
+        "stage": "Outcome & Nurture",
+        "question": "What happens to leads that are not ready, not suitable or unresponsive?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Polite decline or tagged for 60-day check-in; often forgotten if quiet..."
+      }
+    ]
+  },
+  {
+    "process_code": "DA-02",
+    "process_name": "Client onboarding and project setup",
+    "industry_id": "digital-agencies",
+    "industry_name": "Digital Agencies & Studios",
+    "work_area": "Studio Operations",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Verify signed scope and deposit, collect brand assets & logins, set up project workspace, and align delivery.",
+    "typical_lifecycle": [
+      "Confirm scope",
+      "Agreement",
+      "Payment/deposit",
+      "Intake",
+      "Assets",
+      "Kickoff",
+      "Workspace",
+      "Team handoff"
+    ],
+    "questions": [
+      {
+        "qid": "DA02_Q1",
+        "stage": "Commercial Confirmation",
+        "question": "What confirms that a client is ready to move from sales into delivery?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Signed SOW/contract AND deposit paid",
+          "Signed contract only",
+          "Verbal / email go-ahead while contract is finalised",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "DA02_Q2",
+        "stage": "Commercial Confirmation",
+        "question": "What scope, deliverables, exclusions, deadlines and approval terms are recorded?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Number of revision rounds, milestone dates, out-of-scope rules in SOW..."
+      },
+      {
+        "qid": "DA02_Q3",
+        "stage": "Commercial Confirmation",
+        "question": "How are agreement and initial payment status confirmed before work begins?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Finance or founder checks bank/Stripe and pings producer in Slack..."
+      },
+      {
+        "qid": "DA02_Q4",
+        "stage": "Assets & Workspace Setup",
+        "question": "What client inputs, brand assets, access and references are collected?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Brand guidelines, logos, CMS/ad account logins, audience notes..."
+      },
+      {
+        "qid": "DA02_Q5",
+        "stage": "Assets & Workspace Setup",
+        "question": "Who checks that the brief and assets are complete?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Producer / project manager runs kickoff readiness checklist",
+          "Designers/devs discover missing assets after starting work",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "DA02_Q6",
+        "stage": "Assets & Workspace Setup",
+        "question": "How are project tasks, owners, deadlines and communication channels created?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Producer duplicates template in Asana/ClickUp, creates Drive folder & Slack channel..."
+      },
+      {
+        "qid": "DA02_Q7",
+        "stage": "Assets & Workspace Setup",
+        "question": "What information is lost or re-requested during the sales-to-delivery handoff?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Discovery call context, verbal promises on speed, or asset links buried in emails..."
+      }
+    ]
+  },
+  {
+    "process_code": "DA-03",
+    "process_name": "Creative/content production and approval",
+    "industry_id": "digital-agencies",
+    "industry_name": "Digital Agencies & Studios",
+    "work_area": "Creative Production",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Turn client requests into complete briefs, schedule capacity, manage QA, and control client feedback & versions.",
+    "typical_lifecycle": [
+      "Brief",
+      "Plan",
+      "Assign",
+      "Create",
+      "Internal review",
+      "Client review",
+      "Revise",
+      "Approve",
+      "Deliver/publish"
+    ],
+    "questions": [
+      {
+        "qid": "DA03_Q1",
+        "stage": "Briefing & Planning",
+        "question": "How does a request become an approved brief?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Structured brief form reviewed by account lead/producer before creative starts",
+          "Client emails or Slacks request straight to creative team",
+          "Translated from call notes inconsistently",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "DA03_Q2",
+        "stage": "Briefing & Planning",
+        "question": "What makes a brief complete enough for production to start?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Objective, target format/specs, copy/assets attached, due date, approver..."
+      },
+      {
+        "qid": "DA03_Q3",
+        "stage": "Briefing & Planning",
+        "question": "Who assigns the work and confirms capacity, dependencies and due dates?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Producer / creative director checks studio workload weekly..."
+      },
+      {
+        "qid": "DA03_Q4",
+        "stage": "Review & Feedback Control",
+        "question": "What internal quality checks happen before client review?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Creative director / peer QA against brief checklist",
+          "Quick Slack glance when time allows",
+          "Sent straight to client by creator",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "DA03_Q5",
+        "stage": "Review & Feedback Control",
+        "question": "How is client feedback collected and consolidated?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Visual review tool (Frame.io / Figma / Markup) with single consolidated pass",
+          "Scattered emails, Slack messages, and comments from multiple stakeholders",
+          "Live call notes",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "DA03_Q6",
+        "stage": "Review & Feedback Control",
+        "question": "How are revision rounds, scope changes and final approval controlled?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. 2 included rounds tracked by account manager; extra changes quoted..."
+      },
+      {
+        "qid": "DA03_Q7",
+        "stage": "Delivery & Sign-Off",
+        "question": "Who confirms delivery or publishing and records the final asset/version?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Account manager sends final files link and archives approved vFINAL folder..."
+      }
+    ]
+  },
+  {
+    "process_code": "DA-04",
+    "process_name": "Client reporting and account review",
+    "industry_id": "digital-agencies",
+    "industry_name": "Digital Agencies & Studios",
+    "work_area": "Client Retention & Reporting",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Gather multi-channel metrics, validate data, add strategic commentary, review quality, and track next-cycle actions.",
+    "typical_lifecycle": [
+      "Collect data",
+      "Validate",
+      "Analyse",
+      "Prepare report",
+      "Review",
+      "Present",
+      "Agree actions",
+      "Track"
+    ],
+    "questions": [
+      {
+        "qid": "DA04_Q1",
+        "stage": "Data Collection & Validation",
+        "question": "Which channels or systems provide performance data?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Ad platforms (Meta, Google, LinkedIn Ads)",
+          "Web analytics (GA4 / Search Console)",
+          "CRM / revenue attribution",
+          "Email / social scheduling tools",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "DA04_Q2",
+        "stage": "Data Collection & Validation",
+        "question": "Who collects the data and how are reporting periods defined?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Account coordinator pulls numbers on 1st–3rd business day of each month..."
+      },
+      {
+        "qid": "DA04_Q3",
+        "stage": "Data Collection & Validation",
+        "question": "What checks confirm data is complete and comparable?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Compare platform spend against invoices and check tracking tags..."
+      },
+      {
+        "qid": "DA04_Q4",
+        "stage": "Analysis & Review",
+        "question": "Who interprets performance and adds context for the client?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Strategist / account manager writes insights and next-month recommendations..."
+      },
+      {
+        "qid": "DA04_Q5",
+        "stage": "Analysis & Review",
+        "question": "Who reviews the report before it is shared?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Account director / senior strategist QA review",
+          "No separate review — coordinator sends directly",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "DA04_Q6",
+        "stage": "Presentation & Action Loop",
+        "question": "How are client decisions and agreed actions captured?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Recap email after monthly review call lists client approvals and agency tasks..."
+      },
+      {
+        "qid": "DA04_Q7",
+        "stage": "Presentation & Action Loop",
+        "question": "How are actions tracked and fed into the next reporting cycle?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Added to project board and reviewed at top of next month's report..."
+      }
+    ]
+  }
+]

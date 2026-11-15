@@ -1,0 +1,373 @@
+[
+  {
+    "process_code": "CA-01",
+    "process_name": "Consumer enquiry to booking",
+    "industry_id": "b2c-agencies",
+    "industry_name": "B2C Agencies",
+    "work_area": "Bookings & Conversion",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Handle consumer enquiries across channels, quote clearly, verify deposits/availability, and reduce no-shows.",
+    "typical_lifecycle": [
+      "Capture enquiry",
+      "Respond",
+      "Assess service need",
+      "Quote",
+      "Schedule",
+      "Confirm",
+      "Prepare customer"
+    ],
+    "questions": [
+      {
+        "qid": "CA01_Q1",
+        "stage": "Enquiry Intake",
+        "question": "Which channels bring in consumer enquiries and where are they recorded?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Instagram / Facebook / TikTok DMs",
+          "WhatsApp",
+          "Website booking / enquiry form",
+          "Phone call",
+          "Walk-in",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "CA01_Q2",
+        "stage": "Enquiry Intake",
+        "question": "What details are needed to understand the service requested and customer availability?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Service option, preferred dates/times, location or branch, special requests..."
+      },
+      {
+        "qid": "CA01_Q3",
+        "stage": "Quoting & Booking",
+        "question": "How are prices, eligibility and service options communicated?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Published menu/pricing page or standard price sheet",
+          "Staff type out custom quotes in DMs or WhatsApp each time",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "CA01_Q4",
+        "stage": "Quoting & Booking",
+        "question": "Who checks availability and confirms the booking?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Front desk / coordinator checks staff rota and confirms slot..."
+      },
+      {
+        "qid": "CA01_Q5",
+        "stage": "Deposits & Preparation",
+        "question": "What deposit, payment or cancellation conditions apply?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Automated deposit payment required at booking with clear cancellation policy",
+          "Manual bank transfer link sent; booking held loosely until paid",
+          "No deposit required — pay on arrival",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "CA01_Q6",
+        "stage": "Deposits & Preparation",
+        "question": "How are reminders and preparation instructions sent?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Automated SMS/email reminders 48h & 24h prior",
+          "Staff manually text reminders the evening before",
+          "No reminders sent",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "CA01_Q7",
+        "stage": "Deposits & Preparation",
+        "question": "What happens when the customer does not respond, cancels or changes the booking?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Slot held until morning or waitlist checked manually..."
+      }
+    ]
+  },
+  {
+    "process_code": "CA-02",
+    "process_name": "Booking to service delivery",
+    "industry_id": "b2c-agencies",
+    "industry_name": "B2C Agencies",
+    "work_area": "Service Execution",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Confirm booking readiness, allocate staff & equipment, verify completion standards, and capture post-visit feedback.",
+    "typical_lifecycle": [
+      "Confirm booking",
+      "Prepare resources",
+      "Assign staff",
+      "Deliver service",
+      "Record completion",
+      "Collect feedback"
+    ],
+    "questions": [
+      {
+        "qid": "CA02_Q1",
+        "stage": "Pre-Delivery Readiness",
+        "question": "What information confirms that a booking is complete and ready for delivery?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Confirmed slot, deposit paid, customer prep form/notes complete..."
+      },
+      {
+        "qid": "CA02_Q2",
+        "stage": "Pre-Delivery Readiness",
+        "question": "How do you prepare staff, materials, equipment or location?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Coordinator checks next-day bookings each afternoon and preps kit/room..."
+      },
+      {
+        "qid": "CA02_Q3",
+        "stage": "Assignment & Delivery",
+        "question": "Who assigns the person delivering the service and confirms availability?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Operations manager matches staff skill and shift schedule..."
+      },
+      {
+        "qid": "CA02_Q4",
+        "stage": "Assignment & Delivery",
+        "question": "What checklist or standard defines a completed service?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Written service completion checklist signed off by specialist",
+          "Informal verbal standard — varies by staff member",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "CA02_Q5",
+        "stage": "Completion & Exceptions",
+        "question": "How are delays, customer changes or service exceptions handled?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Staff message coordinator to adjust schedule or notify next customer..."
+      },
+      {
+        "qid": "CA02_Q6",
+        "stage": "Completion & Exceptions",
+        "question": "Who records completion and any follow-up required?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Practitioner marks booking complete in system and adds aftercare note..."
+      },
+      {
+        "qid": "CA02_Q7",
+        "stage": "Completion & Exceptions",
+        "question": "How is feedback or a complaint linked to the original booking?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Automated post-visit feedback linked to booking ID & staff member",
+          "Reviewed in Google reviews or DMs without linking to the booking record",
+          "Not tracked",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      }
+    ]
+  },
+  {
+    "process_code": "CA-03",
+    "process_name": "Customer complaint and service recovery",
+    "industry_id": "b2c-agencies",
+    "industry_name": "B2C Agencies",
+    "work_area": "Service Recovery",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Log consumer complaints cleanly, define frontline resolution limits, escalate to managers, and fix root causes.",
+    "typical_lifecycle": [
+      "Receive complaint",
+      "Acknowledge",
+      "Capture facts",
+      "Assess severity",
+      "Assign",
+      "Resolve",
+      "Confirm",
+      "Review"
+    ],
+    "questions": [
+      {
+        "qid": "CA03_Q1",
+        "stage": "Complaint Intake",
+        "question": "Where can customers raise complaints and how are they logged?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Email / contact form",
+          "Phone call / in-person at desk",
+          "Social media comments / DMs / Google reviews",
+          "WhatsApp / SMS",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "CA03_Q2",
+        "stage": "Complaint Intake",
+        "question": "What information is collected to understand the issue?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Booking reference, service date, staff involved, photos/description..."
+      },
+      {
+        "qid": "CA03_Q3",
+        "stage": "Severity & Resolution Rules",
+        "question": "Who decides priority and whether a manager must intervene?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Written severity tiers (safety/refund/public review triggers immediate manager review)",
+          "Frontline staff handle what they can and pass angry cases to owner/manager",
+          "Owner handles every complaint personally",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "CA03_Q4",
+        "stage": "Severity & Resolution Rules",
+        "question": "What resolution options are permitted and who can approve exceptions?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Frontline can offer complimentary redo/voucher up to £25; cash refunds need manager approval..."
+      },
+      {
+        "qid": "CA03_Q5",
+        "stage": "Follow-Through & Learning",
+        "question": "How does the customer receive progress updates?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Coordinator emails/calls within 24h while investigating..."
+      },
+      {
+        "qid": "CA03_Q6",
+        "stage": "Follow-Through & Learning",
+        "question": "How is customer acceptance or unresolved dissatisfaction recorded?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Closed in complaint log once customer confirms satisfaction..."
+      },
+      {
+        "qid": "CA03_Q7",
+        "stage": "Follow-Through & Learning",
+        "question": "How are recurring causes reviewed and assigned for improvement?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Monthly review of complaint themes with team training/process updates",
+          "Discussed ad hoc when the same issue happens repeatedly",
+          "Not reviewed systematically",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      }
+    ]
+  },
+  {
+    "process_code": "CA-04",
+    "process_name": "Repeat booking and customer retention",
+    "industry_id": "b2c-agencies",
+    "industry_name": "B2C Agencies",
+    "work_area": "Retention & Rebooking",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Identify timely repeat-booking triggers, respect consent preferences, personalise outreach, and track retention.",
+    "typical_lifecycle": [
+      "Identify follow-up point",
+      "Segment need",
+      "Contact customer",
+      "Offer next action",
+      "Book",
+      "Record outcome"
+    ],
+    "questions": [
+      {
+        "qid": "CA04_Q1",
+        "stage": "Trigger & Segmentation",
+        "question": "What event or customer need indicates a follow-up is appropriate?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. 6 weeks after last appointment, package completion, seasonal service cycle..."
+      },
+      {
+        "qid": "CA04_Q2",
+        "stage": "Trigger & Segmentation",
+        "question": "How do you identify customers due for a repeat service without contacting the wrong people?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Booking system segments active vs lapsed customers and excludes open complaints",
+          "Export customer list to spreadsheet and filter manually",
+          "Blast all past customers with generic promo messages",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "CA04_Q3",
+        "stage": "Trigger & Segmentation",
+        "question": "What consent and contact preferences are recorded?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Marketing opt-in flag & preferred channel (SMS vs email) in booking profile..."
+      },
+      {
+        "qid": "CA04_Q4",
+        "stage": "Outreach & Tailored Advice",
+        "question": "Who decides the message, offer and timing?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Marketing/manager sets standard templates and timing intervals..."
+      },
+      {
+        "qid": "CA04_Q5",
+        "stage": "Outreach & Tailored Advice",
+        "question": "How are responses, bookings and opt-outs recorded?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Link tracks bookings automatically; unsubscribes synced to profile..."
+      },
+      {
+        "qid": "CA04_Q6",
+        "stage": "Outreach & Tailored Advice",
+        "question": "What happens when a customer needs personal advice or a tailored recommendation?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Handed over to specialist/consultant for personal call or message..."
+      },
+      {
+        "qid": "CA04_Q7",
+        "stage": "Measurement",
+        "question": "How do you measure repeat booking and customer retention?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Track monthly rebooking rate & repeat revenue in booking system",
+          "Roughly gauge how many familiar faces return",
+          "Not measured",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      }
+    ]
+  }
+]

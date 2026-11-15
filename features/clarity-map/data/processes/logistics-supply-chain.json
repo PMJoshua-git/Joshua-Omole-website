@@ -1,0 +1,400 @@
+[
+  {
+    "process_code": "LS-01",
+    "process_name": "Customer order to dispatch",
+    "industry_id": "logistics-supply-chain",
+    "industry_name": "Logistics & Supply Chain",
+    "work_area": "Fulfilment & Warehouse",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Validate customer orders, check stock/capacity, allocate to warehouse/route, verify packing, and dispatch.",
+    "typical_lifecycle": [
+      "Receive order",
+      "Validate",
+      "Check stock/capacity",
+      "Plan fulfilment",
+      "Pick",
+      "Pack",
+      "Dispatch",
+      "Update customer"
+    ],
+    "questions": [
+      {
+        "qid": "LS01_Q1",
+        "stage": "Order Intake",
+        "question": "How do customer orders enter the operation and where are they recorded?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "ERP / OMS / EDI feed",
+          "Email POs / spreadsheets from customers",
+          "Web portal / online form",
+          "Phone or WhatsApp orders",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "LS01_Q2",
+        "stage": "Validation & Allocation",
+        "question": "What checks are performed on order details, quantities, delivery address and payment/credit status?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Coordinator checks credit limit in accounting and verifies SKU codes manually..."
+      },
+      {
+        "qid": "LS01_Q3",
+        "stage": "Validation & Allocation",
+        "question": "How is stock or capacity availability confirmed?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Real-time WMS/ERP inventory reservation",
+          "Warehouse supervisor physically checks racks or spreadsheet",
+          "Assumed available until picker cannot find it",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "LS01_Q4",
+        "stage": "Validation & Allocation",
+        "question": "Who allocates the order to a warehouse, route or fulfilment team?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Operations planner assigns orders to regional depots each morning..."
+      },
+      {
+        "qid": "LS01_Q5",
+        "stage": "Pick, Pack & Dispatch",
+        "question": "How are picking, packing and loading verified against the order?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Barcode scan verification before sealing",
+          "Paper pick list signed off by checker",
+          "Single picker packs and loads without independent check",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "LS01_Q6",
+        "stage": "Pick, Pack & Dispatch",
+        "question": "What documents and dispatch evidence are created?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Packing slip / delivery note",
+          "Bill of lading / carrier manifest",
+          "Tracking number / customer dispatch notice",
+          "Photo of loaded pallet",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "LS01_Q7",
+        "stage": "Pick, Pack & Dispatch",
+        "question": "What happens when stock, vehicle capacity, address or delivery slot is unavailable?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Order held on backorder sheet and customer service emailed to reschedule..."
+      }
+    ]
+  },
+  {
+    "process_code": "LS-02",
+    "process_name": "Transport planning and dispatch",
+    "industry_id": "logistics-supply-chain",
+    "industry_name": "Logistics & Supply Chain",
+    "work_area": "Fleet & Routing",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Consolidate shipment loads, assign drivers/vehicles, run pre-dispatch checks, and manage live route exceptions.",
+    "typical_lifecycle": [
+      "Collect shipment requirements",
+      "Consolidate",
+      "Plan route/load",
+      "Assign vehicle/driver",
+      "Check readiness",
+      "Dispatch",
+      "Monitor"
+    ],
+    "questions": [
+      {
+        "qid": "LS02_Q1",
+        "stage": "Load Planning",
+        "question": "What information is needed before a shipment can be planned?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Weight, pallet count, and dimensions",
+          "Delivery window / site restrictions",
+          "Special handling (cold chain, fragile, hazmat)",
+          "Collection/drop contact details",
+          "Often incomplete until warehouse finishes packing",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "LS02_Q2",
+        "stage": "Load Planning",
+        "question": "How are loads consolidated and priorities determined?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Routing software groups stops by zone and SLA priority",
+          "Transport planner builds routes manually in spreadsheet / map",
+          "Handled ad hoc as orders finish",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "LS02_Q3",
+        "stage": "Assignment & Readiness",
+        "question": "Who selects the vehicle, driver, route and delivery sequence?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Transport coordinator assigns fleet drivers or third-party hauliers daily..."
+      },
+      {
+        "qid": "LS02_Q4",
+        "stage": "Assignment & Readiness",
+        "question": "What checks confirm vehicle, driver, documents and cargo are ready?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Driver pre-trip walkaround checklist + load manifest sign-off..."
+      },
+      {
+        "qid": "LS02_Q5",
+        "stage": "Dispatch & Monitoring",
+        "question": "How are dispatch instructions and handover details communicated?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Driver mobile app with stop details",
+          "Printed run sheet + WhatsApp / phone call",
+          "Verbal briefing at depot",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "LS02_Q6",
+        "stage": "Dispatch & Monitoring",
+        "question": "How are delays, breakdowns, route changes or failed deliveries escalated?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Driver calls dispatcher who manually phones affected customers..."
+      },
+      {
+        "qid": "LS02_Q7",
+        "stage": "Dispatch & Monitoring",
+        "question": "Where is the live shipment status recorded and who updates customers?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Live TMS/GPS portal sends automatic ETA updates",
+          "Dispatcher tracks via driver calls and replies to customer emails",
+          "Customers only know if they call to ask",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      }
+    ]
+  },
+  {
+    "process_code": "LS-03",
+    "process_name": "Proof of delivery and exception handling",
+    "industry_id": "logistics-supply-chain",
+    "industry_name": "Logistics & Supply Chain",
+    "work_area": "Delivery & Billing Readiness",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Capture signed proof of delivery, resolve shortages or damage claims, and notify finance for billing.",
+    "typical_lifecycle": [
+      "Attempt delivery",
+      "Capture proof",
+      "Confirm recipient",
+      "Record status",
+      "Handle failure/damage/shortage",
+      "Close"
+    ],
+    "questions": [
+      {
+        "qid": "LS03_Q1",
+        "stage": "POD Capture",
+        "question": "What counts as acceptable proof of delivery for your operation?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Digital signature + timestamp",
+          "Geo-tagged photo of goods at site",
+          "Signed paper delivery note",
+          "Recipient name & stamp",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "LS03_Q2",
+        "stage": "POD Capture",
+        "question": "Who captures the proof and where is it stored?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Driver app syncs POD straight to central system",
+          "Driver takes WhatsApp photo or hands paper slip back at end of shift",
+          "Third-party carrier portal downloaded manually later",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "LS03_Q3",
+        "stage": "POD Capture",
+        "question": "How are quantity, condition and recipient details confirmed?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Receiver signs count on screen; shortages noted in remarks..."
+      },
+      {
+        "qid": "LS03_Q4",
+        "stage": "Exception Investigation",
+        "question": "What happens when delivery is refused, partial, late or unsuccessful?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Goods returned to depot and logged on exception sheet for rebooking..."
+      },
+      {
+        "qid": "LS03_Q5",
+        "stage": "Exception Investigation",
+        "question": "Who investigates damage, shortage or disputed delivery?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Operations supervisor checks warehouse load photos, driver notes, and customer claim..."
+      },
+      {
+        "qid": "LS03_Q6",
+        "stage": "Closure & Billing",
+        "question": "How are claims and customer updates tracked to resolution?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Central claims/exception log with owner and due date",
+          "Email chains between customer service, depot, and haulier",
+          "Not tracked formally",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "LS03_Q7",
+        "stage": "Closure & Billing",
+        "question": "How does finance or customer service know a delivery is complete and billable?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "System automatically marks order billable once POD attaches",
+          "Admin compiles paper PODs at end of week and notifies finance",
+          "Finance invoices on dispatch and handles disputes later",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      }
+    ]
+  },
+  {
+    "process_code": "LS-04",
+    "process_name": "Supplier purchase to goods receipt",
+    "industry_id": "logistics-supply-chain",
+    "industry_name": "Logistics & Supply Chain",
+    "work_area": "Procurement & Receiving",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Approve purchase orders, track supplier ETAs, inspect inbound deliveries against POs, and resolve shortages.",
+    "typical_lifecycle": [
+      "Raise demand",
+      "Approve purchase",
+      "Issue order",
+      "Track supplier",
+      "Receive",
+      "Inspect",
+      "Record",
+      "Resolve discrepancy"
+    ],
+    "questions": [
+      {
+        "qid": "LS04_Q1",
+        "stage": "Purchase Request & Approval",
+        "question": "How is the need for replenishment or purchasing identified?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "System reorder trigger or MRP report",
+          "Warehouse/project lead emails or messages buyer",
+          "Manual stock check when running low",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "LS04_Q2",
+        "stage": "Purchase Request & Approval",
+        "question": "What information and approvals are required before a purchase order is issued?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Quote, supplier terms, cost code; manager/finance sign-off over threshold..."
+      },
+      {
+        "qid": "LS04_Q3",
+        "stage": "Supplier Tracking",
+        "question": "Who selects the supplier and confirms price, quantity and delivery terms?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Procurement officer checks approved supplier list and issues PO..."
+      },
+      {
+        "qid": "LS04_Q4",
+        "stage": "Supplier Tracking",
+        "question": "How are supplier confirmations and expected delivery dates tracked?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "PO tracker with confirmed ETA dates visible to warehouse",
+          "Buyer keeps confirmations in email inbox; warehouse doesn't always know when stock arrives",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "LS04_Q5",
+        "stage": "Goods Receipt & Reconciliation",
+        "question": "Who checks received goods against the order and delivery documents?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Receiving team checks blind or against PO in WMS/ERP",
+          "Warehouse signs carrier note and hands paperwork to office later",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "LS04_Q6",
+        "stage": "Goods Receipt & Reconciliation",
+        "question": "How are shortages, damage, substitutions or late deliveries recorded and escalated?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Quarantine note created, photos emailed to procurement to claim credit..."
+      },
+      {
+        "qid": "LS04_Q7",
+        "stage": "Goods Receipt & Reconciliation",
+        "question": "When is the receipt accepted and the inventory or finance record updated?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Three-way match (PO + GRN + invoice) verified before payment and stock release..."
+      }
+    ]
+  }
+]

@@ -1,0 +1,397 @@
+[
+  {
+    "process_code": "ST-01",
+    "process_name": "Customer onboarding to activation",
+    "industry_id": "saas-tech",
+    "industry_name": "SaaS & Tech",
+    "work_area": "Customer Success",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Handle sales-to-onboarding handoff, account setup, data migration, activation verification, and CS transition.",
+    "typical_lifecycle": [
+      "Sales handoff",
+      "Kickoff",
+      "Configure account",
+      "Invite users",
+      "Migrate data",
+      "Train",
+      "Confirm activation",
+      "Hand to success"
+    ],
+    "questions": [
+      {
+        "qid": "ST01_Q1",
+        "stage": "Sales Handoff",
+        "question": "What event triggers onboarding and what information arrives from sales or self-signup?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "CRM deal closed-won triggers structured handoff note",
+          "Self-serve checkout / signup webhook",
+          "Sales rep sends Slack/email summary informally",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "ST01_Q2",
+        "stage": "Sales Handoff",
+        "question": "What customer goals, plan, technical requirements and commitments are recorded?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Target go-live date, plan tier, custom integrations promised during sales..."
+      },
+      {
+        "qid": "ST01_Q3",
+        "stage": "Configuration & Migration",
+        "question": "Who owns kickoff, configuration, migration and customer communication?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Dedicated onboarding specialist owns end-to-end",
+          "Split between CSM, solutions engineer, and support",
+          "Founder or product lead handles each onboarding ad hoc",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "ST01_Q4",
+        "stage": "Configuration & Migration",
+        "question": "How are access, permissions, integrations and data migration requested and verified?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Onboarding form collects CSV exports and API keys; team manually tests import..."
+      },
+      {
+        "qid": "ST01_Q5",
+        "stage": "Activation & Transition",
+        "question": "What does 'activated' mean for this customer, and who confirms it?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Written activation criteria + usage milestone verified by onboarding lead",
+          "First live workflow run / users invited",
+          "No formal definition — once training call finishes",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "ST01_Q6",
+        "stage": "Activation & Transition",
+        "question": "How are risks, blockers and customer dependencies tracked?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Tracked in onboarding board or weekly standup when customer stalls..."
+      },
+      {
+        "qid": "ST01_Q7",
+        "stage": "Activation & Transition",
+        "question": "What information is handed to ongoing customer success and how is acceptance confirmed?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Account summary, open tickets, and baseline usage handed off in CRM..."
+      }
+    ]
+  },
+  {
+    "process_code": "ST-02",
+    "process_name": "Technical support ticket to resolution",
+    "industry_id": "saas-tech",
+    "industry_name": "SaaS & Tech",
+    "work_area": "Support Operations",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Capture user bug reports, classify severity, gather reproduction evidence, escalate to engineering, and close.",
+    "typical_lifecycle": [
+      "Receive issue",
+      "Classify severity",
+      "Gather evidence",
+      "Assign",
+      "Investigate",
+      "Communicate",
+      "Resolve",
+      "Close",
+      "Learn"
+    ],
+    "questions": [
+      {
+        "qid": "ST02_Q1",
+        "stage": "Ticket Intake",
+        "question": "Where do users report issues and what information is required at intake?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "In-app support widget / helpdesk portal",
+          "Support email",
+          "Shared Slack / Discord channel",
+          "Account manager / sales email",
+          "Not sure"
+        ],
+        "allowOther": true,
+        "allowNotSure": true
+      },
+      {
+        "qid": "ST02_Q2",
+        "stage": "Ticket Intake",
+        "question": "How do you classify severity, business impact and urgency?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Written severity tiers (P1–P4) based on user impact",
+          "Support agent judges urgency informally",
+          "Handled first-in-first-out unless an enterprise customer escalates",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "ST02_Q3",
+        "stage": "Triage & Escalation",
+        "question": "What evidence is gathered before assigning the issue to engineering or another team?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Structured checklist: steps to reproduce, account ID, logs, screenshot",
+          "Support pastes customer message straight into engineering chat/Jira",
+          "Engineering has to go back and ask customer for details",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "ST02_Q4",
+        "stage": "Triage & Escalation",
+        "question": "Who owns triage, investigation, customer updates and final resolution?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Tier-1 support triages, engineering fixes code, support updates customer..."
+      },
+      {
+        "qid": "ST02_Q5",
+        "stage": "Resolution & Learning",
+        "question": "How are response and update expectations set by severity?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Defined SLA timers per severity level",
+          "Best-effort replies; no formal SLA tracking",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "ST02_Q6",
+        "stage": "Resolution & Learning",
+        "question": "What is the escalation path for incidents or security concerns?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. On-call engineer paged via Slack/PagerDuty; CTO notified for security..."
+      },
+      {
+        "qid": "ST02_Q7",
+        "stage": "Resolution & Learning",
+        "question": "How are root causes, known fixes and repeat issues recorded?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Linked to knowledge base / known-issue library & reviewed monthly",
+          "Closed in ticket thread only; repeat bugs noticed manually",
+          "Not recorded systematically",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      }
+    ]
+  },
+  {
+    "process_code": "ST-03",
+    "process_name": "Product change or release management",
+    "industry_id": "saas-tech",
+    "industry_name": "SaaS & Tech",
+    "work_area": "Product & Engineering",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Assess product requests and defects, prioritise backlog, verify QA & approvals, release, and monitor post-deploy.",
+    "typical_lifecycle": [
+      "Capture request",
+      "Assess",
+      "Prioritise",
+      "Plan",
+      "Build",
+      "Test",
+      "Approve",
+      "Release",
+      "Monitor"
+    ],
+    "questions": [
+      {
+        "qid": "ST03_Q1",
+        "stage": "Backlog & Assessment",
+        "question": "Where do product requests and defects enter the backlog?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Issue tracker (Linear / Jira / GitHub Issues)",
+          "Customer feedback portal / board",
+          "Slack messages from sales or support",
+          "Spreadsheets or meeting notes",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "ST03_Q2",
+        "stage": "Backlog & Assessment",
+        "question": "What information is required to assess value, urgency, customer impact and risk?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Problem summary, affected customer segment, severity, effort estimate..."
+      },
+      {
+        "qid": "ST03_Q3",
+        "stage": "Prioritisation & Planning",
+        "question": "Who decides priority and what criteria are used?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Product lead + CTO review weekly against roadmap goals and customer churn risk..."
+      },
+      {
+        "qid": "ST03_Q4",
+        "stage": "Prioritisation & Planning",
+        "question": "How are dependencies, owners and release dates agreed?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Sprint/cycle planning with assigned owner and target date",
+          "Informal Slack agreement; dates shift frequently",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "ST03_Q5",
+        "stage": "Testing & Release",
+        "question": "What testing and approval are required before release?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Automated CI tests + staging QA sign-off by product/lead engineer..."
+      },
+      {
+        "qid": "ST03_Q6",
+        "stage": "Testing & Release",
+        "question": "How are customers and internal teams informed about changes?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Internal release notes before launch + customer changelog",
+          "Quick Slack note after deploy; customers rarely notified proactively",
+          "Support often finds out when customers ask",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "ST03_Q7",
+        "stage": "Testing & Release",
+        "question": "What monitoring, rollback or incident process applies after release?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Error monitoring alerts checked for 30 mins; feature flag or revert if regression appears..."
+      }
+    ]
+  },
+  {
+    "process_code": "ST-04",
+    "process_name": "Subscription change, renewal and billing exception",
+    "industry_id": "saas-tech",
+    "industry_name": "SaaS & Tech",
+    "work_area": "Revenue Operations",
+    "questionnaire_version": "1.0.0",
+    "short_description": "Verify identity & commercial terms for upgrades, downgrades, cancellations, credits, and billing disputes.",
+    "typical_lifecycle": [
+      "Receive request",
+      "Verify account/authority",
+      "Assess terms",
+      "Approve",
+      "Change subscription",
+      "Confirm",
+      "Reconcile"
+    ],
+    "questions": [
+      {
+        "qid": "ST04_Q1",
+        "stage": "Request & Verification",
+        "question": "How do customers request plan changes, cancellations or billing corrections?",
+        "type": "multi_select",
+        "required": true,
+        "options": [
+          "Self-serve billing portal",
+          "Support / billing email",
+          "Customer success manager or sales rep",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "ST04_Q2",
+        "stage": "Request & Verification",
+        "question": "How do you verify account identity and the requester's authority?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Logged-in billing admin role or verified primary email match",
+          "Manual check against CRM primary contact",
+          "No formal check — processed from whichever email asks",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "ST04_Q3",
+        "stage": "Commercial Rules & Approval",
+        "question": "What commercial or contractual rules determine eligibility and effective dates?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Annual contracts require 30-day notice; mid-cycle upgrades prorate immediately..."
+      },
+      {
+        "qid": "ST04_Q4",
+        "stage": "Commercial Rules & Approval",
+        "question": "Who approves discounts, credits, refunds or exceptions?",
+        "type": "single_select",
+        "required": true,
+        "options": [
+          "Clear threshold limits (support up to X, finance/VP above X)",
+          "Founder / finance director approves every exception ad hoc",
+          "CSMs apply credits without consistent approval",
+          "Not sure"
+        ],
+        "allowNotSure": true
+      },
+      {
+        "qid": "ST04_Q5",
+        "stage": "Execution & Reconciliation",
+        "question": "How are changes applied and checked against billing records?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Updated in Stripe/billing tool, then manually copied into CRM & accounting..."
+      },
+      {
+        "qid": "ST04_Q6",
+        "stage": "Execution & Reconciliation",
+        "question": "How is the customer informed and the account record updated?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Confirmation receipt emailed and CRM renewal date/ARR updated..."
+      },
+      {
+        "qid": "ST04_Q7",
+        "stage": "Execution & Reconciliation",
+        "question": "What happens when billing data, contract terms and customer expectations conflict?",
+        "type": "short_text",
+        "required": true,
+        "placeholder": "e.g. Escalated to RevOps/finance to review signed MSA vs Stripe history..."
+      }
+    ]
+  }
+]
