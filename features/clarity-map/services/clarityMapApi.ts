@@ -105,6 +105,11 @@ export async function analyzeWorkflow(
   }
 
   if (!res.ok) {
+    if (res.status === 504 && !payload?.error) {
+      throw new Error(
+        'The workflow analysis took longer than expected on the server. Please try again.'
+      );
+    }
     throw new Error(
       payload?.error || 'Could not complete workflow analysis right now. Please try again.'
     );

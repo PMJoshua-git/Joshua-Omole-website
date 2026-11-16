@@ -163,6 +163,26 @@ export class InMemorySlidingWindowStore implements SlidingWindowStore {
   }
 }
 
+const REDIS_OP_TIMEOUT_MS = 2500;
+
+function withRedisTimeout<T>(promise: Promise<T>, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`Upstash Redis ${label} timed out after ${REDIS_OP_TIMEOUT_MS}ms`));
+    }, REDIS_OP_TIMEOUT_MS);
+    promise.then(
+      (val) => {
+        clearTimeout(timer);
+        resolve(val);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      }
+    );
+  });
+}
+
 export class UpstashSlidingWindowStore implements SlidingWindowStore {
   private client: Redis;
 
@@ -176,10 +196,13 @@ export class UpstashSlidingWindowStore implements SlidingWindowStore {
     windowMs: number
   ): Promise<{ count: number; oldestScoreMs: number | null }> {
     const cutoff = nowMs - windowMs;
-    await this.client.zremrangebyscore(key, '-inf', cutoff);
-    const items = await this.client.zrange<(string | number)[]>(key, 0, -1, {
-      withScores: true,
-    });
+    await withRedisTimeout(this.client.zremrangebyscore(key, '-inf', cutoff), 'zremrangebyscore');
+    const items = await withRedisTimeout(
+      this.client.zrange<(string | number)[]>(key, 0, -1, {
+        withScores: true,
+      }),
+      'zrange'
+    );
 
     if (!items || items.length < 2) {
       return { count: 0, oldestScoreMs: null };
@@ -202,10 +225,13 @@ export class UpstashSlidingWindowStore implements SlidingWindowStore {
     member: string,
     ttlSeconds: number
   ): Promise<{ allowed: boolean; count: number; oldestScoreMs: number | null }> {
-    const res = (await this.client.eval(
-      ATOMIC_RESERVE_LUA,
-      [key],
-      [nowMs, windowMs, limit, member, ttlSeconds]
+    const res = (await withRedisTimeout(
+      this.client.eval(
+        ATOMIC_RESERVE_LUA,
+        [key],
+        [nowMs, windowMs, limit, member, ttlSeconds]
+      ),
+      'eval'
     )) as [number, number, number];
 
     const allowed = Number(res?.[0]) === 1;
@@ -219,7 +245,7 @@ export class UpstashSlidingWindowStore implements SlidingWindowStore {
   }
 
   async release(key: string, member: string): Promise<void> {
-    await this.client.zrem(key, member);
+    await withRedisTimeout(this.client.zrem(key, member), 'zrem');
   }
 }
 

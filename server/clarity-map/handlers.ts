@@ -156,9 +156,13 @@ export async function handleAnalyzeRequest(
   res: HttpResponseLike,
   deps: ClarityMapHandlerDeps = {}
 ) {
+  const startedAt = Date.now();
   const body = parseRequestBody(req.body);
   const parsed = questionnaireSubmissionSchema.safeParse(body);
   if (!parsed.success) {
+    console.warn('[ClarityMap /analyze] Validation failed on submission:', {
+      issues: parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).slice(0, 6),
+    });
     return res.status(400).json({
       error: 'Please review your answers and ensure required steps are filled in.',
       details: parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`),
@@ -169,8 +173,16 @@ export async function handleAnalyzeRequest(
   const analyzer = deps.analyzer ?? analyzeWorkflowWithGemini;
   const trustProxy = resolveTrustProxy(req, deps.trustProxy);
 
-  // Enforce IP rate limit server-side BEFORE calling the AI model
-  const reservation = await limiter.reserveGenerationSlot(req, { trustProxy });
+  let reservation: RateLimitReservation;
+  try {
+    reservation = await limiter.reserveGenerationSlot(req, { trustProxy });
+  } catch (rateErr: any) {
+    console.error('[ClarityMap /analyze] Rate limiter threw unexpectedly:', rateErr?.message || rateErr);
+    return res.status(500).json({
+      error: 'An unexpected error occurred while preparing your workflow analysis. Please try again.',
+    });
+  }
+
   applyHeaders(res, reservation.headers);
 
   if (!reservation.allowed) {
@@ -189,9 +201,21 @@ export async function handleAnalyzeRequest(
   }
 
   const { sanitized, redactedPII } = sanitizeSubmission(parsed.data);
+  console.info('[ClarityMap /analyze] Starting analysis:', {
+    processCode: sanitized.process_code,
+    industryId: sanitized.industry_id,
+    answerCount: sanitized.answers.length,
+    rateLimitMs: Date.now() - startedAt,
+    usedRedisFallback: reservation.reservationToken?.usedFallback ?? false,
+  });
 
   try {
     const analysis = await analyzer(sanitized, redactedPII);
+    console.info('[ClarityMap /analyze] Analysis succeeded:', {
+      processCode: sanitized.process_code,
+      totalMs: Date.now() - startedAt,
+      readiness: analysis.readiness?.score_percent,
+    });
     return res.status(200).json({
       ok: true,
       analysis,
@@ -205,16 +229,33 @@ export async function handleAnalyzeRequest(
   } catch (err: any) {
     // Refund reserved slot on any AI, validation, or server error
     await limiter.releaseGenerationSlot(reservation.reservationToken);
+    const totalMs = Date.now() - startedAt;
 
     if (err instanceof GeminiConfigurationError) {
+      console.error('[ClarityMap /analyze] Configuration error:', {
+        processCode: sanitized.process_code,
+        totalMs,
+        message: err.message,
+      });
       return res.status(503).json({
         error: 'Clarity Map analysis is temporarily unavailable on the server.',
       });
     }
     if (err instanceof GeminiAnalysisError) {
+      console.error('[ClarityMap /analyze] Gemini analysis error:', {
+        processCode: sanitized.process_code,
+        statusCode: err.statusCode,
+        totalMs,
+        message: err.message,
+      });
       return res.status(err.statusCode).json({ error: err.message });
     }
-    console.error('[ClarityMap /analyze] Unexpected error:', err);
+    console.error('[ClarityMap /analyze] Unexpected error:', {
+      processCode: sanitized.process_code,
+      totalMs,
+      name: err?.name,
+      message: err?.message || String(err),
+    });
     return res.status(500).json({
       error: 'An unexpected error occurred while analyzing your workflow. Please try again.',
     });

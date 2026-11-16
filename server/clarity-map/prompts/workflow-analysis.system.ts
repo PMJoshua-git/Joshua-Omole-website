@@ -343,7 +343,15 @@ Use "none" for human_checkpoint only for pure notifications.
 - automated_state.status, automated_state.reason, automated_state.revisit_when
 - automation_opportunities[].verdict, why_this_volume, revisit_when
 - automated_state.nodes[].automation: structured fields above
-- implementation_order[0].includes_baseline`;
+- implementation_order[0].includes_baseline
+
+CRITICAL V2 CHECKLIST (include every one of these in your JSON output):
+1. Top-level "schema_version": 2.
+2. Every node in current_state.nodes, redesigned_state.nodes, and non-empty automated_state.nodes MUST have "edges": [{"to": "...", "label": "..."}] matching its "next" ids.
+3. Every non-empty stage MUST end with at least one terminal node where "type": "end", "next": [], "edges": [], "time_min": null, "time_max": null, and every earlier node must have a path to an "end" node.
+4. Keep reader-facing text plain English ONLY: never write node ids (c1, r2, a3), question ids (C1, RE03_Q1), or snake_case tokens (no_record, follow_up) inside prose fields—use hyphens or spaces instead.
+5. Set "implementation_order[0].includes_baseline": true and include timing/recording each step across the next 5 to 10 runs in Week 1 actions.
+6. Keep labels concise (6 words max) and omit "AI" from automated_state node labels.`;
 
 export const CLARITY_MAP_SYSTEM_PROMPT_V2 = `${CLARITY_MAP_SYSTEM_PROMPT}\n\n${SYSTEM_PROMPT_V2_APPENDIX}`;
 

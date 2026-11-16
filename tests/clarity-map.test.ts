@@ -49,6 +49,7 @@ import {
   LoopsConfigurationError,
   syncClarityMapContactToLoops,
 } from '../server/clarity-map/crm/loopsSync';
+import { normalizeGeminiOutputForV2 } from '../server/clarity-map/ai/geminiAnalyzer';
 import type { ClarityMapResult, QuestionAnswerValue } from '../features/clarity-map/types/clarityMap';
 
 /**
@@ -1420,3 +1421,49 @@ test('Readiness computation & Loops CRM error handling behave deterministically'
 
   if (prevKey !== undefined) process.env.LOOPS_API_KEY = prevKey;
 });
+
+test('normalizeGeminiOutputForV2 normalizes missing v2 boilerplate and prevents unnecessary repair calls', () => {
+  const raw = structuredClone(makeRe03V2Fixture()) as any;
+  delete raw.schema_version;
+  // Remove edges and terminal end nodes from current & redesigned stages
+  raw.current_state.nodes = raw.current_state.nodes.slice(0, -1).map((n: any, idx: number, arr: any[]) => {
+    const copy = { ...n };
+    delete copy.edges;
+    if (idx === arr.length - 1) copy.next = [];
+    return copy;
+  });
+  raw.redesigned_state.nodes = raw.redesigned_state.nodes.slice(0, -1).map((n: any, idx: number, arr: any[]) => {
+    const copy = { ...n };
+    delete copy.edges;
+    if (idx === arr.length - 1) copy.next = [];
+    return copy;
+  });
+  raw.automated_state = {
+    nodes: [],
+    not_automated: raw.automated_state.not_automated,
+  };
+  raw.bridge_diagnosis.D.finding = 'No written record because of no_record and slow follow_up.';
+  delete raw.implementation_order[0].includes_baseline;
+
+  const submission = {
+    industry: 'Real Estate',
+    industry_id: 'real-estate',
+    process_code: 'RE-03',
+    process_name: 'Property maintenance request',
+    questionnaire_version: '1.0.0',
+    answers: [{ qid: 'C1', question: 'Frequency', answer: 'Weekly', time_range: null }],
+  };
+  const volumeContext = {
+    runs_per_week: { min: 4, max: 8 },
+    volume_band: 'low' as const,
+    basis: 'weekly' as const,
+  };
+
+  const normalized = normalizeGeminiOutputForV2(raw, submission, volumeContext);
+  const outcome = validateClarityMapAnalysis(normalized, { volumeContext, strictV2: true });
+  assert.equal(outcome.valid, true, `Normalized output failed v2 validation: ${outcome.errors.join('; ')}`);
+  assert.equal(outcome.data?.schema_version, 2);
+  assert.equal(outcome.data?.automated_state.status, 'not_yet');
+  assert.equal(outcome.data?.implementation_order[0].includes_baseline, true);
+});
+

@@ -11,6 +11,7 @@ import {
 } from '../../../features/clarity-map/services/processLibrary.js';
 import {
   computeVolumeContext,
+  type VolumeContext,
 } from '../../../features/clarity-map/services/volumeContext.js';
 import type {
   ClarityMapResult,
@@ -18,6 +19,11 @@ import type {
 } from '../../../features/clarity-map/types/clarityMap.js';
 
 const GEMINI_MODEL = 'gemini-4-hydrogen';
+const TOTAL_ANALYZER_BUDGET_MS = 52_000;
+const PRIMARY_CALL_TIMEOUT_MS = 35_000;
+const REPAIR_CALL_TIMEOUT_MS = 18_000;
+const MIN_BUDGET_FOR_RETRY_MS = 14_000;
+const MIN_BUDGET_FOR_REPAIR_MS = 12_000;
 
 function getGeminiClient(): GoogleGenAI {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -63,10 +69,396 @@ function extractJsonString(rawText: string): string {
   return trimmed;
 }
 
+function withCallTimeout<T>(promise: Promise<T>, timeoutMs: number, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`GEMINI_CALL_TIMEOUT: ${label} exceeded ${timeoutMs}ms`));
+    }, timeoutMs);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      }
+    );
+  });
+}
+
+function isTransientGeminiError(err: any): boolean {
+  const msg = String(err?.message || err || '');
+  const status = Number(err?.status ?? err?.statusCode ?? 0);
+  if (status === 503 || status === 500 || status === 502 || status === 504) return true;
+  return (
+    msg.includes('UNAVAILABLE') ||
+    msg.includes('503') ||
+    msg.includes('500') ||
+    msg.includes('ECONNRESET') ||
+    msg.includes('ETIMEDOUT') ||
+    msg.includes('fetch failed')
+  );
+}
+
+const SNAKE_TOKEN_REPLACEMENTS: Array<[RegExp, string]> = [
+  [/\bsingle_person_dependency\b/g, 'single-person dependency'],
+  [/\bre_entry\b/g, 're-entry'],
+  [/\bno_owner\b/g, 'no assigned owner'],
+  [/\bno_record\b/g, 'no written record'],
+  [/\bno_status\b/g, 'no visible status'],
+  [/\brework_risk\b/g, 'rework risk'],
+  [/\bno_rule\b/g, 'no written rule'],
+  [/\bno_review\b/g, 'no scheduled review'],
+  [/\bfollow_up\b/gi, 'follow-up'],
+  [/\bsign_off\b/gi, 'sign-off'],
+  [/\bhand_off\b/gi, 'handoff'],
+  [/\bcheck_in\b/gi, 'check-in'],
+  [/\be_commerce\b/gi, 'e-commerce'],
+];
+
+function cleanReaderText(value: unknown): unknown {
+  if (typeof value !== 'string') return value;
+  let cleaned = value;
+  for (const [pattern, replacement] of SNAKE_TOKEN_REPLACEMENTS) {
+    cleaned = cleaned.replace(pattern, replacement);
+  }
+  return cleaned;
+}
+
+function cleanReaderStringsInPlace(obj: any): void {
+  if (!obj || typeof obj !== 'object') return;
+  if (typeof obj.summary?.headline === 'string') {
+    obj.summary.headline = cleanReaderText(obj.summary.headline);
+  }
+  if (typeof obj.summary?.paragraph === 'string') {
+    obj.summary.paragraph = cleanReaderText(obj.summary.paragraph);
+  }
+  if (typeof obj.time_estimate?.caveat === 'string') {
+    obj.time_estimate.caveat = cleanReaderText(obj.time_estimate.caveat);
+  }
+  if (Array.isArray(obj.time_estimate?.assumptions)) {
+    obj.time_estimate.assumptions = obj.time_estimate.assumptions.map(cleanReaderText);
+  }
+  if (Array.isArray(obj.current_state?.visibility_gaps)) {
+    obj.current_state.visibility_gaps = obj.current_state.visibility_gaps.map(cleanReaderText);
+  }
+  if (obj.bridge_diagnosis && typeof obj.bridge_diagnosis === 'object') {
+    for (const k of ['B', 'R', 'I', 'D', 'G', 'E']) {
+      if (typeof obj.bridge_diagnosis[k]?.finding === 'string') {
+        obj.bridge_diagnosis[k].finding = cleanReaderText(obj.bridge_diagnosis[k].finding);
+      }
+    }
+  }
+  if (Array.isArray(obj.redesigned_state?.removed)) {
+    for (const rem of obj.redesigned_state.removed) {
+      if (typeof rem?.reason === 'string') rem.reason = cleanReaderText(rem.reason);
+    }
+  }
+  if (Array.isArray(obj.redesigned_state?.rules_introduced)) {
+    obj.redesigned_state.rules_introduced = obj.redesigned_state.rules_introduced.map(cleanReaderText);
+  }
+  if (typeof obj.automated_state?.reason === 'string') {
+    obj.automated_state.reason = cleanReaderText(obj.automated_state.reason);
+  }
+  if (typeof obj.automated_state?.revisit_when === 'string') {
+    obj.automated_state.revisit_when = cleanReaderText(obj.automated_state.revisit_when);
+  }
+  if (Array.isArray(obj.automated_state?.not_automated)) {
+    for (const na of obj.automated_state.not_automated) {
+      if (typeof na?.reason === 'string') na.reason = cleanReaderText(na.reason);
+    }
+  }
+  if (Array.isArray(obj.bottlenecks)) {
+    for (const b of obj.bottlenecks) {
+      if (typeof b?.title === 'string') b.title = cleanReaderText(b.title);
+      if (typeof b?.why_it_matters === 'string') b.why_it_matters = cleanReaderText(b.why_it_matters);
+    }
+  }
+  if (Array.isArray(obj.quick_wins)) {
+    for (const q of obj.quick_wins) {
+      if (typeof q?.action === 'string') q.action = cleanReaderText(q.action);
+    }
+  }
+  if (Array.isArray(obj.automation_opportunities)) {
+    for (const o of obj.automation_opportunities) {
+      if (typeof o?.name === 'string') o.name = cleanReaderText(o.name);
+      if (typeof o?.why_this_volume === 'string') o.why_this_volume = cleanReaderText(o.why_this_volume);
+      if (typeof o?.revisit_when === 'string') o.revisit_when = cleanReaderText(o.revisit_when);
+    }
+  }
+  if (Array.isArray(obj.implementation_order)) {
+    for (const wk of obj.implementation_order) {
+      if (typeof wk?.focus === 'string') wk.focus = cleanReaderText(wk.focus);
+      if (Array.isArray(wk?.actions)) {
+        wk.actions = wk.actions.map(cleanReaderText);
+      }
+    }
+  }
+}
+
+function nextNodeId(prefix: string, nodes: any[]): string {
+  let maxNum = 0;
+  for (const n of nodes) {
+    const m = typeof n?.id === 'string' ? n.id.match(/^[cra](\d+)$/) : null;
+    if (m) {
+      maxNum = Math.max(maxNum, Number.parseInt(m[1], 10));
+    }
+  }
+  return `${prefix}${maxNum + 1}`;
+}
+
+function normalizeStageNodes(
+  stageKey: 'current_state' | 'redesigned_state' | 'automated_state',
+  prefix: 'c' | 'r' | 'a',
+  nodes: any[]
+): void {
+  if (!Array.isArray(nodes) || nodes.length === 0) return;
+
+  for (const node of nodes) {
+    if (!node || typeof node !== 'object') continue;
+    if (typeof node.label === 'string') {
+      node.label = cleanReaderText(node.label);
+      if (stageKey === 'automated_state') {
+        node.label = node.label.replace(/\bAI\b/g, 'Automated');
+      }
+    }
+    if (typeof node.actor === 'string') node.actor = cleanReaderText(node.actor);
+    if (typeof node.tool === 'string') node.tool = cleanReaderText(node.tool);
+    if (typeof node.rationale === 'string') node.rationale = cleanReaderText(node.rationale);
+    if (node.automation && typeof node.automation === 'object') {
+      for (const field of [
+        'description',
+        'function',
+        'trigger',
+        'input',
+        'action',
+        'exception_route',
+        'owner',
+        'human_checkpoint',
+      ]) {
+        if (typeof node.automation[field] === 'string') {
+          node.automation[field] = cleanReaderText(node.automation[field]);
+        }
+      }
+    }
+
+    if (node.type === 'end') {
+      node.next = [];
+      node.edges = [];
+      node.time_min = null;
+      node.time_max = null;
+      if (stageKey === 'current_state' && !Array.isArray(node.pain_flags)) {
+        node.pain_flags = [];
+      }
+      if (stageKey === 'current_state' && !Array.isArray(node.evidence)) {
+        node.evidence = [];
+      }
+      if (stageKey === 'current_state' && typeof node.inferred !== 'boolean') {
+        node.inferred = true;
+      }
+      continue;
+    }
+
+    if (stageKey === 'current_state') {
+      if (!Array.isArray(node.evidence)) node.evidence = [];
+      if (node.evidence.length === 0) node.inferred = true;
+    }
+
+    const rawNext = Array.isArray(node.next) ? node.next.map(String) : [];
+    const nodeLabelById = new Map<string, string>(
+      nodes
+        .filter((n) => n && typeof n.id === 'string' && typeof n.label === 'string')
+        .map((n) => [n.id, n.label])
+    );
+    const fallbackDecisionLabel = (targetId: string, idx: number): string => {
+      const targetLabel = nodeLabelById.get(targetId);
+      if (targetLabel) {
+        const words = targetLabel.trim().split(/\s+/).slice(0, 4).join(' ');
+        if (words) return words;
+      }
+      return idx === 0 ? 'Primary path' : `Alternative ${idx}`;
+    };
+
+    if (!Array.isArray(node.edges)) {
+      node.edges = rawNext.map((to: string, idx: number) => ({
+        to,
+        label: node.type === 'decision' ? fallbackDecisionLabel(to, idx) : '',
+      }));
+    } else {
+      node.edges = node.edges
+        .filter((e: any) => e && typeof e.to === 'string' && e.to.trim() !== '')
+        .map((e: any, idx: number) => {
+          const to = e.to.trim();
+          const rawLabel = typeof e.label === 'string' ? String(cleanReaderText(e.label)).trim() : '';
+          return {
+            to,
+            label:
+              node.type === 'decision' && rawLabel === ''
+                ? fallbackDecisionLabel(to, idx)
+                : rawLabel,
+          };
+        });
+      if (rawNext.length === 0 && node.edges.length > 0) {
+        node.next = node.edges.map((e: { to: string }) => e.to);
+      }
+    }
+    if (!Array.isArray(node.next)) {
+      node.next = [];
+    }
+  }
+
+  // Ensure at least one terminal "end" node exists when under the 12-node cap
+  const hasEndNode = nodes.some((n) => n?.type === 'end');
+  if (!hasEndNode && nodes.length < 12) {
+    const endId = nextNodeId(prefix, nodes);
+    const terminalNodes = nodes.filter(
+      (n) =>
+        n &&
+        (!Array.isArray(n.edges) || n.edges.length === 0) &&
+        (!Array.isArray(n.next) || n.next.length === 0)
+    );
+    const targetsToLink =
+      terminalNodes.length > 0 ? terminalNodes : [nodes[nodes.length - 1]];
+
+    for (const t of targetsToLink) {
+      if (!t) continue;
+      t.next = [endId];
+      t.edges = [{ to: endId, label: '' }];
+    }
+
+    const baseEnd: Record<string, any> = {
+      id: endId,
+      label: 'Process complete',
+      type: 'end',
+      actor: targetsToLink[0]?.actor || 'Process Owner',
+      tool: targetsToLink[0]?.tool || 'Shared Tracker',
+      time_min: null,
+      time_max: null,
+      next: [],
+      edges: [],
+    };
+
+    if (stageKey === 'current_state') {
+      baseEnd.pain_flags = [];
+      baseEnd.inferred = true;
+      baseEnd.evidence = [];
+    } else if (stageKey === 'redesigned_state') {
+      baseEnd.change_type = 'unchanged';
+      baseEnd.bridge_letter = 'B';
+      baseEnd.replaces = [];
+      baseEnd.rationale = 'Marks clear completion of the redesigned workflow.';
+    } else {
+      baseEnd.automation = {
+        type: 'status_notification',
+        description: 'Marks clear completion of the workflow.',
+        function: 'Completion marker',
+        trigger: 'Final step completes',
+        input: 'Completed workflow record',
+        action: 'Record workflow completion',
+        exception_route: 'Flag incomplete items for owner review',
+        owner: targetsToLink[0]?.actor || 'Process Owner',
+        human_checkpoint: 'none',
+      };
+      baseEnd.from = [];
+    }
+
+    nodes.push(baseEnd);
+  }
+}
+
+/**
+ * Losslessly normalizes safe structural v2 boilerplate (schema_version, edges, end node,
+ * Week 1 baseline flag, automated_state status, and accidental snake_case leaks) before
+ * running strict schema & graph validation so valid analyses succeed on the first pass.
+ */
+export function normalizeGeminiOutputForV2(
+  raw: unknown,
+  submission: QuestionnaireSubmission,
+  volumeContext: VolumeContext
+): unknown {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return raw;
+  }
+
+  const draft: any = structuredClone(raw);
+  draft.schema_version = 2;
+
+  draft.meta = {
+    industry: draft.meta?.industry || submission.industry,
+    process_code: draft.meta?.process_code || submission.process_code,
+    process_name: draft.meta?.process_name || submission.process_name,
+    questionnaire_version:
+      draft.meta?.questionnaire_version || submission.questionnaire_version,
+    analysis_version: draft.meta?.analysis_version || CLARITY_MAP_ANALYSIS_VERSION,
+  };
+
+  if (draft.current_state?.nodes) {
+    normalizeStageNodes('current_state', 'c', draft.current_state.nodes);
+  }
+  if (draft.redesigned_state?.nodes) {
+    normalizeStageNodes('redesigned_state', 'r', draft.redesigned_state.nodes);
+  }
+  if (draft.automated_state) {
+    const autoNodes = Array.isArray(draft.automated_state.nodes)
+      ? draft.automated_state.nodes
+      : [];
+    if (autoNodes.length > 0) {
+      normalizeStageNodes('automated_state', 'a', autoNodes);
+    }
+
+    const operationalAutoCount = autoNodes.filter((n: any) => n?.type !== 'end').length;
+    if (operationalAutoCount === 0) {
+      draft.automated_state.nodes = [];
+      draft.automated_state.status = 'not_yet';
+      if (!draft.automated_state.reason || String(draft.automated_state.reason).trim() === '') {
+        draft.automated_state.reason =
+          'At current volume and process maturity, operating-system fixes deliver the meaningful gains before adding automation.';
+      }
+      if (
+        !draft.automated_state.revisit_when ||
+        String(draft.automated_state.revisit_when).trim() === ''
+      ) {
+        draft.automated_state.revisit_when =
+          'Revisit lightweight automation once weekly volume exceeds 10 consistent runs.';
+      }
+    } else if (
+      volumeContext.volume_band === 'low' ||
+      volumeContext.volume_band === 'unknown'
+    ) {
+      if (!draft.automated_state.status || draft.automated_state.status === 'recommended') {
+        draft.automated_state.status = 'limited';
+      }
+    } else if (!draft.automated_state.status) {
+      draft.automated_state.status = 'recommended';
+    }
+  }
+
+  if (Array.isArray(draft.implementation_order) && draft.implementation_order.length === 4) {
+    draft.implementation_order.sort((a: any, b: any) => Number(a?.week) - Number(b?.week));
+    const week1 = draft.implementation_order[0];
+    if (week1 && week1.week === 1) {
+      week1.includes_baseline = true;
+      const actions: string[] = Array.isArray(week1.actions) ? week1.actions : [];
+      const week1Text = `${week1.focus || ''} ${actions.join(' ')}`;
+      if (!/\b(time|measure|baseline|track|record|runs?)\b/i.test(week1Text)) {
+        week1.actions = [
+          'Time each step across your next 5 to 10 real runs and record the times in the same tracker.',
+          ...actions,
+        ];
+      }
+    }
+  }
+
+  cleanReaderStringsInPlace(draft);
+  return draft;
+}
+
 export async function analyzeWorkflowWithGemini(
   submission: QuestionnaireSubmission,
   redactedPII: boolean
 ): Promise<ClarityMapResult> {
+  const startedAt = Date.now();
   const ai = getGeminiClient();
   const processDef = getProcessByCode(submission.process_code);
   const volumeContext = computeVolumeContext(submission.answers);
@@ -108,46 +500,60 @@ export async function analyzeWorkflowWithGemini(
   )}\n</untrusted_user_answers>`;
 
   let rawText = '';
-  try {
-    const response = await ai.models.generateContent({
-      model: GEMINI_MODEL,
-      contents: userMessage,
-      config: {
-        systemInstruction: CLARITY_MAP_SYSTEM_PROMPT_V2,
-        responseMimeType: 'application/json',
-        thinkingConfig: {
-          thinkingLevel: ThinkingLevel.MEDIUM,
+  const callPrimary = async () => {
+    const remainingBudget = TOTAL_ANALYZER_BUDGET_MS - (Date.now() - startedAt);
+    const timeoutMs = Math.max(5_000, Math.min(PRIMARY_CALL_TIMEOUT_MS, remainingBudget));
+    const response = await withCallTimeout(
+      ai.models.generateContent({
+        model: GEMINI_MODEL,
+        contents: userMessage,
+        config: {
+          systemInstruction: CLARITY_MAP_SYSTEM_PROMPT_V2,
+          responseMimeType: 'application/json',
+          thinkingConfig: {
+            thinkingLevel: ThinkingLevel.LOW,
+          },
         },
-      },
-    });
-    rawText = response.text ?? '';
-  } catch (err: any) {
-    const msg = String(err?.message || err || '');
-    console.error('[ClarityMap Gemini] API call failed:', msg);
-    if (msg.includes('API_KEY_INVALID') || msg.includes('PERMISSION_DENIED') || msg.includes('403') || msg.includes('401')) {
-      throw new GeminiAnalysisError(
-        'The Gemini API key could not be authenticated. Please check GEMINI_API_KEY in Settings > Secrets.',
-        403
-      );
-    }
-    if (msg.includes('RESOURCE_EXHAUSTED') || msg.includes('429')) {
-      throw new GeminiAnalysisError(
-        'The analysis engine is temporarily busy. Please wait a moment and try again.',
-        429
-      );
-    }
-    throw new GeminiAnalysisError(
-      'Unable to complete the workflow analysis right now. Please try again shortly.',
-      502
+      }),
+      timeoutMs,
+      `generateContent(${GEMINI_MODEL})`
     );
+    return response.text ?? '';
+  };
+
+  try {
+    rawText = await callPrimary();
+  } catch (firstErr: any) {
+    const remainingAfterFirst = TOTAL_ANALYZER_BUDGET_MS - (Date.now() - startedAt);
+    if (isTransientGeminiError(firstErr) && remainingAfterFirst >= MIN_BUDGET_FOR_RETRY_MS) {
+      console.warn('[ClarityMap Gemini] Transient error on primary call, retrying once:', {
+        model: GEMINI_MODEL,
+        elapsedMs: Date.now() - startedAt,
+        message: String(firstErr?.message || firstErr),
+      });
+      await new Promise((r) => setTimeout(r, 800));
+      try {
+        rawText = await callPrimary();
+      } catch (retryErr: any) {
+        return handleGeminiSdkFailure(retryErr, startedAt);
+      }
+    } else {
+      return handleGeminiSdkFailure(firstErr, startedAt);
+    }
   }
 
-  let parsedJson: unknown;
+  console.info('[ClarityMap Gemini] Primary response received:', {
+    model: GEMINI_MODEL,
+    elapsedMs: Date.now() - startedAt,
+    chars: rawText.length,
+  });
+
   let validationErrors: string[] = [];
 
   try {
-    parsedJson = JSON.parse(extractJsonString(rawText));
-    const check = validateClarityMapAnalysis(parsedJson, { volumeContext, strictV2: true });
+    const parsedJson = JSON.parse(extractJsonString(rawText));
+    const normalized = normalizeGeminiOutputForV2(parsedJson, submission, volumeContext);
+    const check = validateClarityMapAnalysis(normalized, { volumeContext, strictV2: true });
     if (check.valid && check.data) {
       return check.data;
     }
@@ -156,8 +562,23 @@ export async function analyzeWorkflowWithGemini(
     validationErrors = [`Malformed JSON: ${parseErr?.message || 'parse error'}`];
   }
 
-  // Controlled repair pass if initial output failed JSON parse or strict v2 schema/reference checks
-  console.warn('[ClarityMap Gemini] Initial output failed validation, attempting controlled repair:', validationErrors.slice(0, 6));
+  // Controlled repair pass if initial output still failed strict v2 schema/reference checks
+  console.warn('[ClarityMap Gemini] Initial output failed validation, attempting controlled repair:', {
+    elapsedMs: Date.now() - startedAt,
+    errors: validationErrors.slice(0, 8),
+  });
+
+  const remainingForRepair = TOTAL_ANALYZER_BUDGET_MS - (Date.now() - startedAt);
+  if (remainingForRepair < MIN_BUDGET_FOR_REPAIR_MS) {
+    console.error('[ClarityMap Gemini] Skipping repair pass due to time budget:', {
+      elapsedMs: Date.now() - startedAt,
+      remainingForRepair,
+    });
+    throw new GeminiAnalysisError(
+      'The workflow analysis took longer than expected to verify. Please try again.',
+      504
+    );
+  }
 
   try {
     const repairPrompt = `The previous JSON output for process "${submission.process_code}" (${submission.process_name}) failed schema/semantic validation with these exact errors:\n${validationErrors
@@ -167,34 +588,90 @@ export async function analyzeWorkflowWithGemini(
         volumeContext
       )}, edges, end nodes, Week 1 baseline, and no step/question/flag tokens in reader text) is satisfied without inventing steps or changing user meaning. Return ONLY valid JSON matching the exact schema.\n\nInvalid output to repair:\n${rawText.slice(0, 24000)}`;
 
-    const repairResponse = await ai.models.generateContent({
-      model: GEMINI_MODEL,
-      contents: repairPrompt,
-      config: {
-        systemInstruction: CLARITY_MAP_SYSTEM_PROMPT_V2,
-        responseMimeType: 'application/json',
-        thinkingConfig: {
-          thinkingLevel: ThinkingLevel.LOW,
+    const repairResponse = await withCallTimeout(
+      ai.models.generateContent({
+        model: GEMINI_MODEL,
+        contents: repairPrompt,
+        config: {
+          systemInstruction: CLARITY_MAP_SYSTEM_PROMPT_V2,
+          responseMimeType: 'application/json',
+          thinkingConfig: {
+            thinkingLevel: ThinkingLevel.LOW,
+          },
         },
-      },
-    });
+      }),
+      Math.min(REPAIR_CALL_TIMEOUT_MS, remainingForRepair),
+      `repairContent(${GEMINI_MODEL})`
+    );
 
     const repairedText = repairResponse.text ?? '';
     const repairedJson = JSON.parse(extractJsonString(repairedText));
-    const recheck = validateClarityMapAnalysis(repairedJson, { volumeContext, strictV2: true });
+    const normalizedRepair = normalizeGeminiOutputForV2(repairedJson, submission, volumeContext);
+    const recheck = validateClarityMapAnalysis(normalizedRepair, { volumeContext, strictV2: true });
     if (recheck.valid && recheck.data) {
       if (recheck.data.confidence === 'high') {
         recheck.data.confidence = 'medium';
       }
+      console.info('[ClarityMap Gemini] Repair pass succeeded:', {
+        elapsedMs: Date.now() - startedAt,
+      });
       return recheck.data;
     }
-    console.error('[ClarityMap Gemini] Repair pass still failed validation:', recheck.errors.slice(0, 8));
+    console.error('[ClarityMap Gemini] Repair pass still failed validation:', {
+      elapsedMs: Date.now() - startedAt,
+      errors: recheck.errors.slice(0, 10),
+    });
   } catch (repairErr: any) {
-    console.error('[ClarityMap Gemini] Repair pass threw error:', repairErr?.message || repairErr);
+    console.error('[ClarityMap Gemini] Repair pass threw error:', {
+      elapsedMs: Date.now() - startedAt,
+      message: repairErr?.message || String(repairErr),
+    });
   }
 
   throw new GeminiAnalysisError(
     'The analysis output could not be verified cleanly. Please retry your analysis.',
     422
+  );
+}
+
+function handleGeminiSdkFailure(err: any, startedAt: number): never {
+  const msg = String(err?.message || err || '');
+  const status = err?.status ?? err?.statusCode ?? null;
+  console.error('[ClarityMap Gemini] API call failed:', {
+    model: GEMINI_MODEL,
+    elapsedMs: Date.now() - startedAt,
+    status,
+    code: err?.code ?? null,
+    message: msg,
+  });
+
+  if (msg.includes('GEMINI_CALL_TIMEOUT')) {
+    throw new GeminiAnalysisError(
+      'The workflow analysis timed out while building your diagram. Please try again.',
+      504
+    );
+  }
+  if (
+    msg.includes('API_KEY_INVALID') ||
+    msg.includes('PERMISSION_DENIED') ||
+    msg.includes('403') ||
+    msg.includes('401') ||
+    status === 401 ||
+    status === 403
+  ) {
+    throw new GeminiAnalysisError(
+      'The Gemini API key could not be authenticated. Please check GEMINI_API_KEY in Settings > Secrets.',
+      403
+    );
+  }
+  if (msg.includes('RESOURCE_EXHAUSTED') || msg.includes('429') || status === 429) {
+    throw new GeminiAnalysisError(
+      'The analysis engine is temporarily busy. Please wait a moment and try again.',
+      429
+    );
+  }
+  throw new GeminiAnalysisError(
+    'Unable to complete the workflow analysis right now. Please try again shortly.',
+    502
   );
 }
