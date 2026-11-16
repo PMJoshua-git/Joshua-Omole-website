@@ -5,7 +5,7 @@ import type {
   CurrentStateNode,
   RedesignedStateNode,
   AutomatedStateNode,
-} from '../types/clarityMap';
+} from '../types/clarityMap.js';
 import {
   computeWorkflowLayout,
   DEFAULT_WEB_LAYOUT_CONFIG,
@@ -13,8 +13,8 @@ import {
   formatMinutesRange,
   resolvePainFlagLabels,
   type LayoutConfig,
-} from './diagramLayout';
-import { resolveEvidenceLabels } from './questionRegistry';
+} from './diagramLayout.js';
+import { resolveEvidenceLabels } from './questionRegistry.js';
 
 export interface StageStepLookup {
   stepNumbers: Record<string, number>;

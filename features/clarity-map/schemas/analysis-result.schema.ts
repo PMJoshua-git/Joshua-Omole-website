@@ -4,8 +4,8 @@ import type {
   ClarityMapResult,
   TimeEstimate,
   WorkflowEdge,
-} from '../types/clarityMap';
-import type { VolumeContext } from '../services/volumeContext';
+} from '../types/clarityMap.js';
+import type { VolumeContext } from '../services/volumeContext.js';
 
 export const bridgeLetterSchema = z.enum(['B', 'R', 'I', 'D', 'G', 'E']);
 export const nodeTypeSchema = z.enum(['task', 'decision', 'wait', 'handoff', 'end']);

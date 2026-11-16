@@ -1,11 +1,11 @@
 import { Resend, type CreateEmailOptions, type CreateEmailRequestOptions, type CreateEmailResponse } from 'resend';
-import type { ClarityMapResult } from '../../../features/clarity-map/types/clarityMap';
+import type { ClarityMapResult } from '../../../features/clarity-map/types/clarityMap.js';
 import {
   buildClarityMapReportEmail,
   cleanFirstName,
   cleanProcessName,
-} from './reportEmailTemplate';
-import { maskEmailForLog } from '../rateLimit/reportGuard';
+} from './reportEmailTemplate.js';
+import { maskEmailForLog } from '../rateLimit/reportGuard.js';
 
 const INTERNAL_LEAD_EMAIL = 'Joshua@mail.joshuaomole.com';
 

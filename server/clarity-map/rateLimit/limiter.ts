@@ -1,12 +1,12 @@
 import crypto from 'node:crypto';
 import { Redis } from '@upstash/redis';
-import { getRateLimitConfig, type RateLimitConfig } from './config';
+import { getRateLimitConfig, type RateLimitConfig } from './config.js';
 import {
   hashIdentity,
   normalizeIp,
   resolveClientIdentity,
   type RateLimitRequestLike,
-} from './ip';
+} from './ip.js';
 
 export interface RateLimitStatusResult {
   limit: number;

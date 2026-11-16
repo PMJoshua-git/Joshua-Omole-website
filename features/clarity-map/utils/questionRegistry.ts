@@ -1,4 +1,4 @@
-import { getAllProcesses, getCommonQuestions } from '../services/processLibrary';
+import { getAllProcesses, getCommonQuestions } from '../services/processLibrary.js';
 
 const EXPLICIT_QUESTION_LABELS: Record<string, string> = {
   // Common questions

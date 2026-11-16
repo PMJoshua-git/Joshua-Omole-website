@@ -6,7 +6,7 @@ import type {
   PainFlag,
   WorkflowEdge,
   WorkflowNodeType,
-} from '../types/clarityMap';
+} from '../types/clarityMap.js';
 
 export interface LayoutNodeInput {
   id: string;

@@ -7,7 +7,7 @@ import type {
   CurrentStateNode,
   RedesignedStateNode,
   WorkflowNodeType,
-} from '../../../features/clarity-map/types/clarityMap';
+} from '../../../features/clarity-map/types/clarityMap.js';
 import {
   AUTOMATION_TYPE_META,
   BRIDGE_LENS_META,
@@ -17,7 +17,7 @@ import {
   resolvePainFlagLabels,
   type GraphLayout,
   type LayoutConfig,
-} from '../../../features/clarity-map/utils/diagramLayout';
+} from '../../../features/clarity-map/utils/diagramLayout.js';
 import {
   formatNotAutomatedStepTitle,
   formatReplacesTodayText,
@@ -27,7 +27,7 @@ import {
   getOptionalNodeTimeLabel,
   hasAnyTimeData,
   normalizeCurrentNodesForRender,
-} from '../../../features/clarity-map/utils/clarityMapPresenter';
+} from '../../../features/clarity-map/utils/clarityMapPresenter.js';
 
 const COLORS = {
   sagePrimary: '#55745C',

@@ -2,20 +2,20 @@ import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import {
   CLARITY_MAP_ANALYSIS_VERSION,
   CLARITY_MAP_SYSTEM_PROMPT_V2,
-} from '../prompts/workflow-analysis.system';
+} from '../prompts/workflow-analysis.system.js';
 import {
   validateClarityMapAnalysis,
-} from '../../../features/clarity-map/schemas/analysis-result.schema';
+} from '../../../features/clarity-map/schemas/analysis-result.schema.js';
 import {
   getProcessByCode,
-} from '../../../features/clarity-map/services/processLibrary';
+} from '../../../features/clarity-map/services/processLibrary.js';
 import {
   computeVolumeContext,
-} from '../../../features/clarity-map/services/volumeContext';
+} from '../../../features/clarity-map/services/volumeContext.js';
 import type {
   ClarityMapResult,
   QuestionnaireSubmission,
-} from '../../../features/clarity-map/types/clarityMap';
+} from '../../../features/clarity-map/types/clarityMap.js';
 
 const GEMINI_MODEL = 'gemini-4-hydrogen';
 

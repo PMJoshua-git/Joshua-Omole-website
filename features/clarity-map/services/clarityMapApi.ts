@@ -3,7 +3,7 @@ import type {
   ClarityMapStage,
   QuestionAnswerValue,
   QuestionnaireSubmission,
-} from '../types/clarityMap';
+} from '../types/clarityMap.js';
 
 export interface RateLimitInfo {
   limit: number;

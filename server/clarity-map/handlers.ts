@@ -2,43 +2,43 @@ import {
   questionnaireSubmissionSchema,
   reportRequestSchema,
   sanitizeSubmission,
-} from '../../features/clarity-map/schemas/questionnaire.schema';
+} from '../../features/clarity-map/schemas/questionnaire.schema.js';
 import {
   validateClarityMapAnalysis,
-} from '../../features/clarity-map/schemas/analysis-result.schema';
+} from '../../features/clarity-map/schemas/analysis-result.schema.js';
 import {
   analyzeWorkflowWithGemini,
   GeminiAnalysisError,
   GeminiConfigurationError,
-} from './ai/geminiAnalyzer';
-import { generateClarityMapPdf } from './reports/generatePdf';
+} from './ai/geminiAnalyzer.js';
+import { generateClarityMapPdf } from './reports/generatePdf.js';
 import {
   sendClarityMapReportEmails,
   EmailConfigurationError,
   EmailDeliveryError,
-} from './email/sendReport';
+} from './email/sendReport.js';
 import {
   cleanFirstName,
   makeReportAttachmentFilename,
-} from './email/reportEmailTemplate';
+} from './email/reportEmailTemplate.js';
 import {
   LoopsConfigurationError,
   LoopsSyncError,
   syncClarityMapContactToLoops,
-} from './crm/loopsSync';
+} from './crm/loopsSync.js';
 import {
   defaultClarityMapRateLimiter,
   type RateLimitReservation,
   type RateLimitStatusResult,
-} from './rateLimit/limiter';
+} from './rateLimit/limiter.js';
 import {
   createClarityMapReportGuard,
   defaultReportGuard,
   deriveResultId,
   maskEmailForLog,
   REPORT_LIMIT_MESSAGE,
-} from './rateLimit/reportGuard';
-import type { RateLimitRequestLike } from './rateLimit/ip';
+} from './rateLimit/reportGuard.js';
+import type { RateLimitRequestLike } from './rateLimit/ip.js';
 
 export interface HttpRequestLike extends RateLimitRequestLike {
   method?: string;

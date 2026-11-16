@@ -1,12 +1,4 @@
 {
-  "functions": {
-    "api/**/*.{ts,js}": {
-      "includeFiles": "server/**"
-    },
-    "api/ssr-meta.ts": {
-      "includeFiles": "{dist/index.html,server/**}"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",

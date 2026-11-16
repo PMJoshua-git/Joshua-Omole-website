@@ -1,4 +1,4 @@
-import { getResourceBySlug } from '../resources/registry';
+import { getResourceBySlug } from '../resources/registry.js';
 
 export interface PageMeta {
   title: string;

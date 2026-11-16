@@ -1,12 +1,12 @@
 import crypto from 'node:crypto';
-import { getRateLimitConfig, type RateLimitConfig } from './config';
-import { hashIdentity } from './ip';
+import { getRateLimitConfig, type RateLimitConfig } from './config.js';
+import { hashIdentity } from './ip.js';
 import {
   InMemorySlidingWindowStore,
   UpstashSlidingWindowStore,
   type SlidingWindowStore,
-} from './limiter';
-import type { ClarityMapResult } from '../../../features/clarity-map/types/clarityMap';
+} from './limiter.js';
+import type { ClarityMapResult } from '../../../features/clarity-map/types/clarityMap.js';
 
 export const REPORT_MAX_SENDS_PER_RESULT = 3;
 export const REPORT_MAX_SENDS_PER_EMAIL_24H = 3;

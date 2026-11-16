@@ -1,17 +1,17 @@
-import industriesData from '../data/industries.json';
-import commonQuestionsData from '../data/common-questions.json';
-import realEstateProcesses from '../data/processes/real-estate.json';
-import ecommerceProcesses from '../data/processes/ecommerce.json';
-import retailProcesses from '../data/processes/retail.json';
-import coachingProcesses from '../data/processes/professional-coaching.json';
-import saasProcesses from '../data/processes/saas-tech.json';
-import profServicesProcesses from '../data/processes/professional-services.json';
-import healthcareProcesses from '../data/processes/healthcare-clinics.json';
-import logisticsProcesses from '../data/processes/logistics-supply-chain.json';
-import financialProcesses from '../data/processes/financial-services.json';
-import digitalAgencyProcesses from '../data/processes/digital-agencies.json';
-import b2bAgencyProcesses from '../data/processes/b2b-agencies.json';
-import b2cAgencyProcesses from '../data/processes/b2c-agencies.json';
+import industriesData from '../data/industries.json' with { type: 'json' };
+import commonQuestionsData from '../data/common-questions.json' with { type: 'json' };
+import realEstateProcesses from '../data/processes/real-estate.json' with { type: 'json' };
+import ecommerceProcesses from '../data/processes/ecommerce.json' with { type: 'json' };
+import retailProcesses from '../data/processes/retail.json' with { type: 'json' };
+import coachingProcesses from '../data/processes/professional-coaching.json' with { type: 'json' };
+import saasProcesses from '../data/processes/saas-tech.json' with { type: 'json' };
+import profServicesProcesses from '../data/processes/professional-services.json' with { type: 'json' };
+import healthcareProcesses from '../data/processes/healthcare-clinics.json' with { type: 'json' };
+import logisticsProcesses from '../data/processes/logistics-supply-chain.json' with { type: 'json' };
+import financialProcesses from '../data/processes/financial-services.json' with { type: 'json' };
+import digitalAgencyProcesses from '../data/processes/digital-agencies.json' with { type: 'json' };
+import b2bAgencyProcesses from '../data/processes/b2b-agencies.json' with { type: 'json' };
+import b2cAgencyProcesses from '../data/processes/b2c-agencies.json' with { type: 'json' };
 
 import type {
   IndustryDefinition,
@@ -19,7 +19,7 @@ import type {
   QuestionDefinition,
   QuestionAnswerValue,
   QuestionCondition,
-} from '../types/clarityMap';
+} from '../types/clarityMap.js';
 
 const INDUSTRIES: IndustryDefinition[] = industriesData as IndustryDefinition[];
 

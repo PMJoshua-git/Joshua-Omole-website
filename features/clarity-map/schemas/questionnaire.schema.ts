@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { QuestionnaireSubmission } from '../types/clarityMap';
+import type { QuestionnaireSubmission } from '../types/clarityMap.js';
 
 export const answerItemSchema = z.object({
   qid: z.string().min(1).max(60),

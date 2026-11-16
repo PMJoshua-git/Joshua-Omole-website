@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { ResourceEntry } from './registry';
+import { ResourceEntry } from './registry.js';
 
 // Initialize Resend client (will use RESEND_API_KEY from environment)
 const getResendClient = () => {

@@ -1,4 +1,4 @@
-import type { ClarityMapResult } from '../../../features/clarity-map/types/clarityMap';
+import type { ClarityMapResult } from '../../../features/clarity-map/types/clarityMap.js';
 
 export class LoopsConfigurationError extends Error {
   constructor(message: string) {

@@ -1,4 +1,4 @@
-import { appendUtmParams, type UtmClickParams } from '../../../utils/attribution';
+import { appendUtmParams, type UtmClickParams } from '../../../utils/attribution.js';
 
 export const POPUP_DELAY_SECONDS = 10;
 export const POPUP_RETRY_INTERVAL_MS = 2000;

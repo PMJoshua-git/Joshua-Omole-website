@@ -1,4 +1,4 @@
-import type { QuestionAnswerValue } from '../types/clarityMap';
+import type { QuestionAnswerValue } from '../types/clarityMap.js';
 
 export const VOLUME_BAND_LOW_MAX = 10;
 export const VOLUME_BAND_HIGH_MIN = 30;

@@ -1,4 +1,4 @@
-import { appendUtmParams } from '../../../utils/attribution';
+import { appendUtmParams } from '../../../utils/attribution.js';
 
 export const REPORT_EMAIL_SUBJECT = 'Your Clarity Map is ready';
 export const REPORT_EMAIL_PREHEADER =

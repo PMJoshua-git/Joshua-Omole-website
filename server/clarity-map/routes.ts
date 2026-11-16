@@ -4,7 +4,7 @@ import {
   handleAnalyzeRequest,
   handleLimitStatusRequest,
   handleReportRequest,
-} from './handlers';
+} from './handlers.js';
 
 const router = Router();
 
