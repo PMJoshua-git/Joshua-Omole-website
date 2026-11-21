@@ -89,7 +89,20 @@ export async function analyzeWorkflow(
     body: JSON.stringify(submission),
   });
 
-  const payload = (await res.json().catch(() => ({}))) as any;
+  const rawText = await res.text().catch(() => '');
+  let payload: any = {};
+  let isJson = false;
+  if (rawText) {
+    try {
+      const parsed = JSON.parse(rawText);
+      if (parsed && typeof parsed === 'object') {
+        payload = parsed;
+        isJson = true;
+      }
+    } catch {
+      isJson = false;
+    }
+  }
 
   if (res.status === 429 || payload?.error === 'rate_limited') {
     throw new RateLimitError({
@@ -105,10 +118,13 @@ export async function analyzeWorkflow(
   }
 
   if (!res.ok) {
-    if (res.status === 504 && !payload?.error) {
-      throw new Error(
-        'The workflow analysis took longer than expected on the server. Please try again.'
-      );
+    if (!isJson) {
+      if (res.status === 504) {
+        throw new Error('The analysis took longer than expected. Please try again.');
+      }
+      if (res.status >= 500) {
+        throw new Error('Something went wrong on our side. Please try again in a moment.');
+      }
     }
     throw new Error(
       payload?.error || 'Could not complete workflow analysis right now. Please try again.'

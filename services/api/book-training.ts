@@ -1,6 +1,6 @@
 import express from 'express';
 import { z } from 'zod';
-import { trainingPipelineTable } from '../airtable';
+import { trainingPipelineTable } from '../airtable/index.js';
 
 const router = express.Router();
 
@@ -16,7 +16,15 @@ router.post('/', async (req, res) => {
   try {
     const data = trainingBookingSchema.parse(req.body);
 
-    if (trainingPipelineTable) {
+    if (!trainingPipelineTable) {
+      if (process.env.VERCEL_ENV === 'production') {
+        return res.status(503).json({
+          success: false,
+          error: 'Training booking storage is not configured right now.',
+        });
+      }
+      console.warn('[Airtable] trainingPipelineTable not configured (non-production mode).');
+    } else {
       try {
         await trainingPipelineTable.create([
           {
@@ -31,9 +39,12 @@ router.post('/', async (req, res) => {
             }
           }
         ]);
-      } catch (err) {
-        console.error('Airtable Error:', err);
-        return res.status(500).json({ success: false, message: 'Database failure' });
+      } catch (err: any) {
+        console.error('[Airtable] book-training error:', {
+          status: err?.statusCode ?? null,
+          errorType: err?.error || err?.name || 'AIRTABLE_ERROR',
+        });
+        return res.status(502).json({ success: false, error: 'Database failure' });
       }
     }
 

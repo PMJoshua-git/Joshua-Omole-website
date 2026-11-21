@@ -1,5 +1,59 @@
 {
+  "functions": {
+    "api/clarity-map/analyze.ts": {
+      "maxDuration": 60,
+      "includeFiles": "{server/**,features/clarity-map/**,utils/**}"
+    },
+    "api/clarity-map/report.ts": {
+      "maxDuration": 60,
+      "includeFiles": "{server/**,features/clarity-map/**,utils/**}"
+    },
+    "api/index.ts": {
+      "includeFiles": "{server/**,services/**,resources-private/**,utils/**,types.ts}"
+    },
+    "api/ssr-meta.ts": {
+      "includeFiles": "server/**"
+    },
+    "api/save-contact.js": {
+      "includeFiles": "server/leads/**"
+    },
+    "api/subscribe.js": {
+      "includeFiles": "server/leads/**"
+    }
+  },
   "rewrites": [
+    {
+      "source": "/api/book-consultation",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/book-consultation/(.*)",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/newsletter-subscribe",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/training-sessions",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/book-training",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/resources",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/resources/(.*)",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/resource-request",
+      "destination": "/api/index"
+    },
     {
       "source": "/api/(.*)",
       "destination": "/api/$1"

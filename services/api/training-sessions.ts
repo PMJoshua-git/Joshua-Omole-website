@@ -1,7 +1,7 @@
 import express from 'express';
-import { trainingSessionsTable } from '../airtable';
+import { trainingSessionsTable } from '../airtable/index.js';
 import NodeCache from 'node-cache';
-import { TrainingSession } from '../../types';
+import type { TrainingSession } from '../../types.js';
 
 const router = express.Router();
 const myCache = new NodeCache({ stdTTL: 3600 }); // Cache for 3600 seconds (1 hour)
@@ -36,6 +36,12 @@ router.get('/', async (req, res) => {
     }
 
     if (!trainingSessionsTable) {
+      if (process.env.VERCEL_ENV === 'production') {
+        return res.status(503).json({
+          success: false,
+          error: 'Training sessions database is not configured right now.',
+        });
+      }
       return res.status(200).json({ success: true, data: [] });
     }
 

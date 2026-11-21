@@ -5,6 +5,7 @@ import {
   handleLimitStatusRequest,
   handleReportRequest,
 } from './handlers.js';
+import { handleHealthRequest } from './health.js';
 
 const router = Router();
 
@@ -17,6 +18,8 @@ const reportLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: 'Too many report requests right now. Please wait a few minutes and try again.' },
 });
+
+router.get('/health', (req, res) => handleHealthRequest(req, res));
 
 router.get('/limit-status', (req, res) => handleLimitStatusRequest(req, res));
 

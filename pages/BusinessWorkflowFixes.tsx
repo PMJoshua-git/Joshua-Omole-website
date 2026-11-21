@@ -377,6 +377,7 @@ const BusinessWorkflowFixes: React.FC = () => {
     console.log('[WorkflowFix] Submitting request with payload:', payload);
 
     let isSuccess = false;
+    let errorMessage = 'Unable to send details. Please try again.';
 
     // 1. Submit to /api/save-contact (Airtable / Lead registry)
     try {
@@ -387,33 +388,32 @@ const BusinessWorkflowFixes: React.FC = () => {
       });
 
       const airtableData = await airtableResponse.json().catch(() => ({}));
-      console.log('[WorkflowFix] /api/save-contact response:', airtableResponse.status, airtableData);
 
-      if (airtableResponse.ok) {
+      if (airtableResponse.ok && airtableData?.success !== false) {
         isSuccess = true;
       } else {
-        console.warn('[WorkflowFix] /api/save-contact returned status:', airtableResponse.status, airtableData);
-        // If server responded with error in preview/testing, still allow testing flow
-        isSuccess = true;
+        console.error('[WorkflowFix] /api/save-contact failed:', airtableResponse.status);
+        errorMessage = airtableData?.error || 'Unable to send details. Please try again.';
       }
     } catch (networkErr: any) {
-      console.warn('[WorkflowFix] Network fetch failed (e.g. Failed to fetch). Activating preview fallback:', networkErr);
-      // "Failed to fetch" happens when dev server is restarting or network iframe disconnects
-      // We gracefully allow the user to test the UI & confirmation flow
-      isSuccess = true;
+      console.error('[WorkflowFix] Network fetch failed:', networkErr?.message || networkErr);
+      errorMessage = 'Unable to reach our server right now. Please try again.';
     }
 
-    // 2. Add to Loops Contact List (User Group = exact service chosen, e.g. "Lead Follow-Up System")
-    try {
-      const loopsResponse = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const loopsData = await loopsResponse.json().catch(() => ({}));
-      console.log('[WorkflowFix] /api/subscribe response:', loopsResponse.status, loopsData);
-    } catch (loopsErr) {
-      console.warn('[WorkflowFix] Loops subscription error (non-blocking):', loopsErr);
+    // 2. Add to Loops Contact List when save-contact succeeded
+    if (isSuccess) {
+      try {
+        const loopsResponse = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!loopsResponse.ok) {
+          console.error('[WorkflowFix] /api/subscribe returned status:', loopsResponse.status);
+        }
+      } catch (loopsErr: any) {
+        console.warn('[WorkflowFix] Loops subscription error:', loopsErr?.message || loopsErr);
+      }
     }
 
     if (isSuccess) {
@@ -432,7 +432,7 @@ const BusinessWorkflowFixes: React.FC = () => {
       setSubmitSuccess(true);
       setSubmitError(null);
     } else {
-      setSubmitError('Unable to send details. Please try again.');
+      setSubmitError(errorMessage);
     }
 
     setIsSubmitting(false);

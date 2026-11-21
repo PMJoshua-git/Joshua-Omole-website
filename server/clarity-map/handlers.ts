@@ -234,8 +234,9 @@ export async function handleAnalyzeRequest(
     if (err instanceof GeminiConfigurationError) {
       console.error('[ClarityMap /analyze] Configuration error:', {
         processCode: sanitized.process_code,
+        statusCode: 503,
         totalMs,
-        message: err.message,
+        message: String(err.message || '').slice(0, 200),
       });
       return res.status(503).json({
         error: 'Clarity Map analysis is temporarily unavailable on the server.',
@@ -246,7 +247,7 @@ export async function handleAnalyzeRequest(
         processCode: sanitized.process_code,
         statusCode: err.statusCode,
         totalMs,
-        message: err.message,
+        message: String(err.message || '').slice(0, 200),
       });
       return res.status(err.statusCode).json({ error: err.message });
     }
@@ -254,7 +255,7 @@ export async function handleAnalyzeRequest(
       processCode: sanitized.process_code,
       totalMs,
       name: err?.name,
-      message: err?.message || String(err),
+      message: String(err?.message || err || '').slice(0, 200),
     });
     return res.status(500).json({
       error: 'An unexpected error occurred while analyzing your workflow. Please try again.',

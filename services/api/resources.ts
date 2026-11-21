@@ -1,7 +1,7 @@
 import express from 'express';
-import { resourceLibraryTable } from '../airtable';
+import { resourceLibraryTable } from '../airtable/index.js';
 import NodeCache from 'node-cache';
-import { Resource } from '../../types';
+import type { Resource } from '../../types.js';
 
 const router = express.Router();
 // Cache for 5 minutes (300 seconds)
@@ -35,7 +35,12 @@ router.get('/', async (req, res) => {
     }
 
     if (!resourceLibraryTable) {
-      // Graceful fallback
+      if (process.env.VERCEL_ENV === 'production') {
+        return res.status(503).json({
+          success: false,
+          error: 'Resources library is not configured right now.',
+        });
+      }
       return res.status(200).json({ success: true, data: [] });
     }
 
@@ -72,11 +77,18 @@ router.get('/:resourceId', async (req, res) => {
     }
 
     if (!resourceLibraryTable) {
+      if (process.env.VERCEL_ENV === 'production') {
+        return res.status(503).json({
+          success: false,
+          error: 'Resources library is not configured right now.',
+        });
+      }
       return res.status(404).json({ success: false, message: 'Resource not found' });
     }
 
+    const safeResourceId = resourceId.replace(/['\\]/g, '');
     const records = await resourceLibraryTable.select({
-      filterByFormula: `AND(OR({Status} = 'Published', {Status} = 'Coming Soon'), {Resource ID} = '${resourceId}')`,
+      filterByFormula: `AND(OR({Status} = 'Published', {Status} = 'Coming Soon'), {Resource ID} = '${safeResourceId}')`,
       maxRecords: 1
     }).all();
 

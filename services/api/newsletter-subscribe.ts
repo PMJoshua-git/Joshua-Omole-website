@@ -12,8 +12,19 @@ router.post('/', async (req, res) => {
   try {
     const data = newsletterSchema.parse(req.body);
 
+    const isProd = process.env.VERCEL_ENV === 'production';
+    const loopsApiKey = process.env.LOOPS_API_KEY?.trim();
+
     // Add to Loops.so
-    if (process.env.LOOPS_API_KEY) {
+    if (!loopsApiKey) {
+      if (isProd) {
+        return res.status(503).json({
+          success: false,
+          error: 'Newsletter service is not configured right now.',
+        });
+      }
+      console.warn('LOOPS_API_KEY is not set in environment variables');
+    } else {
       try {
         const loopsPayload = {
           email: data.email,
@@ -25,23 +36,42 @@ router.post('/', async (req, res) => {
         const response = await fetch('https://app.loops.so/api/v1/contacts/create', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${process.env.LOOPS_API_KEY}`,
+            'Authorization': `Bearer ${loopsApiKey}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(loopsPayload)
         });
 
-        if (!response.ok) {
-          const errText = await response.text();
-          console.error(`Loops API responded with status ${response.status}: ${errText}`);
-        } else {
-          console.log(`Successfully added contact ${data.email} to Loops (Source: Newsletter)`);
+        if (response.status === 409) {
+          const updateRes = await fetch('https://app.loops.so/api/v1/contacts/update', {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${loopsApiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(loopsPayload)
+          });
+          if (!updateRes.ok) {
+            console.error('[Loops] newsletter-subscribe update failed:', { status: updateRes.status });
+            if (isProd) {
+              return res.status(502).json({ success: false, error: 'Unable to update subscription right now.' });
+            }
+          }
+        } else if (!response.ok) {
+          console.error('[Loops] newsletter-subscribe create failed:', { status: response.status });
+          if (isProd) {
+            return res.status(502).json({ success: false, error: 'Unable to subscribe right now.' });
+          }
         }
-      } catch (err) {
-        console.error('Error adding contact to Loops:', err);
+      } catch (err: any) {
+        console.error('[Loops] newsletter-subscribe network error:', {
+          name: err?.name || 'Error',
+          message: String(err?.message || '').slice(0, 200),
+        });
+        if (isProd) {
+          return res.status(502).json({ success: false, error: 'Unable to reach subscription service right now.' });
+        }
       }
-    } else {
-      console.warn('LOOPS_API_KEY is not set in environment variables');
     }
 
     return res.status(200).json({ success: true, message: 'Subscribed successfully' });

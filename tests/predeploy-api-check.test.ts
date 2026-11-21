@@ -6,6 +6,7 @@ import path from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { pathToFileURL } from 'node:url';
+import http from 'node:http';
 import ts from 'typescript';
 
 const execFileAsync = promisify(execFile);
@@ -65,7 +66,19 @@ test('Pre-deploy API check: TypeScript sources import cleanly and ssr-meta is fa
     const mod = await import(`../${rel}`);
     assert.ok(mod, `API module ${rel} should import successfully`);
     if (typeof mod.default === 'function') {
-      const mockReq = { method: 'GET', url: '/', query: {} };
+      if (rel === path.join('api', 'index.ts')) {
+        const srv = http.createServer(mod.default);
+        await new Promise<void>((resolve) => srv.listen(0, '127.0.0.1', resolve));
+        try {
+          const addr = srv.address() as any;
+          const resp = await fetch(`http://127.0.0.1:${addr.port}/api/resources`);
+          assert.equal(resp.status, 200, 'api/index.ts /api/resources should return 200');
+        } finally {
+          await new Promise<void>((resolve) => srv.close(() => resolve()));
+        }
+        continue;
+      }
+      const mockReq = { method: 'GET', url: '/', query: {}, headers: {} };
       const mockRes = createMockRes();
       await mod.default(mockReq, mockRes);
       if (rel === path.join('api', 'ssr-meta.ts')) {
@@ -84,14 +97,22 @@ test('Pre-deploy API check: compiled Node native ESM loads every api/** function
     const sourceRoots = [
       path.join(cwd, 'api'),
       path.join(cwd, 'server'),
+      path.join(cwd, 'services'),
       path.join(cwd, 'features', 'clarity-map'),
       path.join(cwd, 'utils'),
     ];
 
     const tsFiles = sourceRoots.flatMap((root) =>
-      collectFiles(root, (p) => (p.endsWith('.ts') || p.endsWith('.tsx')) && !p.endsWith('.d.ts'))
+      collectFiles(
+        root,
+        (p) => (p.endsWith('.ts') || p.endsWith('.tsx') || p.endsWith('.js')) && !p.endsWith('.d.ts')
+      )
     );
-    assert.ok(tsFiles.length > 0, 'Should collect TypeScript files to compile');
+    const rootTypesFile = path.join(cwd, 'types.ts');
+    if (fs.existsSync(rootTypesFile)) {
+      tsFiles.push(rootTypesFile);
+    }
+    assert.ok(tsFiles.length > 0, 'Should collect TypeScript/JS files to compile');
 
     const compilerOptions: ts.CompilerOptions = {
       target: ts.ScriptTarget.ES2022,
@@ -100,6 +121,7 @@ test('Pre-deploy API check: compiled Node native ESM loads every api/** function
       lib: ['lib.es2022.d.ts', 'lib.dom.d.ts'],
       types: ['node'],
       jsx: ts.JsxEmit.ReactJSX,
+      allowJs: true,
       skipLibCheck: true,
       isolatedModules: true,
       moduleDetection: ts.ModuleDetectionKind.Force,
@@ -126,19 +148,23 @@ test('Pre-deploy API check: compiled Node native ESM loads every api/** function
       assert.fail(`TypeScript compilation errors in API/server tree:\n${formatted}`);
     }
 
-    // Mirror package.json ("type": "module"), node_modules, and static JSON data files
+    // Mirror package.json ("type": "module"), node_modules, and static data/private files
     fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({ type: 'module' }));
     fs.symlinkSync(path.join(cwd, 'node_modules'), path.join(tmpDir, 'node_modules'), 'dir');
 
     const dataSrcDir = path.join(cwd, 'features', 'clarity-map', 'data');
     const dataDestDir = path.join(tmpDir, 'features', 'clarity-map', 'data');
     fs.cpSync(dataSrcDir, dataDestDir, { recursive: true });
+    const resourcesSrcDir = path.join(cwd, 'resources-private');
+    if (fs.existsSync(resourcesSrcDir)) {
+      fs.cpSync(resourcesSrcDir, path.join(tmpDir, 'resources-private'), { recursive: true });
+    }
 
     const compiledApiFiles = collectFiles(
       path.join(tmpDir, 'api'),
       (p) => p.endsWith('.js')
     );
-    assert.ok(compiledApiFiles.length >= 4, 'Should emit compiled JS files for all api routes');
+    assert.ok(compiledApiFiles.length >= 8, 'Should emit compiled JS files for all api routes');
 
     const moduleUrls = compiledApiFiles.map((f) => pathToFileURL(f).href);
     // Also verify dynamic import target of ssr-meta.js resolves in plain Node ESM

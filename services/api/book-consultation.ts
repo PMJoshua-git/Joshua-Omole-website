@@ -1,6 +1,6 @@
 import express from 'express';
 import { z } from 'zod';
-import { leadsTable } from '../airtable';
+import { leadsTable } from '../airtable/index.js';
 
 const router = express.Router();
 
@@ -35,8 +35,17 @@ router.post('/', async (req, res) => {
 
     let leadId: string | undefined = undefined;
 
-    // 1. Save lead to Airtable
-    if (leadsTable) {
+    const isProd = process.env.VERCEL_ENV === 'production';
+
+    if (!leadsTable) {
+      if (isProd) {
+        return res.status(503).json({
+          success: false,
+          error: 'Lead storage is not configured right now. Please try again later.',
+        });
+      }
+      console.warn('[Airtable] leadsTable not configured (non-production mode).');
+    } else {
       try {
         const created = await leadsTable.create([
           {
@@ -66,8 +75,17 @@ router.post('/', async (req, res) => {
           }
         ]);
         leadId = created?.[0]?.id;
-      } catch (err) {
-        console.error('Airtable Error (non-blocking):', err);
+      } catch (err: any) {
+        console.error('[Airtable] book-consultation create failed:', {
+          status: err?.statusCode ?? null,
+          errorType: err?.error || err?.name || 'AIRTABLE_ERROR',
+        });
+        if (isProd) {
+          return res.status(502).json({
+            success: false,
+            error: 'Unable to save consultation request right now. Please try again.',
+          });
+        }
       }
     }
 
@@ -141,44 +159,59 @@ router.post('/', async (req, res) => {
 // 3. Confirm calendar booking endpoint
 router.post('/confirm-booking', async (req, res) => {
   try {
-    const { leadId, email, bookingTime } = req.body;
+    const { leadId, email, bookingTime } = req.body || {};
     const resolvedBookingTime = bookingTime || new Date().toISOString();
 
-    if (leadsTable) {
-      if (leadId) {
+    if (!leadsTable) {
+      if (process.env.VERCEL_ENV === 'production') {
+        return res.status(503).json({
+          success: false,
+          error: 'Lead storage is not configured right now.',
+        });
+      }
+      return res.status(200).json({ success: true, message: 'Booking confirmed' });
+    }
+
+    if (leadId) {
+      await leadsTable.update([
+        {
+          id: leadId,
+          fields: {
+            "Status": "Booked",
+            "Booking Time": resolvedBookingTime
+          }
+        }
+      ]);
+      console.log(`Successfully updated Airtable lead ${leadId} status to Booked`);
+    } else if (typeof email === 'string' && email.trim() !== '') {
+      const safeEmail = email.trim().replace(/['\\]/g, '');
+      const matching = await leadsTable.select({
+        filterByFormula: `{Email} = '${safeEmail}'`,
+        maxRecords: 1
+      }).firstPage();
+      if (matching && matching.length > 0) {
         await leadsTable.update([
           {
-            id: leadId,
+            id: matching[0].id,
             fields: {
               "Status": "Booked",
               "Booking Time": resolvedBookingTime
             }
           }
         ]);
-        console.log(`Successfully updated Airtable lead ${leadId} status to Booked`);
-      } else if (email) {
-        const matching = await leadsTable.select({
-          filterByFormula: `{Email} = '${email}'`,
-          maxRecords: 1
-        }).firstPage();
-        if (matching && matching.length > 0) {
-          await leadsTable.update([
-            {
-              id: matching[0].id,
-              fields: {
-                "Status": "Booked",
-                "Booking Time": resolvedBookingTime
-              }
-            }
-          ]);
-          console.log(`Successfully updated Airtable lead by email ${email} status to Booked`);
-        }
+        console.log(`Successfully updated Airtable lead ${matching[0].id} status to Booked`);
       }
     }
 
     return res.status(200).json({ success: true, message: 'Booking confirmed' });
-  } catch (err) {
-    console.error('Confirm Booking Error (non-blocking):', err);
+  } catch (err: any) {
+    console.error('[Airtable] confirm-booking error:', {
+      status: err?.statusCode ?? null,
+      errorType: err?.error || err?.name || 'AIRTABLE_ERROR',
+    });
+    if (process.env.VERCEL_ENV === 'production') {
+      return res.status(502).json({ success: false, error: 'Could not update booking status' });
+    }
     return res.status(200).json({ success: false, error: 'Could not update status' });
   }
 });

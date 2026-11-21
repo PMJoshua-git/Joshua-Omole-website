@@ -3,26 +3,28 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
     "start": "node dist/server.cjs",
     "preview": "vite preview",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "check:functions": "node scripts/check-functions.mjs",
+    "predeploy": "npm run lint && npm run check:functions"
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.3",
     "@google/genai": "^3.3.0",
     "@hookform/resolvers": "^5.4.0",
-    "@types/jsdom": "^30.0.0",
-    "@types/pdfkit": "^0.17.7",
     "@upstash/redis": "^1.41.0",
     "airtable": "^0.12.2",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.7.3",
     "framer-motion": "^12.40.0",
-    "jsdom": "^31.0.1",
     "lucide-react": "^0.563.0",
     "node-cache": "^5.1.2",
     "pdfkit": "^0.20.2",
@@ -37,9 +39,12 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/jsdom": "^30.0.0",
     "@types/node": "^22.14.0",
+    "@types/pdfkit": "^0.17.7",
     "@vitejs/plugin-react": "^5.0.0",
     "esbuild": "^0.28.0",
+    "jsdom": "^31.0.1",
     "tsx": "^4.22.4",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"

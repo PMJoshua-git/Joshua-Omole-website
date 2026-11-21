@@ -13,19 +13,14 @@ const NewsletterModal: React.FC<NewsletterModalProps> = ({ isOpen, onClose }) =>
     const [firstName, setFirstName] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
 
     if (!isOpen) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        
-        const attribution = getAttributionData();
-        const payload = {
-            firstName,
-            email,
-            ...attribution
-        };
+        setSubmitError(null);
 
         try {
             const response = await fetch('/api/subscribe', {
@@ -41,18 +36,21 @@ const NewsletterModal: React.FC<NewsletterModalProps> = ({ isOpen, onClose }) =>
                     mailingLists: {},
                 })
             });
-            const result = await response.json();
-            if (!response.ok) {
-                console.error('Newsletter subscribe error', result);
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok || result?.success === false) {
+                console.error('Newsletter subscribe error:', response.status);
+                setSubmitError(result?.error || 'Unable to subscribe right now. Please try again.');
+                return;
             }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setIsSubmitting(false);
             setIsSubmitted(true);
             setEmail('');
             setFirstName('');
             localStorage.setItem('newsletter_subscribed', 'true');
+        } catch (err) {
+            console.error(err);
+            setSubmitError('Unable to reach our server right now. Please try again.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -105,6 +103,9 @@ const NewsletterModal: React.FC<NewsletterModalProps> = ({ isOpen, onClose }) =>
                             className="input-interaction w-full bg-sage-surface-2 border border-sage-border text-sage-text px-5 py-4 rounded-xl"
                             required
                         />
+                        {submitError && (
+                            <p className="text-sm text-red-500 text-left">{submitError}</p>
+                        )}
                         <button 
                             type="submit" 
                             disabled={isSubmitting}

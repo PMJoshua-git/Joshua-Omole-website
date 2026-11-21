@@ -13,12 +13,14 @@ const LiveTrainingSessions: React.FC = () => {
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [showCalEmbed, setShowCalEmbed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: '', email: '', location: '', expectations: '' });
   
   useEffect(() => {
     if (!selectedSession) {
       setShowBookingForm(false);
       setShowCalEmbed(false);
+      setSubmitError(null);
       setFormData({ name: '', email: '', location: '', expectations: '' });
     }
   }, [selectedSession]);
@@ -63,15 +65,8 @@ const LiveTrainingSessions: React.FC = () => {
     if (!selectedSession) return;
     
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
-      const payload = {
-        name: formData.name,
-        email: formData.email,
-        location: formData.location,
-        expectations: formData.expectations,
-        sessionTitle: selectedSession.title
-      };
-      
       const response = await fetch('/api/save-contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -89,15 +84,15 @@ const LiveTrainingSessions: React.FC = () => {
         })
       });
       
-      const result = await response.json();
-      if (response.ok && selectedSession.calBookingLink) {
+      const result = await response.json().catch(() => ({}));
+      if (response.ok && result?.success !== false && selectedSession.calBookingLink) {
         setShowCalEmbed(true);
       } else {
-        alert('Failed to submit booking. Please try again.');
+        setSubmitError(result?.error || 'Failed to submit booking. Please try again.');
       }
     } catch (err) {
       console.error(err);
-      alert('An error occurred. Please try again.');
+      setSubmitError('An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -289,6 +284,12 @@ const LiveTrainingSessions: React.FC = () => {
                       placeholder="Tell me what you hope to get out of this session..."
                     ></textarea>
                   </div>
+
+                  {submitError && (
+                    <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-lg text-sm">
+                      {submitError}
+                    </div>
+                  )}
 
                   <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-6">
                     <button 

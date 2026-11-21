@@ -18,28 +18,32 @@ import type {
   QuestionnaireSubmission,
 } from '../../../features/clarity-map/types/clarityMap.js';
 
-const GEMINI_MODEL = 'gemini-4-hydrogen';
+const DEFAULT_GEMINI_MODEL = 'gemini-4-hydrogen';
 const TOTAL_ANALYZER_BUDGET_MS = 52_000;
 const PRIMARY_CALL_TIMEOUT_MS = 35_000;
 const REPAIR_CALL_TIMEOUT_MS = 18_000;
 const MIN_BUDGET_FOR_RETRY_MS = 14_000;
 const MIN_BUDGET_FOR_REPAIR_MS = 12_000;
+const HEALTH_PING_TIMEOUT_MS = 10_000;
+
+export function getPrimaryGeminiModel(): string {
+  const configured = process.env.GEMINI_MODEL?.trim();
+  return configured || DEFAULT_GEMINI_MODEL;
+}
+
+export function getFallbackGeminiModel(): string | null {
+  const configured = process.env.GEMINI_FALLBACK_MODEL?.trim();
+  return configured ? configured : null;
+}
 
 function getGeminiClient(): GoogleGenAI {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey.trim() === '') {
     throw new GeminiConfigurationError(
-      'GEMINI_API_KEY is not configured. Please add your Gemini API key in Settings > Secrets.'
+      'GEMINI_API_KEY is not configured. Please set the GEMINI_API_KEY environment variable.'
     );
   }
-  return new GoogleGenAI({
-    apiKey,
-    httpOptions: {
-      headers: {
-        'User-Agent': 'aistudio-build',
-      },
-    },
-  });
+  return new GoogleGenAI({ apiKey });
 }
 
 export class GeminiConfigurationError extends Error {
@@ -87,17 +91,68 @@ function withCallTimeout<T>(promise: Promise<T>, timeoutMs: number, label: strin
   });
 }
 
+function extractGeminiErrorDetails(err: any): {
+  status: number | null;
+  code: string | null;
+  message: string;
+} {
+  const rawStatus = err?.status ?? err?.statusCode ?? err?.error?.code ?? null;
+  const parsedStatus =
+    typeof rawStatus === 'number' && Number.isFinite(rawStatus)
+      ? rawStatus
+      : typeof rawStatus === 'string' && /^\d+$/.test(rawStatus)
+      ? Number.parseInt(rawStatus, 10)
+      : null;
+  const rawCode = err?.code ?? err?.error?.status ?? null;
+  const code = rawCode ? String(rawCode) : null;
+  const message = String(err?.message || err || '').slice(0, 200);
+  return { status: parsedStatus, code, message };
+}
+
+function logGeminiCallFailure(opts: {
+  model: string;
+  attempt: 'primary' | 'repair';
+  startedAt: number;
+  err: any;
+}) {
+  const { status, code, message } = extractGeminiErrorDetails(opts.err);
+  console.error('[ClarityMap Gemini] API call failed:', {
+    model: opts.model,
+    attempt: opts.attempt,
+    elapsedMs: Date.now() - opts.startedAt,
+    status,
+    code,
+    message,
+  });
+}
+
+function shouldRetryWithFallback(err: any): boolean {
+  const { status, code, message } = extractGeminiErrorDetails(err);
+  const combined = `${code || ''} ${message}`.toUpperCase();
+  if (status === 404 || status === 400 || status === 401 || status === 403) {
+    return true;
+  }
+  return (
+    combined.includes('NOT_FOUND') ||
+    combined.includes('NOT FOUND') ||
+    combined.includes('INVALID_ARGUMENT') ||
+    combined.includes('UNSUPPORTED') ||
+    combined.includes('PERMISSION_DENIED') ||
+    combined.includes('UNAUTHENTICATED') ||
+    combined.includes('API_KEY_INVALID')
+  );
+}
+
 function isTransientGeminiError(err: any): boolean {
-  const msg = String(err?.message || err || '');
-  const status = Number(err?.status ?? err?.statusCode ?? 0);
+  const { status, message } = extractGeminiErrorDetails(err);
   if (status === 503 || status === 500 || status === 502 || status === 504) return true;
   return (
-    msg.includes('UNAVAILABLE') ||
-    msg.includes('503') ||
-    msg.includes('500') ||
-    msg.includes('ECONNRESET') ||
-    msg.includes('ETIMEDOUT') ||
-    msg.includes('fetch failed')
+    message.includes('UNAVAILABLE') ||
+    message.includes('503') ||
+    message.includes('500') ||
+    message.includes('ECONNRESET') ||
+    message.includes('ETIMEDOUT') ||
+    message.includes('fetch failed')
   );
 }
 
@@ -499,51 +554,77 @@ export async function analyzeWorkflowWithGemini(
     2
   )}\n</untrusted_user_answers>`;
 
+  const primaryModel = getPrimaryGeminiModel();
+  const fallbackModel = getFallbackGeminiModel();
+  let activeModel = primaryModel;
   let rawText = '';
-  const callPrimary = async () => {
+
+  const callPrimary = async (modelToUse: string) => {
     const remainingBudget = TOTAL_ANALYZER_BUDGET_MS - (Date.now() - startedAt);
     const timeoutMs = Math.max(5_000, Math.min(PRIMARY_CALL_TIMEOUT_MS, remainingBudget));
     const response = await withCallTimeout(
       ai.models.generateContent({
-        model: GEMINI_MODEL,
+        model: modelToUse,
         contents: userMessage,
         config: {
           systemInstruction: CLARITY_MAP_SYSTEM_PROMPT_V2,
           responseMimeType: 'application/json',
           thinkingConfig: {
-            thinkingLevel: ThinkingLevel.LOW,
+            thinkingLevel: ThinkingLevel.MEDIUM,
           },
         },
       }),
       timeoutMs,
-      `generateContent(${GEMINI_MODEL})`
+      `generateContent(${modelToUse})`
     );
     return response.text ?? '';
   };
 
   try {
-    rawText = await callPrimary();
+    rawText = await callPrimary(activeModel);
   } catch (firstErr: any) {
     const remainingAfterFirst = TOTAL_ANALYZER_BUDGET_MS - (Date.now() - startedAt);
-    if (isTransientGeminiError(firstErr) && remainingAfterFirst >= MIN_BUDGET_FOR_RETRY_MS) {
-      console.warn('[ClarityMap Gemini] Transient error on primary call, retrying once:', {
-        model: GEMINI_MODEL,
+    if (
+      fallbackModel &&
+      fallbackModel !== activeModel &&
+      shouldRetryWithFallback(firstErr) &&
+      remainingAfterFirst >= MIN_BUDGET_FOR_RETRY_MS
+    ) {
+      logGeminiCallFailure({ model: activeModel, attempt: 'primary', startedAt, err: firstErr });
+      console.warn('[ClarityMap Gemini] Retrying primary call with fallback model:', {
+        fromModel: activeModel,
+        toModel: fallbackModel,
         elapsedMs: Date.now() - startedAt,
-        message: String(firstErr?.message || firstErr),
+      });
+      activeModel = fallbackModel;
+      try {
+        rawText = await callPrimary(activeModel);
+      } catch (fallbackErr: any) {
+        return handleGeminiSdkFailure(fallbackErr, startedAt, activeModel, 'primary');
+      }
+    } else if (isTransientGeminiError(firstErr) && remainingAfterFirst >= MIN_BUDGET_FOR_RETRY_MS) {
+      const firstDetails = extractGeminiErrorDetails(firstErr);
+      console.warn('[ClarityMap Gemini] Transient error on primary call, retrying once:', {
+        model: activeModel,
+        attempt: 'primary',
+        elapsedMs: Date.now() - startedAt,
+        status: firstDetails.status,
+        code: firstDetails.code,
+        message: firstDetails.message,
       });
       await new Promise((r) => setTimeout(r, 800));
       try {
-        rawText = await callPrimary();
+        rawText = await callPrimary(activeModel);
       } catch (retryErr: any) {
-        return handleGeminiSdkFailure(retryErr, startedAt);
+        return handleGeminiSdkFailure(retryErr, startedAt, activeModel, 'primary');
       }
     } else {
-      return handleGeminiSdkFailure(firstErr, startedAt);
+      return handleGeminiSdkFailure(firstErr, startedAt, activeModel, 'primary');
     }
   }
 
   console.info('[ClarityMap Gemini] Primary response received:', {
-    model: GEMINI_MODEL,
+    model: activeModel,
     elapsedMs: Date.now() - startedAt,
     chars: rawText.length,
   });
@@ -564,6 +645,8 @@ export async function analyzeWorkflowWithGemini(
 
   // Controlled repair pass if initial output still failed strict v2 schema/reference checks
   console.warn('[ClarityMap Gemini] Initial output failed validation, attempting controlled repair:', {
+    model: activeModel,
+    attempt: 'repair',
     elapsedMs: Date.now() - startedAt,
     errors: validationErrors.slice(0, 8),
   });
@@ -571,6 +654,8 @@ export async function analyzeWorkflowWithGemini(
   const remainingForRepair = TOTAL_ANALYZER_BUDGET_MS - (Date.now() - startedAt);
   if (remainingForRepair < MIN_BUDGET_FOR_REPAIR_MS) {
     console.error('[ClarityMap Gemini] Skipping repair pass due to time budget:', {
+      model: activeModel,
+      attempt: 'repair',
       elapsedMs: Date.now() - startedAt,
       remainingForRepair,
     });
@@ -590,7 +675,7 @@ export async function analyzeWorkflowWithGemini(
 
     const repairResponse = await withCallTimeout(
       ai.models.generateContent({
-        model: GEMINI_MODEL,
+        model: activeModel,
         contents: repairPrompt,
         config: {
           systemInstruction: CLARITY_MAP_SYSTEM_PROMPT_V2,
@@ -601,7 +686,7 @@ export async function analyzeWorkflowWithGemini(
         },
       }),
       Math.min(REPAIR_CALL_TIMEOUT_MS, remainingForRepair),
-      `repairContent(${GEMINI_MODEL})`
+      `repairContent(${activeModel})`
     );
 
     const repairedText = repairResponse.text ?? '';
@@ -613,19 +698,19 @@ export async function analyzeWorkflowWithGemini(
         recheck.data.confidence = 'medium';
       }
       console.info('[ClarityMap Gemini] Repair pass succeeded:', {
+        model: activeModel,
         elapsedMs: Date.now() - startedAt,
       });
       return recheck.data;
     }
     console.error('[ClarityMap Gemini] Repair pass still failed validation:', {
+      model: activeModel,
+      attempt: 'repair',
       elapsedMs: Date.now() - startedAt,
       errors: recheck.errors.slice(0, 10),
     });
   } catch (repairErr: any) {
-    console.error('[ClarityMap Gemini] Repair pass threw error:', {
-      elapsedMs: Date.now() - startedAt,
-      message: repairErr?.message || String(repairErr),
-    });
+    logGeminiCallFailure({ model: activeModel, attempt: 'repair', startedAt, err: repairErr });
   }
 
   throw new GeminiAnalysisError(
@@ -634,16 +719,14 @@ export async function analyzeWorkflowWithGemini(
   );
 }
 
-function handleGeminiSdkFailure(err: any, startedAt: number): never {
-  const msg = String(err?.message || err || '');
-  const status = err?.status ?? err?.statusCode ?? null;
-  console.error('[ClarityMap Gemini] API call failed:', {
-    model: GEMINI_MODEL,
-    elapsedMs: Date.now() - startedAt,
-    status,
-    code: err?.code ?? null,
-    message: msg,
-  });
+function handleGeminiSdkFailure(
+  err: any,
+  startedAt: number,
+  model: string,
+  attempt: 'primary' | 'repair'
+): never {
+  logGeminiCallFailure({ model, attempt, startedAt, err });
+  const { status, message: msg } = extractGeminiErrorDetails(err);
 
   if (msg.includes('GEMINI_CALL_TIMEOUT')) {
     throw new GeminiAnalysisError(
@@ -660,7 +743,7 @@ function handleGeminiSdkFailure(err: any, startedAt: number): never {
     status === 403
   ) {
     throw new GeminiAnalysisError(
-      'The Gemini API key could not be authenticated. Please check GEMINI_API_KEY in Settings > Secrets.',
+      'The Gemini API key could not be authenticated. Please check the GEMINI_API_KEY environment variable.',
       403
     );
   }
@@ -674,4 +757,56 @@ function handleGeminiSdkFailure(err: any, startedAt: number): never {
     'Unable to complete the workflow analysis right now. Please try again shortly.',
     502
   );
+}
+
+export async function pingGeminiHealth(): Promise<{
+  ok: boolean;
+  status: number | null;
+  code: string | null;
+  errorClass: string | null;
+  ms: number;
+}> {
+  const startedAt = Date.now();
+  const model = getPrimaryGeminiModel();
+
+  try {
+    const ai = getGeminiClient();
+    const response = await withCallTimeout(
+      ai.models.generateContent({
+        model,
+        contents: 'Reply with OK',
+        config: {
+          maxOutputTokens: 64,
+          thinkingConfig: {
+            thinkingLevel: ThinkingLevel.LOW,
+          },
+        },
+      }),
+      HEALTH_PING_TIMEOUT_MS,
+      `healthPing(${model})`
+    );
+    const hasText = typeof response?.text === 'string' && response.text.trim().length > 0;
+    return {
+      ok: hasText || Boolean(response),
+      status: 200,
+      code: null,
+      errorClass: null,
+      ms: Date.now() - startedAt,
+    };
+  } catch (err: any) {
+    const { status, code, message } = extractGeminiErrorDetails(err);
+    let errorClass = err?.name ? String(err.name) : 'GeminiError';
+    if (err instanceof GeminiConfigurationError) {
+      errorClass = 'GeminiConfigurationError';
+    } else if (message.includes('GEMINI_CALL_TIMEOUT')) {
+      errorClass = 'TimeoutError';
+    }
+    return {
+      ok: false,
+      status,
+      code,
+      errorClass,
+      ms: Date.now() - startedAt,
+    };
+  }
 }
