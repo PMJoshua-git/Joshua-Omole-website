@@ -4,6 +4,7 @@ import {
   CLARITY_MAP_SYSTEM_PROMPT_V2,
 } from '../prompts/workflow-analysis.system.js';
 import {
+  LOW_VOLUME_ALLOWED_AUTOMATION_TYPES,
   validateClarityMapAnalysis,
 } from '../../../features/clarity-map/schemas/analysis-result.schema.js';
 import {
@@ -487,10 +488,253 @@ function normalizeStageNodes(
   }
 }
 
+const LOW_VOLUME_TYPE_FALLBACK: Record<string, string> = {
+  auto_record: 'capture_form',
+  sync_between_systems: 'capture_form',
+  dashboard_or_report: 'template_generation',
+  rule_based_routing: 'status_notification',
+  approval_request: 'status_notification',
+  payment_or_data_match: 'status_notification',
+  assisted_by_ai: 'status_notification',
+};
+
+function hasRawAutomationSpec(node: any): boolean {
+  if (!node || typeof node !== 'object') return false;
+  const a = node.automation;
+  if (!a || typeof a !== 'object' || Array.isArray(a)) return false;
+  return Boolean(
+    (typeof a.type === 'string' && a.type.trim() !== '') ||
+      (typeof a.action === 'string' && a.action.trim() !== '') ||
+      (typeof a.description === 'string' && a.description.trim() !== '')
+  );
+}
+
+function getEffectiveRawEdges(node: any): Array<{ to: string; label: string }> {
+  if (Array.isArray(node?.edges) && node.edges.length > 0) {
+    return node.edges
+      .filter((e: any) => e && typeof e.to === 'string' && e.to.trim() !== '')
+      .map((e: any) => ({
+        to: e.to.trim(),
+        label: typeof e.label === 'string' ? e.label : '',
+      }));
+  }
+  if (Array.isArray(node?.next) && node.next.length > 0) {
+    return node.next
+      .filter((id: any) => typeof id === 'string' && id.trim() !== '')
+      .map((id: string) => ({ to: id.trim(), label: '' }));
+  }
+  return [];
+}
+
+function enforceAutomatedVolumeGateAndRewire(
+  automatedState: any,
+  volumeContext: VolumeContext,
+  redesignedIds: Set<string>,
+  rawAutomatedWithSpec: Set<string>
+): void {
+  const nodes: any[] = Array.isArray(automatedState?.nodes) ? automatedState.nodes : [];
+  if (nodes.length === 0) return;
+
+  const volumeBand = volumeContext.volume_band;
+  const maxOperational =
+    volumeBand === 'low' || volumeBand === 'unknown'
+      ? 2
+      : volumeBand === 'medium'
+      ? 3
+      : 5;
+
+  const operationalNodes = nodes.filter((n) => n && n.type !== 'end');
+  const endNodes = nodes.filter((n) => n && n.type === 'end');
+
+  if (operationalNodes.length > maxOperational && endNodes.length > 0) {
+    const ranked = operationalNodes.map((n, index) => {
+      const hasRealAuto = rawAutomatedWithSpec.has(n.id) ? 1 : 0;
+      const lowVolPreferred =
+        (volumeBand === 'low' || volumeBand === 'unknown') &&
+        LOW_VOLUME_ALLOWED_AUTOMATION_TYPES.has(n?.automation?.type)
+          ? 1
+          : 0;
+      return { node: n, index, hasRealAuto, lowVolPreferred };
+    });
+
+    ranked.sort((a, b) => {
+      if (b.hasRealAuto !== a.hasRealAuto) return b.hasRealAuto - a.hasRealAuto;
+      if (b.lowVolPreferred !== a.lowVolPreferred) return b.lowVolPreferred - a.lowVolPreferred;
+      return a.index - b.index;
+    });
+
+    const chosenOpIds = new Set(ranked.slice(0, maxOperational).map((r) => r.node.id));
+    const endIds = new Set(endNodes.map((n) => n.id));
+    const keptIds = new Set<string>([...chosenOpIds, ...endIds]);
+    const primaryEndId = endNodes[0].id;
+    const nodeById = new Map<string, any>(nodes.filter((n) => n?.id).map((n) => [n.id, n]));
+
+    const resolveTargetsForBranch = (originId: string, firstTargetId: string): string[] => {
+      const resolved: string[] = [];
+      const visited = new Set<string>([originId]);
+      const queue: string[] = [firstTargetId];
+
+      while (queue.length > 0) {
+        const currId = queue.shift()!;
+        if (visited.has(currId)) continue;
+        visited.add(currId);
+
+        if (keptIds.has(currId)) {
+          if (!resolved.includes(currId)) {
+            resolved.push(currId);
+          }
+          continue;
+        }
+
+        const droppedNode = nodeById.get(currId);
+        if (!droppedNode) continue;
+        for (const edge of getEffectiveRawEdges(droppedNode)) {
+          if (!visited.has(edge.to)) {
+            queue.push(edge.to);
+          }
+        }
+      }
+
+      return resolved;
+    };
+
+    const keptNodes = nodes.filter((n) => n && keptIds.has(n.id));
+    for (const node of keptNodes) {
+      if (node.type === 'end') {
+        node.next = [];
+        node.edges = [];
+        continue;
+      }
+
+      const rawEdges = getEffectiveRawEdges(node);
+      const dedupedEdges: Array<{ to: string; label: string }> = [];
+      const seenTargets = new Set<string>();
+
+      for (const edge of rawEdges) {
+        const targets = resolveTargetsForBranch(node.id, edge.to);
+        const finalTargets = targets.length > 0 ? targets : [primaryEndId];
+        for (const targetId of finalTargets) {
+          if (!seenTargets.has(targetId)) {
+            seenTargets.add(targetId);
+            dedupedEdges.push({ to: targetId, label: edge.label || '' });
+          }
+        }
+      }
+
+      if (dedupedEdges.length === 0) {
+        dedupedEdges.push({ to: primaryEndId, label: '' });
+      }
+
+      if (node.type === 'decision' && dedupedEdges.length < 2) {
+        node.type = 'task';
+      } else if (node.type === 'decision') {
+        dedupedEdges.forEach((e, idx) => {
+          if (!e.label || e.label.trim() === '') {
+            e.label = idx === 0 ? 'Primary path' : `Branch ${idx + 1}`;
+          }
+        });
+      }
+
+      node.edges = dedupedEdges;
+      node.next = dedupedEdges.map((e) => e.to);
+    }
+
+    // Ensure every kept operational node can reach an "end" node
+    const computeCanReachEnd = (): Set<string> => {
+      const reverseAdj = new Map<string, string[]>();
+      keptNodes.forEach((n) => reverseAdj.set(n.id, []));
+      for (const n of keptNodes) {
+        for (const e of n.edges || []) {
+          reverseAdj.get(e.to)?.push(n.id);
+        }
+      }
+      const reachable = new Set<string>(endIds);
+      const q = [...endIds];
+      while (q.length > 0) {
+        const curr = q.shift()!;
+        for (const prev of reverseAdj.get(curr) || []) {
+          if (!reachable.has(prev)) {
+            reachable.add(prev);
+            q.push(prev);
+          }
+        }
+      }
+      return reachable;
+    };
+
+    const reachable = computeCanReachEnd();
+    for (const n of keptNodes) {
+      if (n.type !== 'end' && !reachable.has(n.id)) {
+        const label = n.type === 'decision' ? 'Complete' : '';
+        n.edges.push({ to: primaryEndId, label });
+        n.next = n.edges.map((e: { to: string }) => e.to);
+      }
+    }
+
+    // Preserve Stage 2 step IDs from dropped nodes in not_automated
+    const keptFromIds = new Set<string>();
+    for (const n of keptNodes) {
+      if (Array.isArray(n.from)) {
+        for (const f of n.from) {
+          if (redesignedIds.has(f)) keptFromIds.add(f);
+        }
+      }
+    }
+
+    if (!Array.isArray(automatedState.not_automated)) {
+      automatedState.not_automated = [];
+    }
+    const existingNotAutomated = new Set<string>(
+      automatedState.not_automated
+        .map((item: any) => item?.step)
+        .filter((s: any) => typeof s === 'string')
+    );
+
+    for (const dropped of operationalNodes) {
+      if (chosenOpIds.has(dropped.id) || !Array.isArray(dropped.from)) continue;
+      for (const rId of dropped.from) {
+        if (
+          typeof rId === 'string' &&
+          redesignedIds.has(rId) &&
+          !keptFromIds.has(rId) &&
+          !existingNotAutomated.has(rId)
+        ) {
+          existingNotAutomated.add(rId);
+          automatedState.not_automated.push({
+            step: rId,
+            reason:
+              'Kept human-led at this weekly volume until the core workflow runs consistently.',
+          });
+        }
+      }
+    }
+
+    automatedState.nodes = keptNodes;
+  }
+
+  // Enforce low/unknown volume automation type whitelist and assisted_by_ai cap (<= 2)
+  let assistedAiCount = 0;
+  for (const node of automatedState.nodes) {
+    if (!node || node.type === 'end' || !node.automation) continue;
+
+    if (volumeBand === 'low' || volumeBand === 'unknown') {
+      if (!LOW_VOLUME_ALLOWED_AUTOMATION_TYPES.has(node.automation.type)) {
+        node.automation.type =
+          LOW_VOLUME_TYPE_FALLBACK[node.automation.type] || 'status_notification';
+      }
+    } else if (node.automation.type === 'assisted_by_ai') {
+      assistedAiCount += 1;
+      if (assistedAiCount > 2) {
+        node.automation.type = 'status_notification';
+      }
+    }
+  }
+}
+
 /**
  * Losslessly normalizes safe structural v2 boilerplate (schema_version, edges, end node,
- * Week 1 baseline flag, automated_state status, and accidental snake_case leaks) before
- * running strict schema & graph validation so valid analyses succeed on the first pass.
+ * Week 1 baseline flag, automated_state status, volume gates, and accidental snake_case leaks)
+ * before running strict schema & graph validation so valid analyses succeed on the first pass.
  */
 export function normalizeGeminiOutputForV2(
   raw: unknown,
@@ -515,20 +759,118 @@ export function normalizeGeminiOutputForV2(
 
   if (draft.current_state?.nodes) {
     normalizeStageNodes('current_state', 'c', draft.current_state.nodes);
+    for (const node of draft.current_state.nodes) {
+      if (
+        node &&
+        typeof node.time_min === 'number' &&
+        typeof node.time_max === 'number' &&
+        node.time_min > node.time_max
+      ) {
+        [node.time_min, node.time_max] = [node.time_max, node.time_min];
+      }
+    }
   }
+
+  const currentIds = new Set<string>(
+    Array.isArray(draft.current_state?.nodes)
+      ? draft.current_state.nodes.map((n: any) => n?.id).filter((id: any) => typeof id === 'string')
+      : []
+  );
+
   if (draft.redesigned_state?.nodes) {
     normalizeStageNodes('redesigned_state', 'r', draft.redesigned_state.nodes);
+    for (const node of draft.redesigned_state.nodes) {
+      if (!node || typeof node !== 'object') continue;
+      if (Array.isArray(node.replaces)) {
+        node.replaces = node.replaces.filter((id: any) => currentIds.has(id));
+      }
+      if (
+        typeof node.time_min === 'number' &&
+        typeof node.time_max === 'number' &&
+        node.time_min > node.time_max
+      ) {
+        [node.time_min, node.time_max] = [node.time_max, node.time_min];
+      }
+    }
   }
+
+  if (Array.isArray(draft.redesigned_state?.removed)) {
+    for (const rem of draft.redesigned_state.removed) {
+      if (Array.isArray(rem?.replaces)) {
+        rem.replaces = rem.replaces.filter((id: any) => currentIds.has(id));
+      }
+    }
+  }
+
+  const redesignedIds = new Set<string>(
+    Array.isArray(draft.redesigned_state?.nodes)
+      ? draft.redesigned_state.nodes
+          .map((n: any) => n?.id)
+          .filter((id: any) => typeof id === 'string')
+      : []
+  );
+
+  if (Array.isArray(draft.bottlenecks)) {
+    for (const b of draft.bottlenecks) {
+      if (Array.isArray(b?.step_ids)) {
+        b.step_ids = b.step_ids.filter((id: any) => currentIds.has(id));
+      }
+    }
+  }
+
   if (draft.automated_state) {
     const autoNodes = Array.isArray(draft.automated_state.nodes)
       ? draft.automated_state.nodes
       : [];
+
+    // Record which nodes originally carried real automation details before filling null specs
+    const rawAutomatedWithSpec = new Set<string>();
+    for (const node of autoNodes) {
+      if (node && node.type !== 'end' && typeof node.id === 'string' && hasRawAutomationSpec(node)) {
+        rawAutomatedWithSpec.add(node.id);
+      }
+    }
+
     if (autoNodes.length > 0) {
       normalizeStageNodes('automated_state', 'a', autoNodes);
+      for (const node of autoNodes) {
+        if (!node || typeof node !== 'object') continue;
+        if (Array.isArray(node.from)) {
+          node.from = node.from.filter((id: any) => redesignedIds.has(id));
+        }
+        if (
+          typeof node.time_min === 'number' &&
+          typeof node.time_max === 'number' &&
+          node.time_min > node.time_max
+        ) {
+          [node.time_min, node.time_max] = [node.time_max, node.time_min];
+        }
+      }
+    }
+
+    if (Array.isArray(draft.automated_state.not_automated)) {
+      draft.automated_state.not_automated = draft.automated_state.not_automated.filter(
+        (item: any) =>
+          item &&
+          typeof item.step === 'string' &&
+          redesignedIds.has(item.step) &&
+          typeof item.reason === 'string' &&
+          item.reason.trim() !== ''
+      );
+    } else {
+      draft.automated_state.not_automated = [];
+    }
+
+    if (
+      draft.automated_state.status === 'not_yet' &&
+      rawAutomatedWithSpec.size > 0 &&
+      autoNodes.some((n: any) => n?.type !== 'end')
+    ) {
+      draft.automated_state.status = 'limited';
     }
 
     const operationalAutoCount = autoNodes.filter((n: any) => n?.type !== 'end').length;
-    if (operationalAutoCount === 0) {
+    if (operationalAutoCount === 0 || draft.automated_state.status === 'not_yet') {
       draft.automated_state.nodes = [];
       draft.automated_state.status = 'not_yet';
       if (!draft.automated_state.reason || String(draft.automated_state.reason).trim() === '') {
@@ -542,15 +884,44 @@ export function normalizeGeminiOutputForV2(
         draft.automated_state.revisit_when =
           'Revisit lightweight automation once weekly volume exceeds 10 consistent runs.';
       }
-    } else if (
-      volumeContext.volume_band === 'low' ||
-      volumeContext.volume_band === 'unknown'
-    ) {
-      if (!draft.automated_state.status || draft.automated_state.status === 'recommended') {
-        draft.automated_state.status = 'limited';
+    } else {
+      enforceAutomatedVolumeGateAndRewire(
+        draft.automated_state,
+        volumeContext,
+        redesignedIds,
+        rawAutomatedWithSpec
+      );
+      if (volumeContext.volume_band === 'low' || volumeContext.volume_band === 'unknown') {
+        if (!draft.automated_state.status || draft.automated_state.status === 'recommended') {
+          draft.automated_state.status = 'limited';
+        }
+      } else if (!draft.automated_state.status) {
+        draft.automated_state.status = 'recommended';
       }
-    } else if (!draft.automated_state.status) {
-      draft.automated_state.status = 'recommended';
+    }
+  }
+
+  if (Array.isArray(draft.automation_opportunities)) {
+    for (const opp of draft.automation_opportunities) {
+      if (!opp || typeof opp !== 'object') continue;
+      if (
+        (volumeContext.volume_band === 'low' || volumeContext.volume_band === 'unknown') &&
+        opp.impact === 'high'
+      ) {
+        opp.impact = 'medium';
+      }
+      if (!opp.verdict) {
+        opp.verdict = opp.effort === 'low' ? 'worth_it_now' : 'worth_it_later';
+      }
+      if (typeof opp.why_this_volume !== 'string' || opp.why_this_volume.trim() === '') {
+        opp.why_this_volume = 'Scoped to fit your current weekly workflow volume.';
+      }
+      if (
+        opp.verdict === 'worth_it_later' &&
+        (typeof opp.revisit_when !== 'string' || opp.revisit_when.trim() === '')
+      ) {
+        opp.revisit_when = 'Revisit once weekly workflow volume increases consistently.';
+      }
     }
   }
 
