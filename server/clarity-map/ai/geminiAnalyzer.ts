@@ -20,7 +20,7 @@ import type {
 
 const DEFAULT_GEMINI_MODEL = 'gemini-4-hydrogen';
 const TOTAL_ANALYZER_BUDGET_MS = 52_000;
-const PRIMARY_CALL_TIMEOUT_MS = 35_000;
+const PRIMARY_CALL_TIMEOUT_MS = 44_000;
 const REPAIR_CALL_TIMEOUT_MS = 18_000;
 const MIN_BUDGET_FOR_RETRY_MS = 14_000;
 const MIN_BUDGET_FOR_REPAIR_MS = 12_000;
@@ -143,13 +143,14 @@ function shouldRetryWithFallback(err: any): boolean {
   );
 }
 
-function isTransientGeminiError(err: any): boolean {
+export function isTransientGeminiError(err: any): boolean {
   const { status, message } = extractGeminiErrorDetails(err);
+  if (message.includes('GEMINI_CALL_TIMEOUT')) return false;
   if (status === 503 || status === 500 || status === 502 || status === 504) return true;
   return (
     message.includes('UNAVAILABLE') ||
-    message.includes('503') ||
-    message.includes('500') ||
+    /\b503\b/.test(message) ||
+    /\b500\b/.test(message) ||
     message.includes('ECONNRESET') ||
     message.includes('ETIMEDOUT') ||
     message.includes('fetch failed')
@@ -570,7 +571,7 @@ export async function analyzeWorkflowWithGemini(
           systemInstruction: CLARITY_MAP_SYSTEM_PROMPT_V2,
           responseMimeType: 'application/json',
           thinkingConfig: {
-            thinkingLevel: ThinkingLevel.MEDIUM,
+            thinkingLevel: ThinkingLevel.LOW,
           },
         },
       }),

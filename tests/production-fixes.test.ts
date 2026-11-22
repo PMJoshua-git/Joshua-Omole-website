@@ -5,6 +5,7 @@ import { handleHealthRequest } from '../server/clarity-map/health.js';
 import {
   getFallbackGeminiModel,
   getPrimaryGeminiModel,
+  isTransientGeminiError,
 } from '../server/clarity-map/ai/geminiAnalyzer.js';
 import {
   analyzeWorkflow,
@@ -126,6 +127,14 @@ test('Task A4: model env resolution reads GEMINI_MODEL and optional GEMINI_FALLB
     process.env.GEMINI_FALLBACK_MODEL = 'gemini-4-hydrogen';
     assert.equal(getPrimaryGeminiModel(), 'gemini-4-neon');
     assert.equal(getFallbackGeminiModel(), 'gemini-4-hydrogen');
+
+    assert.equal(
+      isTransientGeminiError(
+        new Error('GEMINI_CALL_TIMEOUT: generateContent(gemini-4-hydrogen) exceeded 35000ms')
+      ),
+      false
+    );
+    assert.equal(isTransientGeminiError({ status: 503, message: 'UNAVAILABLE' }), true);
   } finally {
     if (prevModel === undefined) delete process.env.GEMINI_MODEL;
     else process.env.GEMINI_MODEL = prevModel;
