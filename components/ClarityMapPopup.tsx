@@ -17,6 +17,9 @@ import {
  */
 interface PopupMemoryState {
   doneForPageLoad: boolean;
+  initialDismissed: boolean;
+  scrollTriggeredForPageLoad: boolean;
+  requireScrollLeaveBottom: boolean;
   visibleMsAccumulated: number;
   visibleStartMs: number | null;
   delayElapsed: boolean;
@@ -25,6 +28,9 @@ interface PopupMemoryState {
 
 const popupState: PopupMemoryState = {
   doneForPageLoad: false,
+  initialDismissed: false,
+  scrollTriggeredForPageLoad: false,
+  requireScrollLeaveBottom: false,
   visibleMsAccumulated: 0,
   visibleStartMs: null,
   delayElapsed: false,
@@ -34,10 +40,34 @@ const popupState: PopupMemoryState = {
 /** Exposed strictly for automated unit tests simulating fresh page loads. */
 export function resetClarityPopupMemoryState(): void {
   popupState.doneForPageLoad = false;
+  popupState.initialDismissed = false;
+  popupState.scrollTriggeredForPageLoad = false;
+  popupState.requireScrollLeaveBottom = false;
   popupState.visibleMsAccumulated = 0;
   popupState.visibleStartMs = null;
   popupState.delayElapsed = false;
   popupState.holdBackStartMs = null;
+}
+
+export function isAtPageBottom(win: Window = window, doc: Document = document): boolean {
+  const scrollTop =
+    win.scrollY ??
+    win.pageYOffset ??
+    doc.documentElement?.scrollTop ??
+    doc.body?.scrollTop ??
+    0;
+  const viewportHeight = win.innerHeight || doc.documentElement?.clientHeight || 0;
+  const docHeight = Math.max(
+    doc.documentElement?.scrollHeight || 0,
+    doc.body?.scrollHeight || 0
+  );
+
+  // Page must be taller than the viewport and actually scrolled down from the top
+  if (docHeight <= viewportHeight + 80 || scrollTop <= 0) {
+    return false;
+  }
+
+  return scrollTop + viewportHeight >= docHeight - 80;
 }
 
 function getVisibleElapsedMs(now: number): number {
@@ -157,11 +187,19 @@ const ClarityMapPopup: React.FC<ClarityMapPopupProps> = ({
       setIsEntered(false);
       const secondsOnSite = Math.round(getVisibleElapsedMs(Date.now()) / 1000);
       if (reason === 'click') {
+        popupState.scrollTriggeredForPageLoad = true;
         trackPopupEvent('clarity_popup_clicked', {
           path: pathname,
           seconds_on_site: secondsOnSite,
         });
       } else {
+        if (!popupState.initialDismissed && !popupState.scrollTriggeredForPageLoad) {
+          popupState.initialDismissed = true;
+          popupState.requireScrollLeaveBottom =
+            typeof window !== 'undefined' && typeof document !== 'undefined'
+              ? isAtPageBottom(window, document)
+              : false;
+        }
         trackPopupEvent('clarity_popup_dismissed', {
           path: pathname,
           seconds_on_site: secondsOnSite,
@@ -315,73 +353,140 @@ const ClarityMapPopup: React.FC<ClarityMapPopupProps> = ({
     };
   }, [mounted, pathname, delayMs, isOpen]);
 
+  // Clear bottom-guard across client-side route transitions
+  useEffect(() => {
+    popupState.requireScrollLeaveBottom = false;
+  }, [pathname]);
+
+  // Re-open pop-up once when reaching the end of a page after cancelling the initial pop-up
+  useEffect(() => {
+    if (
+      !mounted ||
+      isOpen ||
+      !popupState.initialDismissed ||
+      popupState.scrollTriggeredForPageLoad ||
+      isPopupExcludedPath(pathname)
+    ) {
+      return;
+    }
+
+    const handleScroll = () => {
+      if (
+        !popupState.initialDismissed ||
+        popupState.scrollTriggeredForPageLoad ||
+        isPopupExcludedPath(pathname)
+      ) {
+        return;
+      }
+
+      const atBottom = isAtPageBottom(window, document);
+      if (popupState.requireScrollLeaveBottom) {
+        if (!atBottom) {
+          popupState.requireScrollLeaveBottom = false;
+        }
+        return;
+      }
+
+      if (atBottom && !isPopupHeldBack()) {
+        popupState.scrollTriggeredForPageLoad = true;
+        setIsOpen(true);
+        trackPopupEvent('clarity_popup_shown', {
+          path: pathname,
+          seconds_on_site: Math.round(getVisibleElapsedMs(Date.now()) / 1000),
+        });
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [mounted, pathname, isOpen]);
+
   // Client-only guard: never render on SSR or before delay elapses
   if (!mounted || !isOpen) {
     return null;
   }
 
   return (
-    <aside
+    <div
       role="dialog"
-      aria-modal="false"
+      aria-modal="true"
       aria-labelledby="clarity-popup-heading"
       data-testid="clarity-map-popup"
       data-reduced-motion={reducedMotion ? 'true' : 'false'}
-      className={`fixed z-[55] bottom-3 left-3 right-3 md:right-auto md:bottom-6 md:left-6 md:w-[360px] max-md:max-h-[25vh] bg-[#FBFAF7] border border-[#C5D4C7] rounded-2xl shadow-medium p-3 md:p-5 text-[#202A24] ${
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          dismissPopup('dismiss');
+        }
+      }}
+      className={`fixed inset-0 z-[70] flex items-center justify-center p-4 bg-[#1E2620]/85 backdrop-blur-sm ${
         reducedMotion
-          ? 'opacity-100 translate-y-0 transition-none'
-          : `transition-all duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
-              isEntered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
+          ? 'opacity-100 transition-none'
+          : `transition-opacity duration-200 ease-out motion-reduce:transition-none ${
+              isEntered ? 'opacity-100' : 'opacity-0'
             }`
       }`}
     >
-      <button
-        type="button"
-        onClick={() => dismissPopup('dismiss')}
-        aria-label={POPUP_COPY.closeAriaLabel}
-        className="absolute top-1 right-1 md:top-2.5 md:right-2.5 w-11 h-11 inline-flex items-center justify-center rounded-xl text-[#49524C] hover:text-[#202A24] hover:bg-[#EEF4EF] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#405A46]"
+      <div
+        className={`relative w-full max-w-md max-h-[90vh] overflow-y-auto bg-white border border-sage-border rounded-2xl shadow-medium p-7 sm:p-8 space-y-5 text-sage-text ${
+          reducedMotion
+            ? 'opacity-100 translate-y-0 scale-100 transition-none'
+            : `transition-all duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
+                isEntered
+                  ? 'opacity-100 translate-y-0 scale-100'
+                  : 'opacity-0 translate-y-2 scale-95'
+              }`
+        }`}
       >
-        <X className="w-4 h-4" />
-      </button>
-
-      <div className="pr-10 space-y-0.5 md:space-y-2">
-        <div className="text-[10px] md:text-[11px] font-semibold uppercase tracking-[0.11em] text-[#405A46] leading-tight">
-          {POPUP_COPY.eyebrow}
-        </div>
-        <h2
-          id="clarity-popup-heading"
-          className="font-serif text-[15px] md:text-lg font-bold text-[#202A24] leading-tight md:leading-snug"
-        >
-          {POPUP_COPY.heading}
-        </h2>
-        <p className="text-[11.5px] md:text-sm text-[#49524C] leading-[1.35] md:leading-relaxed">
-          {POPUP_COPY.body}
-        </p>
-      </div>
-
-      <div className="mt-2 md:mt-4 flex items-center gap-2 md:gap-3">
-        <Link
-          to={href}
-          onClick={() => dismissPopup('click')}
-          className="inline-flex items-center justify-center gap-1.5 bg-[#405A46] hover:bg-[#334838] text-white font-semibold text-xs md:text-sm px-4 py-2 rounded-xl shadow-soft transition-colors min-h-[44px] flex-1 md:flex-initial"
-        >
-          <span>{POPUP_COPY.primaryCta}</span>
-          <ArrowRight className="w-3.5 h-3.5 shrink-0" />
-        </Link>
-
         <button
           type="button"
           onClick={() => dismissPopup('dismiss')}
-          className="inline-flex items-center justify-center text-xs md:text-sm font-medium text-[#49524C] hover:text-[#202A24] px-3 py-2 rounded-xl transition-colors min-h-[44px]"
+          aria-label={POPUP_COPY.closeAriaLabel}
+          className="absolute top-4 right-4 w-10 h-10 rounded-lg flex items-center justify-center text-sage-muted hover:text-sage-text hover:bg-sage-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#405A46]"
         >
-          {POPUP_COPY.secondaryCta}
+          <X className="w-4 h-4" />
         </button>
-      </div>
 
-      <p className="mt-1 md:mt-2.5 text-[10.5px] md:text-[11px] text-[#49524C] leading-tight">
-        {POPUP_COPY.finePrint}
-      </p>
-    </aside>
+        <div className="pr-8 space-y-2">
+          <div className="text-xs font-semibold uppercase tracking-[0.11em] text-[#405A46]">
+            {POPUP_COPY.eyebrow}
+          </div>
+          <h2
+            id="clarity-popup-heading"
+            className="font-serif text-2xl sm:text-[26px] font-bold text-sage-text leading-snug"
+          >
+            {POPUP_COPY.heading}
+          </h2>
+          <p className="text-sm text-sage-sec leading-relaxed">
+            {POPUP_COPY.body}
+          </p>
+        </div>
+
+        <div className="space-y-2.5 pt-1">
+          <Link
+            to={href}
+            onClick={() => dismissPopup('click')}
+            className="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-[#405A46] hover:bg-[#334838] text-white font-semibold text-sm transition-colors min-h-[44px]"
+          >
+            <span>{POPUP_COPY.primaryCta}</span>
+            <ArrowRight className="w-4 h-4 shrink-0" />
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => dismissPopup('dismiss')}
+            className="w-full px-5 py-3.5 rounded-xl border border-sage-border bg-white hover:bg-sage-surface-2 text-sage-text font-medium text-sm transition-colors min-h-[44px]"
+          >
+            {POPUP_COPY.secondaryCta}
+          </button>
+        </div>
+
+        <p className="text-xs text-sage-muted text-center leading-relaxed">
+          {POPUP_COPY.finePrint}
+        </p>
+      </div>
+    </div>
   );
 };
 

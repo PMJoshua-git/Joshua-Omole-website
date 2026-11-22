@@ -78,9 +78,9 @@ const FloatingAssistant: React.FC = () => {
         onClick={toggleOpen}
         data-testid="floating-assistant-toggle"
         data-floating-assistant-open={isOpen ? 'true' : 'false'}
-        className={`fixed right-6 z-[60] bg-sage-primary text-white hover:bg-sage-primary-hover rounded-full w-12 h-12 shadow-md transition-all flex items-center justify-center ${
-          clarityPopupVisible ? 'max-md:bottom-[28vh] md:bottom-6' : 'bottom-6'
-        } ${isOpen ? 'rotate-90' : 'rotate-0'}`}
+        className={`fixed bottom-6 right-6 z-[60] bg-sage-primary text-white hover:bg-sage-primary-hover rounded-full w-12 h-12 shadow-md transition-all flex items-center justify-center ${
+          isOpen ? 'rotate-90' : 'rotate-0'
+        }`}
         aria-label={isOpen ? "Close Chat" : "Open Chat"}
       >
         {isOpen ? <X className="w-6 h-6" /> : <Bot className="w-7 h-7" />}

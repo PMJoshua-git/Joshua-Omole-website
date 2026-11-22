@@ -778,10 +778,11 @@ test('11-17. Promotional Pop-up behavior, visibility timer, exclusions, hold-bac
       setDocumentHidden(document, false);
       t.mock.timers.tick(1000);
     });
+    assert.equal(POPUP_DELAY_SECONDS, 5);
     const popup = document.querySelector('[data-testid="clarity-map-popup"]');
-    assert.ok(popup, 'Popup should render after 25s visible time');
+    assert.ok(popup, 'Popup should render after 5s visible time');
     assert.equal(popup.getAttribute('role'), 'dialog');
-    assert.equal(popup.getAttribute('aria-modal'), 'false');
+    assert.equal(popup.getAttribute('aria-modal'), 'true');
     assert.equal(popup.textContent?.includes(POPUP_COPY.heading), true);
     assert.equal(/AI\b/i.test(popup.textContent || ''), false);
 
@@ -974,7 +975,7 @@ test('11-17. Promotional Pop-up behavior, visibility timer, exclusions, hold-bac
       );
     });
 
-    // Advance past 5s assistant teaser and 25s Clarity Map popup
+    // Advance past 5s assistant teaser and 5s Clarity Map popup
     await act(async () => {
       t.mock.timers.tick(POPUP_DELAY_SECONDS * 1000);
     });
@@ -987,15 +988,139 @@ test('11-17. Promotional Pop-up behavior, visibility timer, exclusions, hold-bac
     assert.equal(popup.getAttribute('data-reduced-motion'), 'true');
     assert.ok(popup.className.includes('transition-none'));
 
-    // Desktop opposite corner (bottom-left vs bottom-right) & mobile non-overlapping sheet
-    assert.ok(popup.className.includes('md:left-6'));
-    assert.ok(popup.className.includes('max-md:max-h-[25vh]'));
-    assert.ok(assistantBtn.className.includes('right-6'));
-    assert.ok(assistantBtn.className.includes('max-md:bottom-[28vh]'));
+    // Centered modal overlay (desktop + mobile) matching EmailCaptureModal, above floating assistant
+    assert.ok(popup.className.includes('fixed inset-0'));
+    assert.ok(popup.className.includes('items-center justify-center'));
+    assert.ok(popup.innerHTML.includes('max-w-md'));
+    assert.ok(assistantBtn.className.includes('bottom-6 right-6'));
     assert.ok(assistantTeaser.className.includes('opacity-0'));
 
     await act(async () => {
       root.unmount();
+    });
+    t.mock.timers.reset();
+    env.cleanup();
+  }
+
+  // Subtest 17b: Scroll-to-end re-opens pop-up once ONLY if initial pop-up was dismissed (not if CTA clicked)
+  {
+    resetClarityPopupMemoryState();
+    const env = setupDomEnvironment({ width: 1280, height: 800 });
+    t.mock.timers.enable({ apis: ['setTimeout', 'Date'] });
+
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      value: 2400,
+      configurable: true,
+    });
+    Object.defineProperty(document.documentElement, 'clientHeight', {
+      value: 800,
+      configurable: true,
+    });
+    let currentScrollY = 0;
+    Object.defineProperty(window, 'scrollY', {
+      get: () => currentScrollY,
+      configurable: true,
+    });
+
+    const container = document.getElementById('root')!;
+    const root = createRoot(container);
+    await act(async () => {
+      root.render(
+        React.createElement(
+          MemoryRouter,
+          { initialEntries: ['/'] },
+          React.createElement(ClarityMapPopup)
+        )
+      );
+    });
+
+    // Scrolling to bottom BEFORE initial popup appears must not trigger scroll-end early
+    currentScrollY = 1600;
+    await act(async () => {
+      window.dispatchEvent(new window.Event('scroll'));
+    });
+    assert.equal(document.querySelector('[data-testid="clarity-map-popup"]'), null);
+
+    // Scroll back to top, then wait 5s for initial pop-up and dismiss it ("Maybe later")
+    currentScrollY = 0;
+    await act(async () => {
+      t.mock.timers.tick(POPUP_DELAY_SECONDS * 1000);
+    });
+    const initialPopup = document.querySelector('[data-testid="clarity-map-popup"]');
+    assert.ok(initialPopup, 'Initial 5s pop-up should appear');
+
+    await act(async () => {
+      window.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape' }));
+    });
+    assert.equal(document.querySelector('[data-testid="clarity-map-popup"]'), null);
+
+    // Mid-page scroll must NOT open pop-up
+    currentScrollY = 700;
+    await act(async () => {
+      window.dispatchEvent(new window.Event('scroll'));
+    });
+    assert.equal(document.querySelector('[data-testid="clarity-map-popup"]'), null);
+
+    // Reaching end of page after initial cancellation MUST re-open pop-up
+    currentScrollY = 1580;
+    await act(async () => {
+      window.dispatchEvent(new window.Event('scroll'));
+    });
+    assert.ok(
+      document.querySelector('[data-testid="clarity-map-popup"]'),
+      'Pop-up should re-open when user reaches the end of the page after cancelling initial pop-up'
+    );
+
+    // Dismiss second time -> further scrolling to bottom must NOT open again
+    await act(async () => {
+      window.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape' }));
+    });
+    assert.equal(document.querySelector('[data-testid="clarity-map-popup"]'), null);
+
+    currentScrollY = 1600;
+    await act(async () => {
+      window.dispatchEvent(new window.Event('scroll'));
+    });
+    assert.equal(document.querySelector('[data-testid="clarity-map-popup"]'), null);
+
+    // Verify clicking primary CTA on initial pop-up prevents scroll-end re-trigger
+    await act(async () => {
+      root.unmount();
+    });
+    resetClarityPopupMemoryState();
+    currentScrollY = 0;
+    const root2 = createRoot(container);
+    await act(async () => {
+      root2.render(
+        React.createElement(
+          MemoryRouter,
+          { initialEntries: ['/'] },
+          React.createElement(ClarityMapPopup)
+        )
+      );
+    });
+    await act(async () => {
+      t.mock.timers.tick(POPUP_DELAY_SECONDS * 1000);
+    });
+    const ctaLink = document.querySelector('[data-testid="clarity-map-popup"] a') as HTMLAnchorElement;
+    assert.ok(ctaLink);
+    await act(async () => {
+      ctaLink.click();
+    });
+    assert.equal(document.querySelector('[data-testid="clarity-map-popup"]'), null);
+
+    currentScrollY = 1600;
+    await act(async () => {
+      window.dispatchEvent(new window.Event('scroll'));
+    });
+    assert.equal(
+      document.querySelector('[data-testid="clarity-map-popup"]'),
+      null,
+      'Scroll-end should NOT re-open if user clicked primary CTA on initial pop-up'
+    );
+
+    await act(async () => {
+      root2.unmount();
     });
     t.mock.timers.reset();
     env.cleanup();
