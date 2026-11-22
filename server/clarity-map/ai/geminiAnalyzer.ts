@@ -21,7 +21,7 @@ import type {
 const DEFAULT_GEMINI_MODEL = 'gemini-4-hydrogen';
 const TOTAL_ANALYZER_BUDGET_MS = 52_000;
 const PRIMARY_CALL_TIMEOUT_MS = 44_000;
-const REPAIR_CALL_TIMEOUT_MS = 18_000;
+const REPAIR_CALL_TIMEOUT_MS = 22_000;
 const MIN_BUDGET_FOR_RETRY_MS = 14_000;
 const MIN_BUDGET_FOR_REPAIR_MS = 12_000;
 const HEALTH_PING_TIMEOUT_MS = 10_000;
@@ -282,6 +282,70 @@ function normalizeStageNodes(
     if (typeof node.actor === 'string') node.actor = cleanReaderText(node.actor);
     if (typeof node.tool === 'string') node.tool = cleanReaderText(node.tool);
     if (typeof node.rationale === 'string') node.rationale = cleanReaderText(node.rationale);
+    if (stageKey === 'automated_state') {
+      const actorOwner =
+        typeof node.actor === 'string' && node.actor.trim()
+          ? node.actor.trim().slice(0, 140)
+          : 'Process Owner';
+      const stepLabel =
+        typeof node.label === 'string' && node.label.trim()
+          ? node.label.trim().slice(0, 100)
+          : 'Workflow step';
+      const isEnd = node.type === 'end';
+
+      if (!node.automation || typeof node.automation !== 'object' || Array.isArray(node.automation)) {
+        node.automation = {
+          type: 'status_notification',
+          description: isEnd
+            ? 'Marks clear completion of the workflow.'
+            : `Team-handled step: ${stepLabel}.`,
+          function: isEnd ? 'Completion marker' : 'Human-led execution',
+          trigger: isEnd ? 'Final step completes' : 'Previous workflow step completes',
+          input: isEnd ? 'Completed workflow record' : 'Current workflow item',
+          action: isEnd ? 'Record workflow completion' : `Complete ${stepLabel} in shared tracker`,
+          exception_route: isEnd
+            ? 'Flag incomplete items for owner review'
+            : `Escalate delays to ${actorOwner}`,
+          owner: actorOwner,
+          human_checkpoint: isEnd ? 'none' : `${actorOwner} completes and verifies this step`,
+        };
+      } else {
+        const a = node.automation;
+        if (typeof a.type !== 'string' || !a.type.trim()) {
+          a.type = 'status_notification';
+        }
+        if (typeof a.description !== 'string' || !a.description.trim()) {
+          a.description = isEnd
+            ? 'Marks clear completion of the workflow.'
+            : `Team-handled step: ${stepLabel}.`;
+        }
+        if (typeof a.function !== 'string' || !a.function.trim()) {
+          a.function = isEnd ? 'Completion marker' : 'Automated workflow step';
+        }
+        if (typeof a.trigger !== 'string' || !a.trigger.trim()) {
+          a.trigger = isEnd ? 'Final step completes' : 'Previous workflow step completes';
+        }
+        if (typeof a.input !== 'string' || !a.input.trim()) {
+          a.input = isEnd ? 'Completed workflow record' : 'Workflow item data';
+        }
+        if (typeof a.action !== 'string' || !a.action.trim()) {
+          a.action = isEnd ? 'Record workflow completion' : `Process ${stepLabel}`;
+        }
+        if (typeof a.exception_route !== 'string' || !a.exception_route.trim()) {
+          a.exception_route = `Escalate exceptions to ${actorOwner}`;
+        }
+        if (typeof a.owner !== 'string' || !a.owner.trim()) {
+          a.owner = actorOwner;
+        }
+        if (typeof a.human_checkpoint !== 'string' || !a.human_checkpoint.trim()) {
+          a.human_checkpoint = isEnd ? 'none' : `${actorOwner} reviews exceptions`;
+        }
+      }
+      if (!Array.isArray(node.from)) {
+        node.from = [];
+      }
+    }
+
     if (node.automation && typeof node.automation === 'object') {
       for (const field of [
         'description',

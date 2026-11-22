@@ -6,7 +6,10 @@ import {
   getFallbackGeminiModel,
   getPrimaryGeminiModel,
   isTransientGeminiError,
+  normalizeGeminiOutputForV2,
 } from '../server/clarity-map/ai/geminiAnalyzer.js';
+import { validateClarityMapAnalysis } from '../features/clarity-map/schemas/analysis-result.schema.js';
+import { computeVolumeContext } from '../features/clarity-map/services/volumeContext.js';
 import {
   analyzeWorkflow,
   HighDemandError,
@@ -305,4 +308,183 @@ test('Task B: ported Express app serves /api/resources and returns 503 in produc
     if (prevEnv === undefined) delete process.env.VERCEL_ENV;
     else process.env.VERCEL_ENV = prevEnv;
   }
+});
+
+test('Task A6: normalizeGeminiOutputForV2 repairs null automation objects on automated_state nodes', () => {
+  const rawOutput = {
+    schema_version: 2,
+    meta: {
+      industry: 'E-commerce',
+      process_code: 'EC-01',
+      process_name: 'Order Fulfillment',
+      questionnaire_version: '2',
+      analysis_version: '2.0.0',
+    },
+    confidence: 'high',
+    summary: {
+      headline: 'Standardise order intake before automating tracking updates',
+      paragraph: 'Orders enter through multiple channels before fulfillment starts.',
+    },
+    current_state: {
+      nodes: [
+        {
+          id: 'c1',
+          label: 'Order arrives',
+          type: 'task',
+          actor: 'Ops Coordinator',
+          tool: 'Shopify',
+          time_min: 5,
+          time_max: 10,
+          next: ['c2'],
+          edges: [{ to: 'c2', label: '' }],
+          pain_flags: ['no_owner'],
+          inferred: false,
+          evidence: ['Manual order check'],
+        },
+        {
+          id: 'c2',
+          label: 'Order shipped',
+          type: 'end',
+          actor: 'Warehouse Lead',
+          tool: 'Carrier Portal',
+          time_min: null,
+          time_max: null,
+          next: [],
+          edges: [],
+          pain_flags: [],
+          inferred: false,
+          evidence: [],
+        },
+      ],
+      visibility_gaps: ['No live order queue view'],
+    },
+    bridge_diagnosis: {
+      B: { score: 2, finding: 'Hand-offs are informal.', evidence: [] },
+      R: { score: 2, finding: 'Rules live in chat.', evidence: [] },
+      I: { score: 2, finding: 'Intake arrives from two inboxes.', evidence: [] },
+      D: { score: 2, finding: 'No single tracker.', evidence: [] },
+      G: { score: 2, finding: 'No owner sign-off.', evidence: [] },
+      E: { score: 2, finding: 'No weekly review.', evidence: [] },
+    },
+    redesigned_state: {
+      nodes: [
+        {
+          id: 'r1',
+          label: 'Log order in single queue',
+          type: 'task',
+          actor: 'Ops Coordinator',
+          tool: 'Shared Tracker',
+          time_min: 3,
+          time_max: 5,
+          next: ['r2'],
+          edges: [{ to: 'r2', label: '' }],
+          change_type: 'standardised',
+          bridge_letter: 'D',
+          replaces: ['c1'],
+          rationale: 'Keeps every incoming order visible.',
+        },
+        {
+          id: 'r2',
+          label: 'Order complete',
+          type: 'end',
+          actor: 'Warehouse Lead',
+          tool: 'Shared Tracker',
+          time_min: null,
+          time_max: null,
+          next: [],
+          edges: [],
+          change_type: 'unchanged',
+          bridge_letter: 'B',
+          replaces: ['c2'],
+          rationale: 'Marks clear fulfillment completion.',
+        },
+      ],
+      removed: [],
+      rules_introduced: ['Every paid order enters the single tracker before picking'],
+    },
+    automated_state: {
+      status: 'limited',
+      reason: 'Automate confirmation status while warehouse packing stays human.',
+      revisit_when: 'When daily orders exceed 50.',
+      nodes: [
+        {
+          id: 'a1',
+          label: 'Pack order manually',
+          type: 'task',
+          actor: 'Warehouse Lead',
+          tool: 'Shared Tracker',
+          time_min: 5,
+          time_max: 10,
+          next: ['a2'],
+          edges: [{ to: 'a2', label: '' }],
+          automation: null,
+          from: ['r1'],
+        },
+        {
+          id: 'a2',
+          label: 'Order complete',
+          type: 'end',
+          actor: 'Warehouse Lead',
+          tool: 'Shared Tracker',
+          time_min: null,
+          time_max: null,
+          next: [],
+          edges: [],
+          automation: null,
+          from: ['r2'],
+        },
+      ],
+      not_automated: [],
+    },
+    time_estimate: {
+      runs_per_week: { min: 15, max: 25 },
+      hours_per_week: {
+        current: { min: 4, max: 6 },
+        redesigned: { min: 2, max: 3 },
+        automated: { min: 1.5, max: 2.5 },
+      },
+      redesign_share_percent: { min: 60, max: 70 },
+      assumptions: ['Assumes consistent volume across weekdays.'],
+      caveat: 'Based on estimated times per run.',
+    },
+    bottlenecks: [
+      { title: 'Split order intake', why_it_matters: 'Causes missed picks.', step_ids: ['c1'], bridge_letter: 'I' },
+      { title: 'Missing owner rule', why_it_matters: 'Creates idle delays.', step_ids: ['c1'], bridge_letter: 'G' },
+      { title: 'No status view', why_it_matters: 'Requires manual checks.', step_ids: ['c1'], bridge_letter: 'D' },
+    ],
+    quick_wins: [
+      { action: 'Create one order status board', step_ids: ['c1'], needs_new_software: false, time_to_do: 'half a day' },
+    ],
+    automation_opportunities: [
+      {
+        name: 'Order confirmation status email',
+        effort: 'low',
+        impact: 'medium',
+        step_ids: ['r1'],
+        verdict: 'worth_it_now',
+        why_this_volume: 'Suited to moderate weekly order volume.',
+        revisit_when: null,
+      },
+    ],
+    implementation_order: [
+      { week: 1, focus: 'Baseline current order timing', actions: ['Measure handling times'], includes_baseline: true },
+      { week: 2, focus: 'Standardise intake queue', actions: ['Consolidate into one board'], includes_baseline: false },
+      { week: 3, focus: 'Assign dispatch owners', actions: ['Set daily cutoff checks'], includes_baseline: false },
+      { week: 4, focus: 'Turn on status alert', actions: ['Enable customer notification'], includes_baseline: false },
+    ],
+    readiness: { score_percent: 62, band: 'Developing' },
+    crm_tags: {
+      industry: 'E-commerce',
+      process_code: 'EC-01',
+      readiness_band: 'Developing',
+      top_bottleneck_bridge_letter: 'I',
+      volume_band: 'medium',
+    },
+    cta: 'Book a systems audit to review your order workflow.',
+  };
+
+  const volumeContext = computeVolumeContext([]);
+  const normalized = normalizeGeminiOutputForV2(rawOutput, dummySubmission as any, volumeContext);
+  const check = validateClarityMapAnalysis(normalized, { volumeContext, strictV2: true });
+  assert.equal(check.valid, true, `Expected valid analysis, got: ${check.errors.join('; ')}`);
 });
