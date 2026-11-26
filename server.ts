@@ -6,7 +6,7 @@ import fs from 'fs';
 
 import apiApp from './server/apiApp.js';
 import { validateResourceRegistry } from './server/resources/registry.js';
-import { injectPageMetaIntoHtml } from './server/seo/pageMeta.js';
+import { renderSeoHtmlDocument } from './server/seo/pageMeta.js';
 
 dotenv.config();
 
@@ -52,8 +52,14 @@ async function startServer() {
           return res.sendFile(filePath);
         }
 
-        const customizedHtml = injectPageMetaIntoHtml(html, req.path);
-        res.send(customizedHtml);
+        const rendered = renderSeoHtmlDocument(html, req.originalUrl || req.path);
+        res.setHeader(
+          'Cache-Control',
+          rendered.statusCode === 404
+            ? 'public, s-maxage=60, stale-while-revalidate=300'
+            : 'public, s-maxage=3600, stale-while-revalidate=86400'
+        );
+        res.status(rendered.statusCode).send(rendered.html);
       });
     });
   }

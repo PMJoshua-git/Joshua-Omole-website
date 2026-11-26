@@ -21,6 +21,7 @@ import {
   handleSaveContactRequest,
   handleSubscribeRequest,
 } from './leads/handlers.js';
+import { buildSitemapXml } from './seo/sitemap.js';
 
 import bookConsultationRouter from '../services/api/book-consultation.js';
 import newsletterSubscribeRouter from '../services/api/newsletter-subscribe.js';
@@ -196,6 +197,12 @@ export function createApiApp() {
   app.use('/api/training-sessions', trainingSessionsRouter);
   app.use('/api/book-training', bookTrainingRouter);
   app.use('/api/clarity-map', clarityMapRouter);
+
+  app.get('/sitemap.xml', (_req, res) => {
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+    res.status(200).send(buildSitemapXml());
+  });
 
   app.get('/api/resources', (_req, res) => {
     res.set('Cache-Control', 'public, max-age=300');

@@ -1,4 +1,33 @@
 {
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.joshuaomole.com"
+        }
+      ],
+      "destination": "https://joshuaomole.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/contact",
+      "destination": "/audit",
+      "permanent": true
+    },
+    {
+      "source": "/knowledge-hub",
+      "destination": "/resources",
+      "permanent": true
+    },
+    {
+      "source": "/knowledge",
+      "destination": "/resources",
+      "permanent": true
+    }
+  ],
   "functions": {
     "api/clarity-map/analyze.ts": {
       "maxDuration": 60,
@@ -12,7 +41,10 @@
       "includeFiles": "{server/**,services/**,resources-private/**,utils/**,types.ts}"
     },
     "api/ssr-meta.ts": {
-      "includeFiles": "server/**"
+      "includeFiles": "{server/**,dist/index.html,utils/**,types/**}"
+    },
+    "api/sitemap.ts": {
+      "includeFiles": "{server/**,utils/**,types/**}"
     },
     "api/save-contact.js": {
       "includeFiles": "server/leads/**"
@@ -21,7 +53,26 @@
       "includeFiles": "server/leads/**"
     }
   },
+  "headers": [
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=3600, stale-while-revalidate=86400"
+        }
+      ]
+    }
+  ],
   "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
     {
       "source": "/api/book-consultation",
       "destination": "/api/index"
@@ -63,7 +114,7 @@
       "destination": "/api/ssr-meta?path=/"
     },
     {
-      "source": "/((?!api/|assets/|images/|favicon\\.svg|og-image\\.svg|.*\\.[a-zA-Z0-9]{1,8}$).*)",
+      "source": "/((?!api/|assets/|images/|favicon\\.svg|og-image\\.svg|robots\\.txt|sitemap\\.xml|.*\\.[a-zA-Z0-9]{1,8}$).*)",
       "destination": "/api/ssr-meta?path=/$1"
     }
   ]

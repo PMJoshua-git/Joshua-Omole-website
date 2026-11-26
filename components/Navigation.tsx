@@ -180,29 +180,20 @@ const Navigation: React.FC = () => {
                 );
               })}
 
-              {/* ── Resources Dropdown (Desktop) ── */}
+              {/* ── Resources Link + Dropdown (Desktop) ── */}
               <div
                 ref={resourcesRef}
-                className="relative"
+                className="relative flex items-center"
                 onMouseEnter={openResources}
                 onMouseLeave={scheduleClose}
               >
-                <button
-                  ref={triggerRef}
-                  type="button"
-                  onClick={() => setIsResourcesOpen((prev) => !prev)}
-                  onKeyDown={(e) => {
-                    if (e.key === ' ' || e.key === 'Enter') {
-                      e.preventDefault();
-                      setIsResourcesOpen((prev) => !prev);
-                    }
-                  }}
-                  aria-haspopup="menu"
-                  aria-expanded={isResourcesOpen}
+                <Link
+                  to="/resources"
+                  onClick={() => setIsResourcesOpen(false)}
                   className={`
-                    relative font-body text-sm px-3 py-1.5 rounded-md
-                    transition-colors duration-150 inline-flex items-center gap-1
-                    cursor-pointer active:scale-[0.98]
+                    relative font-body text-sm pl-3 pr-1.5 py-1.5 rounded-md
+                    transition-colors duration-150 inline-flex items-center
+                    active:scale-[0.98]
                     focus-visible:outline-none
                     focus-visible:ring-2
                     focus-visible:ring-sage-primary
@@ -214,23 +205,17 @@ const Navigation: React.FC = () => {
                   `}
                 >
                   <span>Resources</span>
-                  <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                      isResourcesOpen ? 'rotate-180' : 'rotate-0'
-                    }`}
-                    aria-hidden="true"
-                  />
                   {/* Active underline indicator */}
                   {isResourcesActive && (
                     shouldReduceMotion ? (
                       <span
-                        className="absolute bottom-0 left-3 right-3 h-[2px] bg-sage-primary rounded-full"
+                        className="absolute bottom-0 left-3 right-1.5 h-[2px] bg-sage-primary rounded-full"
                         aria-hidden="true"
                       />
                     ) : (
                       <motion.span
                         layoutId="activeNavIndicator"
-                        className="absolute bottom-0 left-3 right-3 h-[2px] bg-sage-primary rounded-full"
+                        className="absolute bottom-0 left-3 right-1.5 h-[2px] bg-sage-primary rounded-full"
                         transition={{
                           type: 'spring',
                           stiffness: 450,
@@ -240,6 +225,36 @@ const Navigation: React.FC = () => {
                       />
                     )
                   )}
+                </Link>
+                <button
+                  ref={triggerRef}
+                  type="button"
+                  onClick={() => setIsResourcesOpen((prev) => !prev)}
+                  onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                      e.preventDefault();
+                      setIsResourcesOpen((prev) => !prev);
+                    }
+                  }}
+                  aria-label="Toggle Resources submenu"
+                  aria-haspopup="menu"
+                  aria-expanded={isResourcesOpen}
+                  className={`
+                    p-1.5 rounded-md transition-colors duration-150 inline-flex items-center
+                    cursor-pointer focus-visible:outline-none focus-visible:ring-2
+                    focus-visible:ring-sage-primary focus-visible:ring-offset-1
+                    ${isResourcesActive
+                      ? 'text-sage-primary'
+                      : 'text-sage-text hover:text-sage-primary'
+                    }
+                  `}
+                >
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                      isResourcesOpen ? 'rotate-180' : 'rotate-0'
+                    }`}
+                    aria-hidden="true"
+                  />
                 </button>
 
                 {/* Dropdown panel with AnimatePresence */}

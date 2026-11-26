@@ -17,8 +17,11 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onRequest 
         {resource.coverImage ? (
           <img
             src={resource.coverImage}
-            alt={resource.title}
+            alt={resource.coverImageAlt || resource.title}
+            width={1200}
+            height={900}
             loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
           />
         ) : (

@@ -60,10 +60,13 @@ export default async function handler(req: any, res: any) {
 
     template = await loadIndexHtmlTemplate(req);
     let html = template;
+    let statusCode = 200;
 
     try {
-      const { injectPageMetaIntoHtml } = await import('../server/seo/pageMeta.js');
-      html = injectPageMetaIntoHtml(template, rawPath);
+      const { renderSeoHtmlDocument } = await import('../server/seo/pageMeta.js');
+      const rendered = renderSeoHtmlDocument(template, rawPath);
+      html = rendered.html;
+      statusCode = rendered.statusCode;
     } catch (metaErr: any) {
       console.error(
         '[SSR Meta] Meta tag injection failed; serving plain index.html:',
@@ -72,8 +75,13 @@ export default async function handler(req: any, res: any) {
     }
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
-    return res.status(200).send(html);
+    res.setHeader(
+      'Cache-Control',
+      statusCode === 404
+        ? 'public, s-maxage=60, stale-while-revalidate=300'
+        : 'public, s-maxage=3600, stale-while-revalidate=86400'
+    );
+    return res.status(statusCode).send(html);
   } catch (err: any) {
     console.error(
       '[SSR Meta] Critical error rendering page, falling back to plain index.html:',

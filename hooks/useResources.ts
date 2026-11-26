@@ -1,9 +1,22 @@
 import { useState, useEffect } from 'react';
 import { ResourcePublic } from '../types/resources';
 
+function readPreloadedResources(): ResourcePublic[] | null {
+  if (typeof document === 'undefined') return null;
+  const el = document.getElementById('__PRELOADED_RESOURCES__');
+  if (!el || !el.textContent) return null;
+  try {
+    const parsed = JSON.parse(el.textContent);
+    return Array.isArray(parsed) ? (parsed as ResourcePublic[]) : null;
+  } catch {
+    return null;
+  }
+}
+
 export const useResources = () => {
-  const [resources, setResources] = useState<ResourcePublic[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [preloaded] = useState<ResourcePublic[] | null>(() => readPreloadedResources());
+  const [resources, setResources] = useState<ResourcePublic[]>(() => preloaded ?? []);
+  const [loading, setLoading] = useState<boolean>(() => preloaded === null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -16,7 +29,7 @@ export const useResources = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-        
+
         if (isMounted) {
           if (Array.isArray(result)) {
             setResources(result);
@@ -25,9 +38,10 @@ export const useResources = () => {
           } else {
             setResources([]);
           }
+          setError(null);
         }
       } catch (err: any) {
-        if (isMounted) {
+        if (isMounted && preloaded === null) {
           setError(err.message || 'Error fetching resources');
           console.error('[useResources] Failed to load resources:', err);
         }
@@ -43,7 +57,7 @@ export const useResources = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [preloaded]);
 
   return { resources, loading, error };
 };
