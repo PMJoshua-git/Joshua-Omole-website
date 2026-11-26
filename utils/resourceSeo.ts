@@ -8,10 +8,6 @@ export function normalizeCanonicalSiteUrl(raw?: string): string {
   let candidate = trimmed || CANONICAL_SITE_URL;
   try {
     const parsed = new URL(candidate);
-    // Normalize www -> apex when pointing at joshuaomole.com so canonicals stay consistent
-    if (parsed.hostname.toLowerCase() === 'www.joshuaomole.com') {
-      parsed.hostname = 'joshuaomole.com';
-    }
     candidate = `${parsed.protocol}//${parsed.host}`;
   } catch {
     candidate = CANONICAL_SITE_URL;

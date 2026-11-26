@@ -345,19 +345,20 @@ test('5. Sitemap XML and robots.txt include canonical URLs only and exclude draf
   assert.equal(ogPng.readUInt32BE(20), 630);
 });
 
-test('6. vercel.json configures trailingSlash, www redirect, sitemap rewrite, and ssr-meta template bundling', () => {
+test('6. vercel.json configures trailingSlash, legacy path redirects without host-loop redirects, sitemap rewrite, and ssr-meta template bundling', () => {
   const vercelRaw = fs.readFileSync(path.join(process.cwd(), 'vercel.json'), 'utf8');
   const vercelCfg = JSON.parse(vercelRaw);
 
   assert.equal(vercelCfg.trailingSlash, false);
   assert.ok(
+    !vercelCfg.redirects.some((r: any) => Array.isArray(r.has) && r.has.some((h: any) => h.type === 'host')),
+    'Must not hardcode host-level www/apex redirects in vercel.json (Vercel Domains manages primary host to prevent 308 loops)'
+  );
+  assert.ok(
     vercelCfg.redirects.some(
-      (r: any) =>
-        r.permanent === true &&
-        r.destination === 'https://joshuaomole.com/:path*' &&
-        r.has?.[0]?.value === 'www.joshuaomole.com'
+      (r: any) => r.permanent === true && r.source === '/contact' && r.destination === '/audit'
     ),
-    'Should permanently redirect www -> apex joshuaomole.com'
+    'Should permanently redirect /contact -> /audit'
   );
   assert.ok(
     vercelCfg.rewrites.some(

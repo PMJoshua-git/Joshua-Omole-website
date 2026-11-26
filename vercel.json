@@ -2,17 +2,6 @@
   "trailingSlash": false,
   "redirects": [
     {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.joshuaomole.com"
-        }
-      ],
-      "destination": "https://joshuaomole.com/:path*",
-      "permanent": true
-    },
-    {
       "source": "/contact",
       "destination": "/audit",
       "permanent": true
