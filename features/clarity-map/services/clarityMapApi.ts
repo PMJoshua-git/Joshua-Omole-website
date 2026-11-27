@@ -137,6 +137,14 @@ export async function requestFullReport(opts: {
   firstName: string;
   email: string;
   analysis: ClarityMapResult;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  referrer?: string;
+  landingPage?: string;
+  leadSource?: string;
+  leadStatus?: string;
+  leadType?: string;
 }): Promise<ReportResponse> {
   const res = await fetch('/api/clarity-map/report', {
     method: 'POST',

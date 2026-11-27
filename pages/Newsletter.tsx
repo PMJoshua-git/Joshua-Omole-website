@@ -21,16 +21,26 @@ const Newsletter: React.FC = () => {
         setSubmitError(null);
 
         try {
+            const attribution = getAttributionData();
             const response = await fetch('/api/subscribe', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email,
-                    firstName: firstName || '',
+                    email: email.trim().toLowerCase(),
+                    firstName: firstName.trim(),
                     lastName: '',
                     userGroup: 'Newsletter Subscriber',
+                    source: 'Newsletter page',
+                    leadSource: attribution.lead_source || 'direct',
+                    leadType: 'Newsletter Subscriber',
+                    leadStatus: 'New',
+                    landingPage: attribution.landing_page || window.location.pathname || '/newsletter',
+                    utmSource: attribution.utm_source || '',
+                    utmMedium: attribution.utm_medium || '',
+                    utmCampaign: attribution.utm_campaign || '',
+                    referrer: attribution.referrer || '',
                     mailingLists: {},
                 })
             });

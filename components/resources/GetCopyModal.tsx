@@ -145,9 +145,16 @@ export const GetCopyModal: React.FC<GetCopyModalProps> = ({ resource, onClose })
           firstName: firstName.trim(),
           email: email.trim().toLowerCase(),
           website, // Honeypot
-          leadSource: attribution.lead_source || 'Resources page',
+          source: 'Resources page',
+          leadSource: attribution.lead_source || 'direct',
           landingPage: attribution.landing_page || window.location.pathname,
           utmParameters: utmParamsString,
+          utmSource: attribution.utm_source || '',
+          utmMedium: attribution.utm_medium || '',
+          utmCampaign: attribution.utm_campaign || '',
+          referrer: attribution.referrer || '',
+          leadStatus: 'New',
+          leadType: 'Resource Download',
         }),
       });
 

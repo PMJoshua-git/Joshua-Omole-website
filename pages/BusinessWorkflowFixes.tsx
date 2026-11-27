@@ -260,7 +260,6 @@ const BusinessWorkflowFixes: React.FC = () => {
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [businessName, setBusinessName] = useState('');
-  const [nextStep, setNextStep] = useState<'30-minute meeting' | 'Fill out a questionnaire'>('30-minute meeting');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -301,7 +300,6 @@ const BusinessWorkflowFixes: React.FC = () => {
     setFirstName('');
     setEmail('');
     setBusinessName('');
-    setNextStep('30-minute meeting');
     setFormErrors({});
   };
 
@@ -333,99 +331,60 @@ const BusinessWorkflowFixes: React.FC = () => {
 
     const attribution = getAttributionData();
 
-    // Canonical 4 fields + source metadata + Airtable/Loops structured fields
     const payload = {
-      // Required 4 fields
       name: firstName.trim(),
+      firstName: firstName.trim(),
       email: email.trim().toLowerCase(),
       business: businessName.trim(),
-      nextStep: nextStep,
-
-      // Required source metadata
-      source: "Workflow fix page",
-
-      // Extended aliases for multi-platform compatibility
-      firstName: firstName.trim(),
       company: businessName.trim(),
       userGroup: activeOffer.name,
-      service: activeOffer.name,
-
-      // Structured Airtable format
-      tableName: 'Leads',
-      fields: {
-        "Created Date": new Date().toISOString(),
-        "Lead Type": "Workflow Fix Inquiry",
-        "First Name": firstName.trim(),
-        "Name": firstName.trim(),
-        "Last Name": "",
-        "Email": email.trim().toLowerCase(),
-        "Company Name": businessName.trim(),
-        "Business": businessName.trim(),
-        "Service Selected": activeOffer.name,
-        "Lead Source": "Workflow fix page",
-        "Landing Page": "/business-workflow-fixes",
-        "Business Goal": `Next Step Preference: ${nextStep}`,
-        "Next Step": nextStep,
-        "UTM Source": attribution.utm_source || "",
-        "UTM Medium": attribution.utm_medium || "",
-        "UTM Campaign": attribution.utm_campaign || "",
-        "Referrer": attribution.referrer || "",
-        "Status": "New"
-      }
+      source: 'Workflow fix page',
+      leadSource: attribution.lead_source || 'direct',
+      leadType: 'Workflow Fix Inquiry',
+      landingPage: '/business-workflow-fixes',
+      leadStatus: 'New',
+      utmSource: attribution.utm_source || '',
+      utmMedium: attribution.utm_medium || '',
+      utmCampaign: attribution.utm_campaign || '',
+      referrer: attribution.referrer || '',
     };
-
-    console.log('[WorkflowFix] Submitting request with payload:', payload);
 
     let isSuccess = false;
     let errorMessage = 'Unable to send details. Please try again.';
 
-    // 1. Submit to /api/save-contact (Airtable / Lead registry)
     try {
-      const airtableResponse = await fetch('/api/save-contact', {
+      const loopsResponse = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
-      const airtableData = await airtableResponse.json().catch(() => ({}));
+      const loopsData = await loopsResponse.json().catch(() => ({}));
 
-      if (airtableResponse.ok && airtableData?.success !== false) {
+      if (loopsResponse.ok && loopsData?.success !== false) {
         isSuccess = true;
       } else {
-        console.error('[WorkflowFix] /api/save-contact failed:', airtableResponse.status);
-        errorMessage = airtableData?.error || 'Unable to send details. Please try again.';
+        console.error('[WorkflowFix] /api/subscribe failed:', loopsResponse.status);
+        errorMessage = loopsData?.error || 'Unable to send details. Please try again.';
       }
     } catch (networkErr: any) {
       console.error('[WorkflowFix] Network fetch failed:', networkErr?.message || networkErr);
       errorMessage = 'Unable to reach our server right now. Please try again.';
     }
 
-    // 2. Add to Loops Contact List when save-contact succeeded
     if (isSuccess) {
       try {
-        const loopsResponse = await fetch('/api/subscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!loopsResponse.ok) {
-          console.error('[WorkflowFix] /api/subscribe returned status:', loopsResponse.status);
-        }
-      } catch (loopsErr: any) {
-        console.warn('[WorkflowFix] Loops subscription error:', loopsErr?.message || loopsErr);
-      }
-    }
-
-    if (isSuccess) {
-      try {
-        sessionStorage.setItem('last_workflow_fix_submission', JSON.stringify({
-          name: payload.name,
-          email: payload.email,
-          business: payload.business,
-          nextStep: payload.nextStep,
-          source: payload.source,
-          submittedAt: new Date().toISOString()
-        }));
+        sessionStorage.setItem(
+          'last_workflow_fix_submission',
+          JSON.stringify({
+            name: payload.name,
+            email: payload.email,
+            business: payload.business,
+            userGroup: payload.userGroup,
+            source: payload.source,
+            submittedAt: new Date().toISOString(),
+          })
+        );
       } catch (storageErr) {
         // ignore storage errors
       }
@@ -723,7 +682,7 @@ const BusinessWorkflowFixes: React.FC = () => {
           </div>
         </section>
 
-        {/* POP-UP MODAL FOR WORKFLOW FIX INTAKE (Blurred Background, 5 Fields, Confirmation Thank You) */}
+        {/* POP-UP MODAL FOR WORKFLOW FIX INTAKE (Blurred Background, 3 Fields, Confirmation Thank You) */}
         {activeOffer && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-sage-bg/75 backdrop-blur-md animate-in fade-in duration-200">
             <div className="relative w-full max-w-lg bg-sage-surface border border-sage-border rounded-2xl shadow-xl overflow-hidden p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
@@ -869,48 +828,6 @@ const BusinessWorkflowFixes: React.FC = () => {
                         placeholder="Example Corp"
                       />
                       {formErrors.businessName && <p className="text-red-400 text-[10px] font-medium">{formErrors.businessName}</p>}
-                    </div>
-
-
-
-                    {/* 5. Next step (How you would like to share the details I need) */}
-                    <div className="space-y-1.5 pt-1">
-                      <label className="text-xs font-semibold text-sage-text uppercase tracking-wider block">
-                        Next step (How you would like to share the details I need) <span className="text-red-400">*</span>
-                      </label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                        <label className={`flex items-center gap-2.5 p-3 rounded-lg border text-xs cursor-pointer transition-colors ${
-                          nextStep === '30-minute meeting' 
-                            ? 'bg-sage-primary/10 border-sage-primary text-sage-text font-medium' 
-                            : 'bg-sage-surface border-sage-border text-sage-muted hover:border-sage-primary/50'
-                        }`}>
-                          <input 
-                            type="radio" 
-                            name="nextStep"
-                            value="30-minute meeting"
-                            checked={nextStep === '30-minute meeting'}
-                            onChange={() => setNextStep('30-minute meeting')}
-                            className="text-sage-primary focus:ring-sage-primary"
-                          />
-                          <span>30-minute meeting</span>
-                        </label>
-
-                        <label className={`flex items-center gap-2.5 p-3 rounded-lg border text-xs cursor-pointer transition-colors ${
-                          nextStep === 'Fill out a questionnaire' 
-                            ? 'bg-sage-primary/10 border-sage-primary text-sage-text font-medium' 
-                            : 'bg-sage-surface border-sage-border text-sage-muted hover:border-sage-primary/50'
-                        }`}>
-                          <input 
-                            type="radio" 
-                            name="nextStep"
-                            value="Fill out a questionnaire"
-                            checked={nextStep === 'Fill out a questionnaire'}
-                            onChange={() => setNextStep('Fill out a questionnaire')}
-                            className="text-sage-primary focus:ring-sage-primary"
-                          />
-                          <span>Fill out a questionnaire</span>
-                        </label>
-                      </div>
                     </div>
 
                     <div className="pt-2">

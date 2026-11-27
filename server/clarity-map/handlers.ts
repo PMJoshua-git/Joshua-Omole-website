@@ -278,7 +278,19 @@ export async function handleReportRequest(
     });
   }
 
-  const { firstName: rawFirstName, email, analysis: rawAnalysis } = parsed.data;
+  const {
+    firstName: rawFirstName,
+    email,
+    analysis: rawAnalysis,
+    utmSource,
+    utmMedium,
+    utmCampaign,
+    referrer,
+    landingPage,
+    leadSource,
+    leadStatus,
+    leadType,
+  } = parsed.data;
   const validated = validateClarityMapAnalysis(rawAnalysis);
   if (!validated.valid || !validated.data) {
     return res.status(400).json({
@@ -331,6 +343,14 @@ export async function handleReportRequest(
       email,
       firstName: cleanedFirstName,
       result,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+      referrer,
+      landingPage,
+      leadSource,
+      leadStatus,
+      leadType,
     });
   } catch (err: any) {
     await reportGuard.releaseSendReservation(reservation.token);

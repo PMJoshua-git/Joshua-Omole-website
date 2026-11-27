@@ -166,34 +166,42 @@ const CustomContactForm: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const payload = {
-    // ── The 5 collected fields ──
-    firstName:      formData.firstName.trim(),
-    email:          formData.email.trim().toLowerCase(),
-    company:        formData.company.trim(),
-    companySize:    formData.companySize,
-    businessGoal:   formData.businessGoal.trim(),
+  const buildPayload = () => {
+    const attr = attribution || getAttributionData();
+    return {
+      // ── The 5 collected fields ──
+      firstName:      formData.firstName.trim(),
+      email:          formData.email.trim().toLowerCase(),
+      company:        formData.company.trim(),
+      companySize:    formData.companySize,
+      businessGoal:   formData.businessGoal.trim(),
 
-    // ── Auto-set fields (not collected from user) ──
-    leadType:       'Service Inquiry',
-    serviceType:    'Systems Clarity Audit',
+      // ── Auto-set fields (not collected from user) ──
+      leadType:       'Service Inquiry',
+      serviceType:    'Systems Clarity Audit',
+      leadStatus:     'New',
 
-    // ── Empty defaults for Airtable schema compatibility ──
-    lastName:       '',
-    phone:          '',
-    position:       '',
-    country:        '',
+      // ── Optional contact fields ──
+      lastName:       '',
+      phone:          '',
+      position:       '',
+      country:        '',
 
-    // ── Optional consent ──
-    newsletterOptIn: formData.newsletterOptIn,
+      // ── Optional consent ──
+      newsletterOptIn: formData.newsletterOptIn,
 
-    // ── Attribution (keep existing logic) ──
-    leadSource:     attribution?.lead_source     ?? '',
-    landingPage:    attribution?.landing_page    ?? '',
-    utmParameters:  attribution?.utm_source      ?? '',
+      // ── Attribution ──
+      leadSource:     attr?.lead_source || 'direct',
+      landingPage:    attr?.landing_page || (typeof window !== 'undefined' ? window.location.pathname : '/audit'),
+      utmParameters:  attr?.utm_source ?? '',
+      utmSource:      attr?.utm_source ?? '',
+      utmMedium:      attr?.utm_medium ?? '',
+      utmCampaign:    attr?.utm_campaign ?? '',
+      referrer:       attr?.referrer ?? '',
+    };
   };
 
-  const submitForm = async (body: typeof payload) => {
+  const submitForm = async (body: ReturnType<typeof buildPayload>) => {
     const response = await fetch('/api/book-consultation', {
       method: 'POST',
       headers: {
@@ -286,7 +294,7 @@ const CustomContactForm: React.FC = () => {
             if (!validate()) return;
             setIsSubmitting(true);
             try {
-              const resData = await submitForm(payload);
+              const resData = await submitForm(buildPayload());
               if (resData?.leadId) {
                 setLeadId(resData.leadId);
               }

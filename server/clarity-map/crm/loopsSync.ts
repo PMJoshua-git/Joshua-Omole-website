@@ -29,6 +29,14 @@ export async function syncClarityMapContactToLoops(opts: {
   email: string;
   firstName: string;
   result: ClarityMapResult;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  referrer?: string;
+  landingPage?: string;
+  leadSource?: string;
+  leadStatus?: string;
+  leadType?: string;
 }): Promise<LoopsSyncOutcome> {
   const apiKey = process.env.LOOPS_API_KEY;
   if (!apiKey || apiKey.trim() === '') {
@@ -42,6 +50,14 @@ export async function syncClarityMapContactToLoops(opts: {
     firstName: opts.firstName,
     userGroup: 'Claritymap',
     source: 'Clarity Map',
+    leadSource: opts.leadSource || 'direct',
+    leadType: opts.leadType || 'Clarity Map',
+    leadStatus: opts.leadStatus || 'New',
+    landingPage: opts.landingPage || '/clarity-map',
+    utmSource: opts.utmSource || '',
+    utmMedium: opts.utmMedium || '',
+    utmCampaign: opts.utmCampaign || '',
+    referrer: opts.referrer || '',
     clarityMapIndustry: opts.result.crm_tags.industry || opts.result.meta.industry,
     clarityMapProcessCode: opts.result.crm_tags.process_code || opts.result.meta.process_code,
     clarityMapProcessName: opts.result.meta.process_name,

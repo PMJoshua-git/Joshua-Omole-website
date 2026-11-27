@@ -35,9 +35,6 @@
     "api/sitemap.ts": {
       "includeFiles": "{server/**,utils/**,types/**}"
     },
-    "api/save-contact.js": {
-      "includeFiles": "server/leads/**"
-    },
     "api/subscribe.js": {
       "includeFiles": "server/leads/**"
     }

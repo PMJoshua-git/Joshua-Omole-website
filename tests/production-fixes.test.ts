@@ -15,11 +15,13 @@ import {
   HighDemandError,
   RateLimitError,
 } from '../features/clarity-map/services/clarityMapApi.js';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
-  handleSaveContactRequest,
   handleSubscribeRequest,
 } from '../server/leads/handlers.js';
 import { createApiApp } from '../server/apiApp.js';
+import { syncClarityMapContactToLoops } from '../server/clarity-map/crm/loopsSync.js';
 
 function createMockRes() {
   const res: any = {
@@ -187,59 +189,7 @@ test('Task A5: analyzeWorkflow maps non-JSON 504 and 5xx cleanly while preservin
   }
 });
 
-test('Task C: save-contact enforces Airtable table/field allowlists and fails cleanly in production', async () => {
-  const prevEnv = process.env.VERCEL_ENV;
-  const prevKey = process.env.AIRTABLE_API_KEY;
-  const prevBase = process.env.AIRTABLE_BASE_ID;
-  try {
-    // Disallow unknown table
-    const badTableRes = createMockRes();
-    await handleSaveContactRequest(
-      { method: 'POST', body: { tableName: 'SecretTable', fields: { Email: 'a@b.com' } } },
-      badTableRes
-    );
-    assert.equal(badTableRes.statusCode, 400);
-
-    // Disallow unknown field
-    const badFieldRes = createMockRes();
-    await handleSaveContactRequest(
-      { method: 'POST', body: { tableName: 'Leads', fields: { EvilColumn: 'x' } } },
-      badFieldRes
-    );
-    assert.equal(badFieldRes.statusCode, 400);
-
-    // Non-production preview mock allowed when keys missing
-    delete process.env.VERCEL_ENV;
-    delete process.env.AIRTABLE_API_KEY;
-    delete process.env.AIRTABLE_BASE_ID;
-    const previewRes = createMockRes();
-    await handleSaveContactRequest(
-      { method: 'POST', body: { name: 'Ada', email: 'ada@example.com' } },
-      previewRes
-    );
-    assert.equal(previewRes.statusCode, 200);
-    assert.equal(previewRes.body.mock, true);
-
-    // Production returns 503 when Airtable env missing
-    process.env.VERCEL_ENV = 'production';
-    const prodMissingRes = createMockRes();
-    await handleSaveContactRequest(
-      { method: 'POST', body: { name: 'Ada', email: 'ada@example.com' } },
-      prodMissingRes
-    );
-    assert.equal(prodMissingRes.statusCode, 503);
-    assert.equal(prodMissingRes.body.success, false);
-  } finally {
-    if (prevEnv === undefined) delete process.env.VERCEL_ENV;
-    else process.env.VERCEL_ENV = prevEnv;
-    if (prevKey === undefined) delete process.env.AIRTABLE_API_KEY;
-    else process.env.AIRTABLE_API_KEY = prevKey;
-    if (prevBase === undefined) delete process.env.AIRTABLE_BASE_ID;
-    else process.env.AIRTABLE_BASE_ID = prevBase;
-  }
-});
-
-test('Task C: subscribe returns 503/502 in production and mock only when VERCEL_ENV !== production', async () => {
+test('Task C: subscribe forwards attribution and lead fields to Loops on create and update without nextStep or serviceSelected', async () => {
   const prevEnv = process.env.VERCEL_ENV;
   const prevKey = process.env.LOOPS_API_KEY;
   const originalFetch = globalThis.fetch;
@@ -247,9 +197,40 @@ test('Task C: subscribe returns 503/502 in production and mock only when VERCEL_
     delete process.env.VERCEL_ENV;
     delete process.env.LOOPS_API_KEY;
     const previewRes = createMockRes();
-    await handleSubscribeRequest({ method: 'POST', body: { email: 'ada@example.com' } }, previewRes);
+    await handleSubscribeRequest(
+      {
+        method: 'POST',
+        body: {
+          email: 'ada@example.com',
+          firstName: 'Ada',
+          business: 'Acme Ops',
+          userGroup: 'Lead Follow-Up System',
+          source: 'Workflow fix page',
+          leadType: 'Workflow Fix Inquiry',
+          landingPage: '/business-workflow-fixes',
+          leadStatus: 'New',
+          utmSource: 'linkedin',
+          utmMedium: 'social',
+          utmCampaign: 'q4_ops',
+          referrer: 'linkedin.com',
+          nextStep: '30-minute meeting',
+          serviceSelected: 'Legacy Service',
+        },
+      },
+      previewRes
+    );
     assert.equal(previewRes.statusCode, 200);
     assert.equal(previewRes.body.mock, true);
+    assert.equal(previewRes.body.data.userGroup, 'Lead Follow-Up System');
+    assert.equal(previewRes.body.data.utmSource, 'linkedin');
+    assert.equal(previewRes.body.data.utmMedium, 'social');
+    assert.equal(previewRes.body.data.utmCampaign, 'q4_ops');
+    assert.equal(previewRes.body.data.referrer, 'linkedin.com');
+    assert.equal(previewRes.body.data.leadStatus, 'New');
+    assert.equal(previewRes.body.data.landingPage, '/business-workflow-fixes');
+    assert.equal(previewRes.body.data.leadType, 'Workflow Fix Inquiry');
+    assert.equal('nextStep' in previewRes.body.data, false);
+    assert.equal('serviceSelected' in previewRes.body.data, false);
 
     process.env.VERCEL_ENV = 'production';
     const prodMissingRes = createMockRes();
@@ -258,12 +239,150 @@ test('Task C: subscribe returns 503/502 in production and mock only when VERCEL_
     assert.equal(prodMissingRes.body.success, false);
 
     process.env.LOOPS_API_KEY = 'test-loops-key';
+
+    // 1. Verify POST /contacts/create sends all camelCase fields and excludes nextStep/serviceSelected
+    const createCalls: Array<{ url: string; method: string; body: any }> = [];
+    globalThis.fetch = (async (url: string, init?: any) => {
+      createCalls.push({
+        url,
+        method: init?.method || 'GET',
+        body: init?.body ? JSON.parse(init.body) : null,
+      });
+      return new Response(JSON.stringify({ success: true, id: 'contact_1' }), { status: 200 });
+    }) as any;
+
+    const createRes = createMockRes();
+    await handleSubscribeRequest(
+      {
+        method: 'POST',
+        body: {
+          email: 'ada@example.com',
+          firstName: 'Ada',
+          company: 'Acme Ops',
+          userGroup: 'Client Onboarding System',
+          source: 'Workflow fix page',
+          leadType: 'Workflow Fix Inquiry',
+          landingPage: '/business-workflow-fixes',
+          leadStatus: 'New',
+          utmSource: 'google',
+          utmMedium: 'cpc',
+          utmCampaign: 'onboarding',
+          referrer: 'google.com',
+          nextStep: 'Fill out a questionnaire',
+          serviceSelected: 'Should Not Send',
+        },
+      },
+      createRes
+    );
+    assert.equal(createRes.statusCode, 200);
+    assert.equal(createCalls.length, 1);
+    assert.equal(createCalls[0].url, 'https://app.loops.so/api/v1/contacts/create');
+    assert.equal(createCalls[0].method, 'POST');
+    assert.deepEqual(
+      {
+        email: createCalls[0].body.email,
+        firstName: createCalls[0].body.firstName,
+        company: createCalls[0].body.company,
+        userGroup: createCalls[0].body.userGroup,
+        source: createCalls[0].body.source,
+        utmSource: createCalls[0].body.utmSource,
+        utmMedium: createCalls[0].body.utmMedium,
+        utmCampaign: createCalls[0].body.utmCampaign,
+        referrer: createCalls[0].body.referrer,
+        leadStatus: createCalls[0].body.leadStatus,
+        landingPage: createCalls[0].body.landingPage,
+        leadType: createCalls[0].body.leadType,
+      },
+      {
+        email: 'ada@example.com',
+        firstName: 'Ada',
+        company: 'Acme Ops',
+        userGroup: 'Client Onboarding System',
+        source: 'Workflow fix page',
+        utmSource: 'google',
+        utmMedium: 'cpc',
+        utmCampaign: 'onboarding',
+        referrer: 'google.com',
+        leadStatus: 'New',
+        landingPage: '/business-workflow-fixes',
+        leadType: 'Workflow Fix Inquiry',
+      }
+    );
+    assert.equal('nextStep' in createCalls[0].body, false);
+    assert.equal('serviceSelected' in createCalls[0].body, false);
+
+    // 2. Verify 409 -> PUT /contacts/update sends all camelCase fields too
+    const updateCalls: Array<{ url: string; method: string; body: any }> = [];
+    globalThis.fetch = (async (url: string, init?: any) => {
+      updateCalls.push({
+        url,
+        method: init?.method || 'GET',
+        body: init?.body ? JSON.parse(init.body) : null,
+      });
+      if (url.endsWith('/create')) {
+        return new Response(JSON.stringify({ message: 'Email already exists' }), { status: 409 });
+      }
+      return new Response(JSON.stringify({ success: true, id: 'contact_1' }), { status: 200 });
+    }) as any;
+
+    const updateRes = createMockRes();
+    await handleSubscribeRequest(
+      {
+        method: 'POST',
+        body: {
+          email: 'ada@example.com',
+          firstName: 'Ada',
+          company: 'Acme Ops',
+          userGroup: 'Simple Sales Funnel',
+          source: 'Workflow fix page',
+          leadType: 'Workflow Fix Inquiry',
+          landingPage: '/business-workflow-fixes',
+          leadStatus: 'New',
+          utmSource: 'newsletter',
+          utmMedium: 'email',
+          utmCampaign: 'spring',
+          referrer: 't.co',
+        },
+      },
+      updateRes
+    );
+    assert.equal(updateRes.statusCode, 200);
+    assert.equal(updateRes.body.updated, true);
+    assert.equal(updateCalls.length, 2);
+    assert.equal(updateCalls[1].url, 'https://app.loops.so/api/v1/contacts/update');
+    assert.equal(updateCalls[1].method, 'PUT');
+    assert.equal(updateCalls[1].body.userGroup, 'Simple Sales Funnel');
+    assert.equal(updateCalls[1].body.utmSource, 'newsletter');
+    assert.equal(updateCalls[1].body.utmMedium, 'email');
+    assert.equal(updateCalls[1].body.utmCampaign, 'spring');
+    assert.equal(updateCalls[1].body.referrer, 't.co');
+    assert.equal(updateCalls[1].body.leadStatus, 'New');
+    assert.equal(updateCalls[1].body.landingPage, '/business-workflow-fixes');
+    assert.equal(updateCalls[1].body.leadType, 'Workflow Fix Inquiry');
+    assert.equal('nextStep' in updateCalls[1].body, false);
+    assert.equal('serviceSelected' in updateCalls[1].body, false);
+
+    // 3. Verify 502 in production when Loops rejects
     globalThis.fetch = (async () =>
       new Response(JSON.stringify({ message: 'Invalid key' }), { status: 401 })) as any;
     const prodRejectRes = createMockRes();
     await handleSubscribeRequest({ method: 'POST', body: { email: 'ada@example.com' } }, prodRejectRes);
     assert.equal(prodRejectRes.statusCode, 502);
     assert.equal(prodRejectRes.body.success, false);
+
+    // 4. Verify Workflow Fix UI removed Next step & Airtable save-contact
+    const workflowPageSrc = fs.readFileSync(
+      path.join(process.cwd(), 'pages', 'BusinessWorkflowFixes.tsx'),
+      'utf8'
+    );
+    assert.equal(workflowPageSrc.includes('/api/save-contact'), false);
+    assert.equal(workflowPageSrc.includes('nextStep'), false);
+    assert.equal(workflowPageSrc.includes('Fill out a questionnaire'), false);
+    assert.equal(workflowPageSrc.includes('Service Selected'), false);
+    assert.ok(workflowPageSrc.includes('/api/subscribe'));
+    assert.ok(workflowPageSrc.includes('utmSource'));
+    assert.ok(workflowPageSrc.includes('leadStatus'));
+    assert.ok(workflowPageSrc.includes('landingPage'));
   } finally {
     globalThis.fetch = originalFetch;
     if (prevEnv === undefined) delete process.env.VERCEL_ENV;
@@ -273,9 +392,12 @@ test('Task C: subscribe returns 503/502 in production and mock only when VERCEL_
   }
 });
 
-test('Task B: ported Express app serves /api/resources and returns 503 in production when Airtable handles are null', async () => {
+test('Task B: ported Express app serves /api/resources, /api/training-sessions, and Loops-backed /api/book-consultation without Airtable', async () => {
   const prevEnv = process.env.VERCEL_ENV;
+  const prevKey = process.env.LOOPS_API_KEY;
   process.env.VERCEL_ENV = 'production';
+  delete process.env.LOOPS_API_KEY;
+
   const app = createApiApp();
   const server = http.createServer(app);
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -289,7 +411,9 @@ test('Task B: ported Express app serves /api/resources and returns 503 in produc
     assert.ok(Array.isArray(resourcesBody));
 
     const resTraining = await fetch(`${baseUrl}/api/training-sessions`);
-    assert.equal(resTraining.status, 503);
+    assert.equal(resTraining.status, 200);
+    const trainingBody = await resTraining.json();
+    assert.deepEqual(trainingBody, { success: true, data: [] });
 
     const resBook = await fetch(`${baseUrl}/api/book-consultation`, {
       method: 'POST',
@@ -303,10 +427,214 @@ test('Task B: ported Express app serves /api/resources and returns 503 in produc
       }),
     });
     assert.equal(resBook.status, 503);
+
+    const resSaveContact = await fetch(`${baseUrl}/api/save-contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'ada@example.com' }),
+    });
+    assert.equal(resSaveContact.status, 404);
   } finally {
     await new Promise<void>((resolve) => server.close(() => resolve()));
     if (prevEnv === undefined) delete process.env.VERCEL_ENV;
     else process.env.VERCEL_ENV = prevEnv;
+    if (prevKey === undefined) delete process.env.LOOPS_API_KEY;
+    else process.env.LOOPS_API_KEY = prevKey;
+  }
+});
+
+test('Site-wide Loops forwarding: Audit, Training, Newsletter, Resources, and Clarity Map send camelCase attribution & lead fields', async () => {
+  const prevEnv = process.env.VERCEL_ENV;
+  const prevKey = process.env.LOOPS_API_KEY;
+  const originalFetch = globalThis.fetch;
+
+  process.env.VERCEL_ENV = 'production';
+  process.env.LOOPS_API_KEY = 'test-loops-key';
+
+  const loopsCalls: Array<{ url: string; method: string; body: any }> = [];
+  globalThis.fetch = (async (input: any, init?: any) => {
+    const url = typeof input === 'string' ? input : input?.url || '';
+    if (url.startsWith('https://app.loops.so/')) {
+      loopsCalls.push({
+        url,
+        method: init?.method || 'GET',
+        body: init?.body ? JSON.parse(init.body) : null,
+      });
+      return new Response(JSON.stringify({ success: true, id: 'contact_site_1' }), { status: 200 });
+    }
+    return originalFetch(input, init);
+  }) as any;
+
+  const app = createApiApp();
+  const server = http.createServer(app);
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const address = server.address() as any;
+  const baseUrl = `http://127.0.0.1:${address.port}`;
+
+  try {
+    // 1. Audit /book-consultation
+    const bookRes = await originalFetch(`${baseUrl}/api/book-consultation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName: 'Ada',
+        email: 'ada@example.com',
+        company: 'Acme Ops',
+        companySize: '11-50',
+        businessGoal: 'Automate client onboarding cleanly',
+        leadSource: 'linkedin',
+        landingPage: '/audit',
+        utmSource: 'linkedin',
+        utmMedium: 'social',
+        utmCampaign: 'audit_q4',
+        referrer: 'linkedin.com',
+        leadStatus: 'New',
+      }),
+    });
+    assert.equal(bookRes.status, 200);
+    const auditCall = loopsCalls.pop()!;
+    assert.equal(auditCall.body.userGroup, 'Audit Booking');
+    assert.equal(auditCall.body.source, 'Audit page');
+    assert.equal(auditCall.body.leadSource, 'linkedin');
+    assert.equal(auditCall.body.utmSource, 'linkedin');
+    assert.equal(auditCall.body.utmMedium, 'social');
+    assert.equal(auditCall.body.utmCampaign, 'audit_q4');
+    assert.equal(auditCall.body.referrer, 'linkedin.com');
+    assert.equal(auditCall.body.leadStatus, 'New');
+    assert.equal(auditCall.body.landingPage, '/audit');
+    assert.equal(auditCall.body.leadType, 'Service Inquiry');
+
+    // 2. Training /book-training
+    const trainRes = await originalFetch(`${baseUrl}/api/book-training`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Ada',
+        email: 'ada@example.com',
+        location: 'London, UK',
+        sessionTitle: 'AI Workflow Sprint',
+        leadSource: 'youtube',
+        landingPage: '/training',
+        utmSource: 'youtube',
+        utmMedium: 'video',
+        utmCampaign: 'workshop',
+        referrer: 'youtube.com',
+        leadStatus: 'Pending',
+        leadType: 'Training Booking',
+      }),
+    });
+    assert.equal(trainRes.status, 200);
+    const trainCall = loopsCalls.pop()!;
+    assert.equal(trainCall.body.userGroup, 'Training Booking');
+    assert.equal(trainCall.body.source, 'Training page');
+    assert.equal(trainCall.body.leadSource, 'youtube');
+    assert.equal(trainCall.body.utmSource, 'youtube');
+    assert.equal(trainCall.body.utmMedium, 'video');
+    assert.equal(trainCall.body.utmCampaign, 'workshop');
+    assert.equal(trainCall.body.referrer, 'youtube.com');
+    assert.equal(trainCall.body.leadStatus, 'Pending');
+    assert.equal(trainCall.body.landingPage, '/training');
+    assert.equal(trainCall.body.leadType, 'Training Booking');
+
+    // 3. Newsletter /newsletter-subscribe
+    const newsRes = await originalFetch(`${baseUrl}/api/newsletter-subscribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName: 'Ada',
+        email: 'ada@example.com',
+        source: 'Newsletter page',
+        leadSource: 'x',
+        landingPage: '/newsletter',
+        utmSource: 'x',
+        utmMedium: 'social',
+        utmCampaign: 'digest',
+        referrer: 't.co',
+        leadStatus: 'New',
+        leadType: 'Newsletter Subscriber',
+      }),
+    });
+    assert.equal(newsRes.status, 200);
+    const newsCall = loopsCalls.pop()!;
+    assert.equal(newsCall.body.userGroup, 'Newsletter Subscriber');
+    assert.equal(newsCall.body.source, 'Newsletter page');
+    assert.equal(newsCall.body.leadSource, 'x');
+    assert.equal(newsCall.body.utmSource, 'x');
+    assert.equal(newsCall.body.utmMedium, 'social');
+    assert.equal(newsCall.body.utmCampaign, 'digest');
+    assert.equal(newsCall.body.referrer, 't.co');
+    assert.equal(newsCall.body.leadStatus, 'New');
+    assert.equal(newsCall.body.landingPage, '/newsletter');
+    assert.equal(newsCall.body.leadType, 'Newsletter Subscriber');
+
+    // 4. Clarity Map syncClarityMapContactToLoops
+    await syncClarityMapContactToLoops({
+      email: 'ada@example.com',
+      firstName: 'Ada',
+      result: {
+        meta: {
+          industry: 'B2B Agencies',
+          process_code: 'BA-01',
+          process_name: 'Client Onboarding',
+        },
+        readiness: { score_percent: 60, band: 'Developing' },
+        crm_tags: {
+          industry: 'B2B Agencies',
+          process_code: 'BA-01',
+          readiness_band: 'Developing',
+          top_bottleneck_bridge_letter: 'B',
+          volume_band: 'medium',
+        },
+      } as any,
+      leadSource: 'google',
+      utmSource: 'google',
+      utmMedium: 'organic',
+      utmCampaign: 'clarity',
+      referrer: 'google.com',
+      landingPage: '/clarity-map',
+      leadStatus: 'New',
+      leadType: 'Clarity Map',
+    });
+    const cmCall = loopsCalls.pop()!;
+    assert.equal(cmCall.body.userGroup, 'Claritymap');
+    assert.equal(cmCall.body.source, 'Clarity Map');
+    assert.equal(cmCall.body.leadSource, 'google');
+    assert.equal(cmCall.body.utmSource, 'google');
+    assert.equal(cmCall.body.utmMedium, 'organic');
+    assert.equal(cmCall.body.utmCampaign, 'clarity');
+    assert.equal(cmCall.body.referrer, 'google.com');
+    assert.equal(cmCall.body.leadStatus, 'New');
+    assert.equal(cmCall.body.landingPage, '/clarity-map');
+    assert.equal(cmCall.body.leadType, 'Clarity Map');
+
+    // 5. Verify all client lead forms invoke getAttributionData() & forward camelCase fields including source and leadSource
+    const clientFormFiles = [
+      path.join(process.cwd(), 'pages', 'BusinessWorkflowFixes.tsx'),
+      path.join(process.cwd(), 'pages', 'Newsletter.tsx'),
+      path.join(process.cwd(), 'components', 'NewsletterModal.tsx'),
+      path.join(process.cwd(), 'components', 'forms', 'CustomContactForm.tsx'),
+      path.join(process.cwd(), 'components', 'resources', 'GetCopyModal.tsx'),
+      path.join(process.cwd(), 'components', 'LiveTrainingSessions.tsx'),
+      path.join(process.cwd(), 'components', 'clarity-map', 'EmailCaptureModal.tsx'),
+    ];
+    for (const filePath of clientFormFiles) {
+      const src = fs.readFileSync(filePath, 'utf8');
+      assert.ok(src.includes('getAttributionData()'), `${path.basename(filePath)} must read getAttributionData()`);
+      assert.ok(src.includes('leadSource'), `${path.basename(filePath)} must send leadSource`);
+      assert.ok(src.includes('utmSource'), `${path.basename(filePath)} must send utmSource`);
+      assert.ok(src.includes('utmMedium'), `${path.basename(filePath)} must send utmMedium`);
+      assert.ok(src.includes('utmCampaign'), `${path.basename(filePath)} must send utmCampaign`);
+      assert.ok(src.includes('referrer'), `${path.basename(filePath)} must send referrer`);
+      assert.ok(src.includes('leadStatus'), `${path.basename(filePath)} must send leadStatus`);
+      assert.ok(src.includes('landingPage'), `${path.basename(filePath)} must send landingPage`);
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    if (prevEnv === undefined) delete process.env.VERCEL_ENV;
+    else process.env.VERCEL_ENV = prevEnv;
+    if (prevKey === undefined) delete process.env.LOOPS_API_KEY;
+    else process.env.LOOPS_API_KEY = prevKey;
   }
 });
 

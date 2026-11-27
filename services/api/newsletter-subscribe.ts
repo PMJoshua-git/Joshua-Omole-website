@@ -6,6 +6,15 @@ const router = express.Router();
 const newsletterSchema = z.object({
   firstName: z.string().optional(),
   email: z.string().email('Invalid email address'),
+  source: z.string().optional().default('Newsletter'),
+  leadSource: z.string().optional().default(''),
+  utmSource: z.string().optional().default(''),
+  utmMedium: z.string().optional().default(''),
+  utmCampaign: z.string().optional().default(''),
+  referrer: z.string().optional().default(''),
+  landingPage: z.string().optional().default('/newsletter'),
+  leadStatus: z.string().optional().default('New'),
+  leadType: z.string().optional().default('Newsletter Subscriber'),
 });
 
 router.post('/', async (req, res) => {
@@ -28,9 +37,17 @@ router.post('/', async (req, res) => {
       try {
         const loopsPayload = {
           email: data.email,
-          firstName: data.firstName || "",
-          source: "Newsletter",
-          userGroup: "Newsletter Subscriber"
+          firstName: data.firstName || '',
+          source: data.source || 'Newsletter',
+          leadSource: data.leadSource || 'direct',
+          userGroup: 'Newsletter Subscriber',
+          leadType: data.leadType || 'Newsletter Subscriber',
+          leadStatus: data.leadStatus || 'New',
+          landingPage: data.landingPage || '/newsletter',
+          utmSource: data.utmSource || '',
+          utmMedium: data.utmMedium || '',
+          utmCampaign: data.utmCampaign || '',
+          referrer: data.referrer || '',
         };
 
         const response = await fetch('https://app.loops.so/api/v1/contacts/create', {

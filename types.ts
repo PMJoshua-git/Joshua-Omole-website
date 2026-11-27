@@ -26,7 +26,7 @@ export interface Resource {
   shortDescription: string;
   longDescription: string;
   coverImageUrl: string;
-  downloadUrl?: string; // from Airtable mapping
+  downloadUrl?: string;
   estimatedReadingTime: string;
   format: string;
   displayOrder: number;

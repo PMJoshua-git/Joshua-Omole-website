@@ -5,6 +5,7 @@ import { UsersRound, X } from 'lucide-react';
 import Markdown from 'react-markdown';
 import Cal, { getCalApi } from "@calcom/embed-react";
 import { LiveTrainingSessionSkeleton } from './Skeleton';
+import { getAttributionData } from '../utils/attribution';
 
 const LiveTrainingSessions: React.FC = () => {
   const [sessions, setSessions] = useState<TrainingSession[]>([]);
@@ -67,20 +68,25 @@ const LiveTrainingSessions: React.FC = () => {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      const response = await fetch('/api/save-contact', {
+      const attribution = getAttributionData();
+      const response = await fetch('/api/book-training', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          tableName: 'Training Pipeline',
-          fields: {
-            "Name": formData.name,
-            "Email": formData.email,
-            "Location": formData.location,
-            "Expectations": formData.expectations || "",
-            "Session": selectedSession.title || "",
-            "Booking date": new Date().toISOString(),
-            "Status": "Pending"
-          }
+          name: formData.name,
+          email: formData.email,
+          location: formData.location,
+          expectations: formData.expectations || '',
+          sessionTitle: selectedSession.title || '',
+          source: 'Training page',
+          leadSource: attribution.lead_source || 'direct',
+          leadType: 'Training Booking',
+          leadStatus: 'Pending',
+          landingPage: attribution.landing_page || window.location.pathname,
+          utmSource: attribution.utm_source || '',
+          utmMedium: attribution.utm_medium || '',
+          utmCampaign: attribution.utm_campaign || '',
+          referrer: attribution.referrer || '',
         })
       });
       

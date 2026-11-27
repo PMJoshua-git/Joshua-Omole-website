@@ -26,6 +26,14 @@ export const reportRequestSchema = z.object({
   firstName: z.string().trim().min(1, 'First name is required').max(80),
   email: z.string().trim().toLowerCase().email('Please enter a valid email address').max(254),
   analysis: z.unknown(),
+  utmSource: z.string().max(200).optional().default(''),
+  utmMedium: z.string().max(200).optional().default(''),
+  utmCampaign: z.string().max(200).optional().default(''),
+  referrer: z.string().max(300).optional().default(''),
+  landingPage: z.string().max(300).optional().default(''),
+  leadSource: z.string().max(200).optional().default(''),
+  leadStatus: z.string().max(60).optional().default('New'),
+  leadType: z.string().max(80).optional().default('Clarity Map'),
 });
 
 /**

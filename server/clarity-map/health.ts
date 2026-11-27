@@ -66,8 +66,6 @@ export async function handleHealthRequest(
       RESEND_FROM_EMAIL: hasNonEmptyEnv('RESEND_FROM_EMAIL'),
       RESEND_REPLY_TO: hasNonEmptyEnv('RESEND_REPLY_TO'),
       LOOPS_API_KEY: hasNonEmptyEnv('LOOPS_API_KEY'),
-      AIRTABLE_API_KEY: hasNonEmptyEnv('AIRTABLE_API_KEY'),
-      AIRTABLE_BASE_ID: hasNonEmptyEnv('AIRTABLE_BASE_ID'),
     },
     gemini,
   });

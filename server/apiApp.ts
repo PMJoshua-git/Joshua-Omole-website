@@ -18,7 +18,6 @@ import {
   type SlidingWindowStore,
 } from './clarity-map/rateLimit/limiter.js';
 import {
-  handleSaveContactRequest,
   handleSubscribeRequest,
 } from './leads/handlers.js';
 import { buildSitemapXml } from './seo/sitemap.js';
@@ -114,9 +113,16 @@ const resourceRequestSchema = z.object({
   firstName: z.string().trim().min(1).max(80),
   email: z.string().trim().toLowerCase().email().max(254),
   website: z.string().optional().default(''), // honeypot
+  source: z.string().optional().default('Resources page'),
   leadSource: z.string().optional().default(''),
   landingPage: z.string().optional().default(''),
   utmParameters: z.string().optional().default(''),
+  utmSource: z.string().optional().default(''),
+  utmMedium: z.string().optional().default(''),
+  utmCampaign: z.string().optional().default(''),
+  referrer: z.string().optional().default(''),
+  leadStatus: z.string().optional().default('New'),
+  leadType: z.string().optional().default('Resource Download'),
 });
 
 async function addToLoops(opts: {
@@ -124,6 +130,14 @@ async function addToLoops(opts: {
   firstName: string;
   userGroup: string;
   source?: string;
+  leadSource?: string;
+  landingPage?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  referrer?: string;
+  leadStatus?: string;
+  leadType?: string;
 }) {
   if (!process.env.LOOPS_API_KEY) {
     console.warn('[Loops] LOOPS_API_KEY is not set in environment');
@@ -133,7 +147,15 @@ async function addToLoops(opts: {
     email: opts.email,
     firstName: opts.firstName || '',
     userGroup: opts.userGroup,
-    source: opts.source || 'joshuaomole.com',
+    source: opts.source || 'Resources page',
+    leadSource: opts.leadSource || 'direct',
+    leadType: opts.leadType || 'Resource Download',
+    leadStatus: opts.leadStatus || 'New',
+    landingPage: opts.landingPage || '',
+    utmSource: opts.utmSource || '',
+    utmMedium: opts.utmMedium || '',
+    utmCampaign: opts.utmCampaign || '',
+    referrer: opts.referrer || '',
   };
 
   const createRes = await fetch('https://app.loops.so/api/v1/contacts/create', {
@@ -217,7 +239,22 @@ export function createApiApp() {
         .json({ error: 'Please check your details and try again.' });
     }
 
-    const { slug, firstName, email, website, leadSource } = parseResult.data;
+    const {
+      slug,
+      firstName,
+      email,
+      website,
+      source,
+      leadSource,
+      landingPage,
+      utmParameters,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+      referrer,
+      leadStatus,
+      leadType,
+    } = parseResult.data;
 
     if (website && website.trim() !== '') {
       return res.status(200).json({ ok: true });
@@ -244,6 +281,8 @@ export function createApiApp() {
       });
     }
 
+    const utmParamsParsed = new URLSearchParams(utmParameters || '');
+
     const [emailResult, loopsResult] = await Promise.allSettled([
       sendResourceEmail({
         to: email,
@@ -255,7 +294,15 @@ export function createApiApp() {
         email,
         firstName,
         userGroup: resource.loopsGroup,
-        source: leadSource || 'Resources page',
+        source: source || 'Resources page',
+        leadSource: leadSource || 'direct',
+        landingPage: landingPage || `/resources/${slug}`,
+        utmSource: utmSource || utmParamsParsed.get('utm_source') || '',
+        utmMedium: utmMedium || utmParamsParsed.get('utm_medium') || '',
+        utmCampaign: utmCampaign || utmParamsParsed.get('utm_campaign') || '',
+        referrer: referrer || '',
+        leadStatus: leadStatus || 'New',
+        leadType: leadType || 'Resource Download',
       }),
     ]);
 
@@ -274,7 +321,6 @@ export function createApiApp() {
   });
 
   app.post('/api/subscribe', (req, res) => handleSubscribeRequest(req, res));
-  app.post('/api/save-contact', (req, res) => handleSaveContactRequest(req, res));
 
   return app;
 }

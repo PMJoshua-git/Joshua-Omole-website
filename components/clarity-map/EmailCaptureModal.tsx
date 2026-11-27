@@ -5,6 +5,7 @@ import {
   requestFullReport,
   trackClarityMapEvent,
 } from '../../features/clarity-map/services/clarityMapApi';
+import { getAttributionData } from '../../utils/attribution';
 
 interface EmailCaptureModalProps {
   isOpen: boolean;
@@ -90,10 +91,19 @@ const EmailCaptureModal: React.FC<EmailCaptureModalProps> = ({
     });
 
     try {
+      const attribution = getAttributionData();
       const response = await requestFullReport({
         firstName: cleanFirst,
         email: cleanEmail,
         analysis,
+        leadSource: attribution.lead_source || 'direct',
+        leadType: 'Clarity Map',
+        leadStatus: 'New',
+        landingPage: attribution.landing_page || window.location.pathname || '/clarity-map',
+        utmSource: attribution.utm_source || '',
+        utmMedium: attribution.utm_medium || '',
+        utmCampaign: attribution.utm_campaign || '',
+        referrer: attribution.referrer || '',
       });
 
       trackClarityMapEvent('report_sent', {
