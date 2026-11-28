@@ -30,5 +30,14 @@ export default async function handler(req: any, res: any) {
         error: 'An unexpected error occurred while analyzing your workflow. Please try again.',
       });
     }
+    if (!res.writableEnded && typeof res.end === 'function') {
+      res.end(
+        JSON.stringify({
+          ok: false,
+          statusCode: 500,
+          error: 'An unexpected error occurred while analyzing your workflow. Please try again.',
+        })
+      );
+    }
   }
 }

@@ -44,13 +44,21 @@ export interface HttpRequestLike extends RateLimitRequestLike {
   method?: string;
   body?: any;
   app?: { get?: (key: string) => unknown };
+  on?: (event: string, listener: (...args: any[]) => void) => any;
 }
 
 export interface HttpResponseLike {
   status(code: number): HttpResponseLike;
   json(payload: unknown): any;
   setHeader(name: string, value: string): any;
-  end?(): any;
+  end?(chunk?: any): any;
+  write?(chunk: any): boolean;
+  flushHeaders?(): void;
+  on?(event: string, listener: (...args: any[]) => void): any;
+  statusCode?: number;
+  headersSent?: boolean;
+  writableEnded?: boolean;
+  destroyed?: boolean;
 }
 
 export interface ClarityMapHandlerDeps {
@@ -69,6 +77,7 @@ export interface ClarityMapHandlerDeps {
   };
   analyzer?: typeof analyzeWorkflowWithGemini;
   trustProxy?: boolean;
+  keepAliveIntervalMs?: number;
 }
 
 export interface ClarityMapReportDeps {
@@ -209,14 +218,66 @@ export async function handleAnalyzeRequest(
     usedRedisFallback: reservation.reservationToken?.usedFallback ?? false,
   });
 
+  const canStreamKeepAlive =
+    typeof res.write === 'function' && typeof res.end === 'function';
+  let streamStarted = false;
+  let clientDisconnected = false;
+  let keepAliveTimer: ReturnType<typeof setInterval> | null = null;
+
+  const stopKeepAlive = () => {
+    if (keepAliveTimer) {
+      clearInterval(keepAliveTimer);
+      keepAliveTimer = null;
+    }
+  };
+
+  if (canStreamKeepAlive) {
+    const markDisconnected = () => {
+      clientDisconnected = true;
+      stopKeepAlive();
+    };
+    res.on?.('close', () => {
+      if (!res.writableEnded) {
+        markDisconnected();
+      }
+    });
+    req.on?.('aborted', markDisconnected);
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-transform');
+    res.setHeader('X-Accel-Buffering', 'no');
+    res.statusCode = 200;
+    res.flushHeaders?.();
+    streamStarted = true;
+
+    const writeKeepAliveByte = () => {
+      if (clientDisconnected || res.writableEnded || res.destroyed) {
+        stopKeepAlive();
+        return;
+      }
+      try {
+        res.write?.(' \n');
+      } catch {
+        stopKeepAlive();
+      }
+    };
+
+    writeKeepAliveByte();
+    const intervalMs = Math.max(10, deps.keepAliveIntervalMs ?? 4000);
+    keepAliveTimer = setInterval(writeKeepAliveByte, intervalMs);
+    (keepAliveTimer as any)?.unref?.();
+  }
+
   try {
     const analysis = await analyzer(sanitized, redactedPII);
+    stopKeepAlive();
     console.info('[ClarityMap /analyze] Analysis succeeded:', {
       processCode: sanitized.process_code,
       totalMs: Date.now() - startedAt,
       readiness: analysis.readiness?.score_percent,
     });
-    return res.status(200).json({
+
+    const successBody = {
       ok: true,
       analysis,
       redactedPII,
@@ -225,40 +286,68 @@ export async function handleAnalyzeRequest(
         remaining: reservation.remaining,
         reset_at: reservation.reset_at,
       },
-    });
+    };
+
+    if (streamStarted) {
+      if (!res.writableEnded && !res.destroyed) {
+        res.end!(JSON.stringify(successBody));
+      }
+      return res;
+    }
+
+    return res.status(200).json(successBody);
   } catch (err: any) {
+    stopKeepAlive();
     // Refund reserved slot on any AI, validation, or server error
     await limiter.releaseGenerationSlot(reservation.reservationToken);
     const totalMs = Date.now() - startedAt;
 
+    let errorStatusCode = 500;
+    let errorMessage =
+      'An unexpected error occurred while analyzing your workflow. Please try again.';
+
     if (err instanceof GeminiConfigurationError) {
+      errorStatusCode = 503;
+      errorMessage = 'Clarity Map analysis is temporarily unavailable on the server.';
       console.error('[ClarityMap /analyze] Configuration error:', {
         processCode: sanitized.process_code,
         statusCode: 503,
         totalMs,
         message: String(err.message || '').slice(0, 200),
       });
-      return res.status(503).json({
-        error: 'Clarity Map analysis is temporarily unavailable on the server.',
-      });
-    }
-    if (err instanceof GeminiAnalysisError) {
+    } else if (err instanceof GeminiAnalysisError) {
+      errorStatusCode = err.statusCode;
+      errorMessage = err.message;
       console.error('[ClarityMap /analyze] Gemini analysis error:', {
         processCode: sanitized.process_code,
         statusCode: err.statusCode,
         totalMs,
         message: String(err.message || '').slice(0, 200),
       });
-      return res.status(err.statusCode).json({ error: err.message });
+    } else {
+      console.error('[ClarityMap /analyze] Unexpected error:', {
+        processCode: sanitized.process_code,
+        totalMs,
+        name: err?.name,
+        message: String(err?.message || err || '').slice(0, 200),
+      });
     }
-    console.error('[ClarityMap /analyze] Unexpected error:', {
-      processCode: sanitized.process_code,
-      totalMs,
-      name: err?.name,
-      message: String(err?.message || err || '').slice(0, 200),
-    });
-    return res.status(500).json({
-      error: 'An unexpected error occurred while analyzing your workflow. Please try again.',
+
+    if (streamStarted) {
+      if (!res.writableEnded && !res.destroyed) {
+        res.end!(
+          JSON.stringify({
+            ok: false,
+            statusCode: errorStatusCode,
+            error: errorMessage,
+          })
+        );
+      }
+      return res;
+    }
+
+    return res.status(errorStatusCode).json({
+      error: errorMessage,
     });
   }
 }

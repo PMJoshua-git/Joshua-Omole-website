@@ -50,6 +50,47 @@ const AnalysisLoading: React.FC<AnalysisLoadingProps> = ({
     return () => window.clearInterval(interval);
   }, [error]);
 
+  // Request Screen Wake Lock while analyzing so mobile devices don't lock mid-request
+  useEffect(() => {
+    if (error || typeof window === 'undefined' || typeof navigator === 'undefined') return;
+
+    let cancelled = false;
+    let sentinel: { release?: () => Promise<void> } | null = null;
+
+    const requestWakeLock = async () => {
+      try {
+        const wakeLockApi = (navigator as any).wakeLock;
+        if (!wakeLockApi || typeof wakeLockApi.request !== 'function') return;
+        const lock = await wakeLockApi.request('screen');
+        if (cancelled) {
+          await lock?.release?.().catch(() => {});
+          return;
+        }
+        sentinel = lock;
+      } catch {
+        // Wake Lock may be unavailable or denied in battery-saver/private mode
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && !cancelled) {
+        requestWakeLock();
+      }
+    };
+
+    requestWakeLock();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      cancelled = true;
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (sentinel && typeof sentinel.release === 'function') {
+        sentinel.release().catch(() => {});
+      }
+      sentinel = null;
+    };
+  }, [error]);
+
   if (error) {
     return (
       <div className="max-w-xl mx-auto my-8 bg-sage-surface border border-sage-border rounded-2xl p-8 space-y-5">
@@ -93,7 +134,7 @@ const AnalysisLoading: React.FC<AnalysisLoadingProps> = ({
           Building your Clarity Map for {processName}
         </h2>
         <p className="text-sm text-sage-sec">
-          This takes a few seconds while we evaluate your workflow against the BRIDGE framework.
+          This usually takes 15–45 seconds while we evaluate your workflow against the BRIDGE framework.
         </p>
       </div>
 
@@ -132,6 +173,10 @@ const AnalysisLoading: React.FC<AnalysisLoadingProps> = ({
             </div>
           );
         })}
+      </div>
+
+      <div className="bg-sage-surface-2 border border-sage-border rounded-xl px-4 py-3 text-xs text-sage-sec leading-relaxed">
+        Please keep this page open until your map appears—switching apps or locking your phone screen can interrupt the connection.
       </div>
     </div>
   );

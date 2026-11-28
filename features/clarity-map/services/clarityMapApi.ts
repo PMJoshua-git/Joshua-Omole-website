@@ -59,6 +59,35 @@ export class HighDemandError extends Error {
   }
 }
 
+export class NetworkConnectionError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'NetworkConnectionError';
+  }
+}
+
+function isBrowserOffline(): boolean {
+  return typeof navigator !== 'undefined' && navigator.onLine === false;
+}
+
+function createFriendlyNetworkError(action: 'analyze' | 'report'): NetworkConnectionError {
+  if (isBrowserOffline()) {
+    return new NetworkConnectionError(
+      action === 'analyze'
+        ? 'You appear to be offline. Reconnect to Wi-Fi or mobile data and tap "Try analysis again".'
+        : 'You appear to be offline. Reconnect to Wi-Fi or mobile data and try sending the report again.'
+    );
+  }
+  if (action === 'analyze') {
+    return new NetworkConnectionError(
+      'Your connection was interrupted before the workflow map could finish. Please keep this page open (don\'t lock your screen or switch apps) and tap "Try analysis again". If this keeps happening on mobile, try opening this page directly in Chrome or Safari or switching between Wi-Fi and mobile data.'
+    );
+  }
+  return new NetworkConnectionError(
+    "We couldn't reach the server to send your report. Please check your connection and try again."
+  );
+}
+
 export async function fetchLimitStatus(): Promise<LimitStatusResponse | null> {
   try {
     const res = await fetch('/api/clarity-map/limit-status', {
@@ -83,18 +112,30 @@ export async function fetchLimitStatus(): Promise<LimitStatusResponse | null> {
 export async function analyzeWorkflow(
   submission: QuestionnaireSubmission
 ): Promise<AnalyzeResponse> {
-  const res = await fetch('/api/clarity-map/analyze', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(submission),
-  });
+  let res: Response;
+  try {
+    res = await fetch('/api/clarity-map/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(submission),
+    });
+  } catch {
+    throw createFriendlyNetworkError('analyze');
+  }
 
-  const rawText = await res.text().catch(() => '');
+  let rawText = '';
+  try {
+    rawText = await res.text();
+  } catch {
+    throw createFriendlyNetworkError('analyze');
+  }
+
+  const trimmedText = rawText.trim();
   let payload: any = {};
   let isJson = false;
-  if (rawText) {
+  if (trimmedText) {
     try {
-      const parsed = JSON.parse(rawText);
+      const parsed = JSON.parse(trimmedText);
       if (parsed && typeof parsed === 'object') {
         payload = parsed;
         isJson = true;
@@ -104,7 +145,14 @@ export async function analyzeWorkflow(
     }
   }
 
-  if (res.status === 429 || payload?.error === 'rate_limited') {
+  const effectiveStatus =
+    !res.ok
+      ? res.status
+      : payload?.ok === false && typeof payload?.statusCode === 'number'
+      ? payload.statusCode
+      : res.status;
+
+  if (effectiveStatus === 429 || payload?.error === 'rate_limited') {
     throw new RateLimitError({
       limit: payload?.limit,
       remaining: payload?.remaining,
@@ -113,16 +161,16 @@ export async function analyzeWorkflow(
     });
   }
 
-  if (res.status === 503 && payload?.error === 'high_demand') {
+  if (effectiveStatus === 503 && payload?.error === 'high_demand') {
     throw new HighDemandError();
   }
 
-  if (!res.ok) {
+  if (!res.ok || payload?.ok === false) {
     if (!isJson) {
-      if (res.status === 504) {
+      if (effectiveStatus === 504) {
         throw new Error('The analysis took longer than expected. Please try again.');
       }
-      if (res.status >= 500) {
+      if (effectiveStatus >= 500) {
         throw new Error('Something went wrong on our side. Please try again in a moment.');
       }
     }
@@ -146,11 +194,16 @@ export async function requestFullReport(opts: {
   leadStatus?: string;
   leadType?: string;
 }): Promise<ReportResponse> {
-  const res = await fetch('/api/clarity-map/report', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(opts),
-  });
+  let res: Response;
+  try {
+    res = await fetch('/api/clarity-map/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(opts),
+    });
+  } catch {
+    throw createFriendlyNetworkError('report');
+  }
 
   const payload = (await res.json().catch(() => ({}))) as any;
   if (!res.ok) {

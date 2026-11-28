@@ -399,8 +399,8 @@ const BusinessWorkflowFixes: React.FC = () => {
 
   const serviceName = activeOffer?.name || 'Workflow Fix';
   const prefilledText = `Hey Joshua, I am ${firstName || 'there'}, I need more details about the ${serviceName} service.`;
-  const whatsappUrl = `https://wa.me/2348000000000?text=${encodeURIComponent(prefilledText)}`;
-  const telegramUrl = `https://t.me/joshuaomole`;
+  const whatsappUrl = `https://wa.me/2349028313630?text=${encodeURIComponent(prefilledText)}`;
+  const telegramUrl = `https://t.me/joshuaomole?text=${encodeURIComponent(prefilledText)}`;
   const linkedinUrl = `https://www.linkedin.com/in/joshuaolaaduraomole`;
 
   return (

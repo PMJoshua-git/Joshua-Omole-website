@@ -2,7 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
 import { handleHealthRequest } from '../server/clarity-map/health.js';
+import { handleAnalyzeRequest } from '../server/clarity-map/handlers.js';
 import {
+  GeminiAnalysisError,
   getFallbackGeminiModel,
   getPrimaryGeminiModel,
   isTransientGeminiError,
@@ -13,6 +15,7 @@ import { computeVolumeContext } from '../features/clarity-map/services/volumeCon
 import {
   analyzeWorkflow,
   HighDemandError,
+  NetworkConnectionError,
   RateLimitError,
 } from '../features/clarity-map/services/clarityMapApi.js';
 import fs from 'node:fs';
@@ -1402,3 +1405,169 @@ test('Production fix: normalizeGeminiOutputForV2 enforces low-volume cap <= 2, a
   assert.ok(opNodes.length <= 2);
 });
 
+test('Mobile hardening: analyzeWorkflow replaces raw Failed to fetch and handles keep-alive streamed responses', async () => {
+  const originalFetch = globalThis.fetch;
+  try {
+    // 1. Raw TypeError("Failed to fetch") becomes NetworkConnectionError with clear mobile retry copy
+    globalThis.fetch = (async () => {
+      throw new TypeError('Failed to fetch');
+    }) as any;
+    await assert.rejects(
+      () => analyzeWorkflow(dummySubmission as any),
+      (err: any) =>
+        err instanceof NetworkConnectionError &&
+        !/Failed to fetch/i.test(err.message) &&
+        err.message.includes('Try analysis again')
+    );
+
+    // 2. Streamed keep-alive leading whitespace + valid JSON parses cleanly
+    globalThis.fetch = (async () =>
+      new Response(' \n \n \n' + JSON.stringify({ ok: true, analysis: { readiness: { score_percent: 72 } } }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      })) as any;
+    const okRes = await analyzeWorkflow(dummySubmission as any);
+    assert.equal(okRes.ok, true);
+    assert.equal(okRes.analysis.readiness.score_percent, 72);
+
+    // 3. Streamed keep-alive whitespace + structured error payload surfaces clean error
+    globalThis.fetch = (async () =>
+      new Response(
+        ' \n \n' +
+          JSON.stringify({
+            ok: false,
+            statusCode: 502,
+            error: 'AI provider returned incomplete data. Please retry.',
+          }),
+        { status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
+      )) as any;
+    await assert.rejects(
+      () => analyzeWorkflow(dummySubmission as any),
+      /AI provider returned incomplete data\. Please retry\./
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('Mobile hardening: handleAnalyzeRequest streams keep-alive whitespace while analyzer runs and emits valid JSON on success and error', async () => {
+  const validSubmission = {
+    industry: 'Professional Services',
+    industry_id: 'professional_services',
+    process_code: 'CLIENT_ONBOARDING',
+    process_name: 'Client Onboarding',
+    questionnaire_version: '2.0',
+    answers: [
+      {
+        qid: 'q1',
+        question: 'How do clients sign up?',
+        answer: 'Email and spreadsheet',
+      },
+    ],
+  };
+
+  function createStreamingMockRes() {
+    const chunks: string[] = [];
+    const res: any = {
+      statusCode: 200,
+      headers: {} as Record<string, string>,
+      headersSent: false,
+      writableEnded: false,
+      destroyed: false,
+      chunks,
+      status(code: number) {
+        res.statusCode = code;
+        return res;
+      },
+      setHeader(name: string, value: string) {
+        res.headers[name.toLowerCase()] = value;
+        return res;
+      },
+      flushHeaders() {
+        res.headersSent = true;
+      },
+      write(chunk: string) {
+        res.headersSent = true;
+        chunks.push(String(chunk));
+        return true;
+      },
+      end(chunk?: string) {
+        if (chunk !== undefined) chunks.push(String(chunk));
+        res.writableEnded = true;
+        return res;
+      },
+      json(data: any) {
+        res.end(JSON.stringify(data));
+        return res;
+      },
+      on() {
+        return res;
+      },
+    };
+    return res;
+  }
+
+  let released = 0;
+  const mockLimiter: any = {
+    async reserveGenerationSlot() {
+      return {
+        allowed: true,
+        limit: 2,
+        remaining: 1,
+        reset_at: null,
+        retry_after_seconds: 0,
+        headers: {},
+        reservationToken: { key: 'k', member: 'm', usedFallback: true },
+      };
+    },
+    async releaseGenerationSlot() {
+      released += 1;
+    },
+    async checkLimitStatus() {
+      return { limit: 2, remaining: 1, reset_at: null, limited: false };
+    },
+  };
+
+  // Success case with multiple keep-alive heartbeats
+  const successRes = createStreamingMockRes();
+  await handleAnalyzeRequest(
+    { method: 'POST', body: validSubmission, headers: {} },
+    successRes,
+    {
+      limiter: mockLimiter,
+      keepAliveIntervalMs: 15,
+      analyzer: async () => {
+        await new Promise((r) => setTimeout(r, 55));
+        return { readiness: { score_percent: 80, band: 'Ready' } } as any;
+      },
+    }
+  );
+  assert.equal(successRes.statusCode, 200);
+  assert.equal(successRes.writableEnded, true);
+  assert.ok(successRes.chunks.length >= 3, `Expected keep-alive chunks, got ${successRes.chunks.length}`);
+  assert.equal(successRes.headers['x-accel-buffering'], 'no');
+  const parsedSuccess = JSON.parse(successRes.chunks.join('').trim());
+  assert.equal(parsedSuccess.ok, true);
+  assert.equal(parsedSuccess.analysis.readiness.score_percent, 80);
+
+  // Error case refunds slot and writes structured JSON error at end of stream
+  const errRes = createStreamingMockRes();
+  await handleAnalyzeRequest(
+    { method: 'POST', body: validSubmission, headers: {} },
+    errRes,
+    {
+      limiter: mockLimiter,
+      keepAliveIntervalMs: 15,
+      analyzer: async () => {
+        await new Promise((r) => setTimeout(r, 25));
+        throw new GeminiAnalysisError('Temporary overload on upstream AI.', 503);
+      },
+    }
+  );
+  assert.equal(released, 1);
+  assert.equal(errRes.writableEnded, true);
+  const parsedErr = JSON.parse(errRes.chunks.join('').trim());
+  assert.equal(parsedErr.ok, false);
+  assert.equal(parsedErr.statusCode, 503);
+  assert.equal(parsedErr.error, 'Temporary overload on upstream AI.');
+});
