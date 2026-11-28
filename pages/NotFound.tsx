@@ -22,7 +22,7 @@ const BrokenRouteMark: React.FC = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     aria-hidden="true"
-    className="w-36 h-7 mx-auto mb-6 text-sage-primary"
+    className="not-found-mark w-36 h-7 mx-auto mb-6 text-sage-primary"
   >
     <line x1="16" y1="14" x2="60" y2="14" stroke="#DDE3DE" strokeWidth="1.5" />
     <line
@@ -87,41 +87,41 @@ const NotFound: React.FC = () => {
       <Layout>
         <section
           aria-labelledby="not-found-heading"
-          className="min-h-[calc(100vh-16rem)] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20 sm:py-28"
+          className="not-found-section min-h-[calc(100vh-16rem)] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20 sm:py-28"
         >
-          <div className="max-w-2xl mx-auto w-full text-center">
+          <div className="not-found-container max-w-2xl mx-auto w-full text-center">
             <BrokenRouteMark />
 
             <p
               aria-label="Error 404"
-              className="font-mono text-2xl sm:text-3xl font-semibold tracking-[0.18em] text-sage-primary mb-4 select-none"
+              className="not-found-code font-mono text-2xl sm:text-3xl font-semibold tracking-[0.18em] text-sage-primary mb-4 select-none"
             >
               404
             </p>
 
             <h1
               id="not-found-heading"
-              className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-sage-text tracking-tight leading-[1.15] mb-5 break-words"
+              className="not-found-headline font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-sage-text tracking-tight leading-[1.15] mb-5 break-words"
             >
               {message.headline}
             </h1>
 
-            <p className="font-sans text-base sm:text-lg text-sage-sec leading-relaxed max-w-xl mx-auto mb-4">
+            <p className="not-found-description font-sans text-base sm:text-lg text-sage-sec leading-relaxed max-w-xl mx-auto mb-4">
               {message.description}
             </p>
 
             {message.context && (
-              <p className="font-sans text-sm sm:text-base text-sage-muted leading-relaxed max-w-lg mx-auto mb-10">
+              <p className="not-found-context font-sans text-sm sm:text-base text-sage-muted leading-relaxed max-w-lg mx-auto mb-10">
                 {message.context}
               </p>
             )}
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 mt-8">
+            <div className="not-found-actions flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 mt-8">
               <Button
                 to="/"
                 variant="primary"
                 size="default"
-                className="w-full sm:w-auto min-w-[180px] gap-2"
+                className="not-found-btn not-found-btn--primary w-full sm:w-auto min-w-[180px] gap-2"
               >
                 <ArrowLeft className="w-4 h-4 shrink-0" aria-hidden="true" />
                 <span>Return Home</span>
@@ -131,7 +131,7 @@ const NotFound: React.FC = () => {
                 to="/services"
                 variant="secondary"
                 size="default"
-                className="w-full sm:w-auto min-w-[180px] gap-2"
+                className="not-found-btn not-found-btn--secondary w-full sm:w-auto min-w-[180px] gap-2"
               >
                 <span>View my service</span>
                 <ArrowRight className="w-4 h-4 shrink-0" aria-hidden="true" />

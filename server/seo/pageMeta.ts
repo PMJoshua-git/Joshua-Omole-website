@@ -403,14 +403,19 @@ export function renderSsrBodyHtml(
     }
 
     const bodyHtml = [
-      renderSsrHeaderHtml(),
-      '<main>',
-      '<p>404</p>',
-      '<h1>Page not found.</h1>',
-      '<p>The page you are looking for could not be found.</p>',
-      '<p><a href="/">Return Home</a> <a href="/services">View my service</a></p>',
+      '<main class="not-found-section">',
+      '<noscript>',
+      '<div class="not-found-container">',
+      '<p class="not-found-code">404</p>',
+      '<h1 class="not-found-headline">Page not found.</h1>',
+      '<p class="not-found-description">The page you are looking for could not be found.</p>',
+      '<div class="not-found-actions">',
+      '<a href="/" class="not-found-btn not-found-btn--primary">Return Home</a>',
+      '<a href="/services" class="not-found-btn not-found-btn--secondary">View my service</a>',
+      '</div>',
+      '</div>',
+      '</noscript>',
       '</main>',
-      renderSsrFooterHtml(),
     ].join('\n');
 
     return { bodyHtml, preloadPublicResources: null };
