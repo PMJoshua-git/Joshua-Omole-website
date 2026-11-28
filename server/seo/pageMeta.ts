@@ -194,7 +194,25 @@ export function resolvePageMeta(
 
   const isResourceIndex =
     cleanPath === '/resources' || cleanPath === '/knowledge-hub' || cleanPath === '/knowledge';
-  const matched = ROUTE_META_MAP[cleanPath] || ROUTE_META_MAP['/'];
+  const matched = ROUTE_META_MAP[cleanPath];
+
+  if (!matched) {
+    return {
+      title: '404 — Page Not Found | Joshua Omole',
+      description:
+        'The page you are looking for could not be found. Return home or view services on JoshuaOmole.com.',
+      url: `${siteUrl}${cleanPath}`,
+      canonicalUrl: null,
+      image: defaultImage,
+      type: 'website',
+      robots: 'noindex, nofollow',
+      statusCode: 404,
+      isNotFound: true,
+      isResourceRoute: false,
+      isResourceIndex: false,
+    };
+  }
+
   const canonicalPath = matched.canonicalPath ?? cleanPath;
   const canonicalUrl = `${siteUrl}${canonicalPath === '/' ? '/' : canonicalPath}`;
 
@@ -370,12 +388,27 @@ export function renderSsrBodyHtml(
   entries: readonly ResourceEntry[] = registryResources
 ): { bodyHtml: string; preloadPublicResources: ResourcePublic[] | null } {
   if (meta.isNotFound) {
+    if (meta.isResourceRoute) {
+      const bodyHtml = [
+        renderSsrHeaderHtml(),
+        '<main>',
+        '<h1>Resource not found</h1>',
+        '<p>This resource could not be found or is no longer available.</p>',
+        '<p><a href="/resources">Back to Resources</a></p>',
+        '</main>',
+        renderSsrFooterHtml(),
+      ].join('\n');
+
+      return { bodyHtml, preloadPublicResources: null };
+    }
+
     const bodyHtml = [
       renderSsrHeaderHtml(),
       '<main>',
-      '<h1>Resource not found</h1>',
-      '<p>This resource could not be found or is no longer available.</p>',
-      '<p><a href="/resources">Back to Resources</a></p>',
+      '<p>404</p>',
+      '<h1>Page not found.</h1>',
+      '<p>The page you are looking for could not be found.</p>',
+      '<p><a href="/">Return Home</a> <a href="/services">View my service</a></p>',
       '</main>',
       renderSsrFooterHtml(),
     ].join('\n');

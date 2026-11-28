@@ -12,6 +12,7 @@ import KnowledgeHub from './pages/KnowledgeHub';
 import ResourceDetail from './pages/ResourceDetail';
 import BusinessWorkflowFixes from './pages/BusinessWorkflowFixes';
 import ClarityMap from './pages/ClarityMap';
+import NotFound from './pages/NotFound';
 import FloatingAssistant from './components/FloatingAssistant';
 import ClarityMapPopup from './components/ClarityMapPopup';
 import { captureAttributionData } from './utils/attribution';
@@ -37,8 +38,10 @@ const PageTitleUpdater = () => {
 
   useEffect(() => {
     const cleanPath = pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
-    const title = TITLE_MAP[cleanPath] || TITLE_MAP["/"];
-    document.title = title;
+    const title = TITLE_MAP[cleanPath];
+    if (title) {
+      document.title = title;
+    }
   }, [pathname]);
 
   return null;
@@ -85,6 +88,7 @@ const App: React.FC = () => {
         <Route path="/knowledge" element={<Navigate to="/resources" replace />} />
         <Route path="/business-workflow-fixes" element={<BusinessWorkflowFixes />} />
         <Route path="/clarity-map" element={<ClarityMap />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <ClarityMapPopup />
     </Router>
